@@ -8,6 +8,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import map.MapGenerator;
+import types.Tile;
 import ui.tiles.DefaultTileSet;
 import ui.tiles.TileRenderLayer;
 import ui.tiles.TileRenderer;
@@ -28,7 +29,7 @@ public class GameView {
        this.renderer = new TileRenderer();
     }
 
-    public void displayGameScreen(int[][] tileMap) {
+    public void displayGameScreen(Tile[][] tileMap) {
         DefaultTileSet tileSet = new DefaultTileSet("tilesets/defaultTileSet.png", 4, 3, 100, 100);
         this.renderer.addRenderLayer(new TileRenderLayer(tileMap.length, tileMap[0].length, tileMap, tileSet));
 

@@ -1,5 +1,7 @@
 package map;
 
+import types.Tile;
+
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
@@ -30,19 +32,19 @@ public class MapGenerator {
             for (int x = 0; x < this.mapWidth; x++)
             {
                 double value = noise.eval(x / this.featureSize, y / this.featureSize, 0.0);
-                int height;
+                int height = -1;
 
                 if (value <= -0.2) {
                     height = -1;
                 }
                 else if (value < 0.2) {
-                    height = 1;
+                    height = 0;
                 }
                 else if (value < 0.6){
-                    height = 2;
+                    height = 1;
                 }
                 else {
-                    height = 3;
+                    height = 2;
                 }
 
                 mapHeights[x][y] = height;
@@ -51,17 +53,26 @@ public class MapGenerator {
         return mapHeights;
     }
 
-    public int[][] convertHeightMapToTileMap(int[][] heightMap) {
+    public Tile[][] convertHeightMapToTileMap(int[][] heightMap) {
         Random random = new Random(seed);
-        int[][] tileMap = new int[heightMap.length][heightMap[0].length];
+        Tile[][] tileMap = new Tile[heightMap.length][heightMap[0].length];
+
+        for (int x = 0; x < heightMap.length; x++) {
+            System.out.printf("[");
+            for (int y = 0; y < heightMap[0].length; y++) {
+                System.out.printf(heightMap[x][y] + ", ");
+            }
+            System.out.printf("]\n");
+        }
 
         for (int x = 0; x < heightMap.length; x++) {
             for (int y = 0; y < heightMap[0].length; y++) {
-                boolean isLand = heightMap[x][y] > 0;
+                boolean isLand = heightMap[x][y] >= 0;
 
-                tileMap[x][y] = isLand ? 1 : 0;
+                Tile tile = new Tile(heightMap[x][y], isLand ? 1 : 0);
 
-                if (isLand) tileMap[x][y] = random.nextDouble() < 0.1 ? 2 : 1;
+                if (isLand) tile.tileIndex = random.nextDouble() < 0.1 ? 2 : 1;
+                tileMap[x][y] = tile;
             }
         }
 
