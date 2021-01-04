@@ -18,13 +18,13 @@ public class GameView {
 
     Canvas canvas;
 
-    final String TILE_SET_URI = "tilesets/defaultTileSet.png";
+    final String TILE_SET_URI = "tilesets/pixelArtTileSet.png";
 
-    final int TILE_SET_COLS = 4;
-    final int TILE_SET_ROWS = 3;
+    final int TILE_SET_COLS = 3;
+    final int TILE_SET_ROWS = 1;
 
-    final int TILE_WIDTH = 100;
-    final int TILE_HEIGHT = 100;
+    final int TILE_WIDTH = 64;
+    final int TILE_HEIGHT = 64;
 
     public GameView(Stage stage) {
        this.stage = stage;
@@ -35,10 +35,16 @@ public class GameView {
 
     public void displayGameScreen(Tile[][] tileMap) {
         DefaultTileSet tileSet = new DefaultTileSet(this.TILE_SET_URI, this.TILE_SET_COLS, this.TILE_SET_ROWS, this.TILE_WIDTH, this.TILE_HEIGHT);
-        this.renderer.addRenderLayer(new TileRenderLayer(tileMap.length, tileMap[0].length, tileMap, tileSet));
+        TileRenderLayer landscapeLayer = new TileRenderLayer(tileMap.length, tileMap[0].length, tileMap, tileSet);
+        landscapeLayer.setOffsetFromCenterY(9);
+        landscapeLayer.makeInteractable(this.gameLoop);
+        this.renderer.addRenderLayer(landscapeLayer);
+
 
         StackPane root = new StackPane();
         this.canvas = new Canvas(1024, 768);
+        this.canvas.widthProperty().bind(this.stage.widthProperty());
+        this.canvas.heightProperty().bind(this.stage.heightProperty());
 
         root.getChildren().add(this.canvas);
 
@@ -46,7 +52,7 @@ public class GameView {
         this.gameLoop.setInitialOffset((int) (this.canvas.getWidth()) / 2, (tileMap[0].length * this.TILE_HEIGHT) / 4);
         this.gameLoop.startGame();
 
-        this.stage.setScene(new Scene(root));
+        this.stage.setScene(new Scene(root, 1024, 768));
         this.stage.show();
     }
 }

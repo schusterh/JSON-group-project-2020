@@ -4,6 +4,8 @@ import map.MapGenerator;
 import types.Tile;
 import ui.GameView;
 
+import java.util.Random;
+
 public class Wirtschaftssimulator extends Application {
 
     GameView view;
@@ -12,7 +14,9 @@ public class Wirtschaftssimulator extends Application {
     public void start(Stage primaryStage) throws Exception {
         this.view = new GameView(primaryStage);
 
-        MapGenerator mapGen = new MapGenerator(100, 100, 2045731057);
+        Random r = new Random(System.currentTimeMillis());
+
+        MapGenerator mapGen = new MapGenerator(400, 300, r.nextLong());
         int[][] heightMap = mapGen.generateHeightmap();
 
         Tile[][] tileMap = mapGen.convertHeightMapToTileMap(heightMap);

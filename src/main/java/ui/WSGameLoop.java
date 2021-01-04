@@ -20,13 +20,17 @@ public class WSGameLoop implements GameLoop {
     int panY;
 
     private void prepareCanvas() {
-        this.gc.setFill(new Color(1.0, 1.0, 1.0, 1.0));
+        this.gc.setFill(new Color(0.168, 0.396, 0.592, 1.0));
         this.gc.fillRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
     }
 
     public void setInitialOffset(int offsetX, int offsetY) {
         this.panX = offsetX;
         this.panY = -offsetY;
+    }
+
+    public int[] getMousePosition() {
+        return new int[]{this.mouseX, this.mouseY};
     }
 
     @Override
@@ -67,8 +71,6 @@ public class WSGameLoop implements GameLoop {
         else if (this.mouseX > (this.canvas.getWidth() - 50) && this.mouseX < this.canvas.getWidth()) this.panX -= 10;
         else if (this.mouseY > 0 && this.mouseY < 50) this.panY += 10;
         else if (this.mouseY > (this.canvas.getHeight() - 50) && this.mouseY < this.canvas.getHeight()) this.panY -= 10;
-
-        System.out.println("Pan: [" + this.panX + ", " + this.panY + "]");
     }
 
     @Override

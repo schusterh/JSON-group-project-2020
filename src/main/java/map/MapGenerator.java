@@ -32,7 +32,7 @@ public class MapGenerator {
                 double value = noise.eval(x / this.featureSize, y / this.featureSize, 0.0);
                 int height;
 
-                if (value <= -0.2) {
+                if (value <= -0.4) {
                     height = -1;
                 }
                 else if (value < 0.2) {
