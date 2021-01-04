@@ -20,7 +20,7 @@ public class WSGameLoop implements GameLoop {
     int panY;
 
     private void prepareCanvas() {
-        this.gc.setFill(new Color(0.168, 0.396, 0.592, 1.0));
+        this.gc.setFill(Color.web("#a96868"));
         this.gc.fillRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
     }
 

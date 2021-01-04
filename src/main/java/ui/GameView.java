@@ -2,7 +2,9 @@ package ui;
 
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import types.Tile;
 import ui.tiles.DefaultTileSet;
@@ -16,15 +18,16 @@ public class GameView {
     WSGameLoop gameLoop;
     TileRenderer renderer;
 
+    HBox topBar;
     Canvas canvas;
 
-    final String TILE_SET_URI = "tilesets/pixelArtTileSet.png";
+    final String TILE_SET_URI = "tilesets/1BitPixelArtTileSet.png";
 
-    final int TILE_SET_COLS = 3;
+    final int TILE_SET_COLS = 4;
     final int TILE_SET_ROWS = 1;
 
-    final int TILE_WIDTH = 64;
-    final int TILE_HEIGHT = 64;
+    final int TILE_WIDTH = 32;
+    final int TILE_HEIGHT = 32;
 
     public GameView(Stage stage) {
        this.stage = stage;
@@ -36,12 +39,13 @@ public class GameView {
     public void displayGameScreen(Tile[][] tileMap) {
         DefaultTileSet tileSet = new DefaultTileSet(this.TILE_SET_URI, this.TILE_SET_COLS, this.TILE_SET_ROWS, this.TILE_WIDTH, this.TILE_HEIGHT);
         TileRenderLayer landscapeLayer = new TileRenderLayer(tileMap.length, tileMap[0].length, tileMap, tileSet);
-        landscapeLayer.setOffsetFromCenterY(9);
+        landscapeLayer.setOffsetFromCenterY(5);
         landscapeLayer.makeInteractable(this.gameLoop);
         this.renderer.addRenderLayer(landscapeLayer);
 
 
-        StackPane root = new StackPane();
+        VBox root = new VBox();
+        this.topBar = new HBox();
         this.canvas = new Canvas(1024, 768);
         this.canvas.widthProperty().bind(this.stage.widthProperty());
         this.canvas.heightProperty().bind(this.stage.heightProperty());

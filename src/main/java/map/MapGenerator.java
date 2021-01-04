@@ -61,7 +61,9 @@ public class MapGenerator {
 
                 Tile tile = new Tile(heightMap[x][y], isLand ? 1 : 0);
 
-                if (isLand) tile.tileIndex = random.nextDouble() < 0.1 ? 2 : 1;
+                if (isLand) {
+                    tile.tileIndex = random.nextDouble() < 0.1 ? 3 : 1;
+                }
                 tileMap[x][y] = tile;
             }
         }
