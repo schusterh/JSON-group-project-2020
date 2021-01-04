@@ -2,14 +2,13 @@ package map;
 
 import types.Tile;
 
-import java.awt.image.BufferedImage;
 import java.util.Random;
 
 public class MapGenerator {
 
-    private int mapWidth;
-    private int mapHeight;
-    private double featureSize;
+    private final int mapWidth;
+    private final int mapHeight;
+    private final double featureSize;
 
     public long seed;
 
@@ -23,7 +22,6 @@ public class MapGenerator {
     public int[][] generateHeightmap() {
 
         OpenSimplexNoise noise = new OpenSimplexNoise(seed);
-        BufferedImage image = new BufferedImage(this.mapWidth, this.mapHeight, BufferedImage.TYPE_INT_RGB);
 
         int[][] mapHeights = new int[this.mapWidth][this.mapHeight];
 
@@ -32,7 +30,7 @@ public class MapGenerator {
             for (int x = 0; x < this.mapWidth; x++)
             {
                 double value = noise.eval(x / this.featureSize, y / this.featureSize, 0.0);
-                int height = -1;
+                int height;
 
                 if (value <= -0.2) {
                     height = -1;
@@ -58,14 +56,6 @@ public class MapGenerator {
         Tile[][] tileMap = new Tile[heightMap.length][heightMap[0].length];
 
         for (int x = 0; x < heightMap.length; x++) {
-            System.out.printf("[");
-            for (int y = 0; y < heightMap[0].length; y++) {
-                System.out.printf(heightMap[x][y] + ", ");
-            }
-            System.out.printf("]\n");
-        }
-
-        for (int x = 0; x < heightMap.length; x++) {
             for (int y = 0; y < heightMap[0].length; y++) {
                 boolean isLand = heightMap[x][y] >= 0;
 
@@ -77,5 +67,5 @@ public class MapGenerator {
         }
 
         return tileMap;
-    };
+    }
 }

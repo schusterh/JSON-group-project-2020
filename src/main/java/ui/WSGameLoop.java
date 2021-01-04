@@ -1,21 +1,15 @@
 package ui;
 
 import javafx.animation.AnimationTimer;
-import javafx.event.EventHandler;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-import ui.tiles.TileRenderLayer;
-import ui.tiles.TileRenderer;
 
 public class WSGameLoop implements GameLoop {
 
     Renderer renderer;
     Canvas canvas;
     GraphicsContext gc;
-
-    boolean isPaused = false;
 
     AnimationTimer timer;
 
@@ -28,6 +22,11 @@ public class WSGameLoop implements GameLoop {
     private void prepareCanvas() {
         this.gc.setFill(new Color(1.0, 1.0, 1.0, 1.0));
         this.gc.fillRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
+    }
+
+    public void setInitialOffset(int offsetX, int offsetY) {
+        this.panX = offsetX;
+        this.panY = -offsetY;
     }
 
     @Override

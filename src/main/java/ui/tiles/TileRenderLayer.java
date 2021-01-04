@@ -1,6 +1,5 @@
 package ui.tiles;
 
-import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import types.Tile;
 import ui.RenderLayer;

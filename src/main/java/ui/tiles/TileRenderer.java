@@ -1,6 +1,5 @@
 package ui.tiles;
 
-import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import ui.RenderLayer;
 import ui.Renderer;
@@ -9,10 +8,7 @@ import java.util.ArrayList;
 
 public class TileRenderer implements Renderer {
 
-    ArrayList<RenderLayer> renderLayers = new ArrayList<RenderLayer>();
-
-    int panX;
-    int panY;
+    ArrayList<RenderLayer> renderLayers = new ArrayList<>();
 
     @Override
     public void addRenderLayer(RenderLayer layer) {
@@ -30,6 +26,5 @@ public class TileRenderer implements Renderer {
         for (RenderLayer layer : this.renderLayers) {
             layer.draw(gc, offsetX, offsetY);
         }
-        System.out.println("Finished rendering all layers!");
     }
 }
