@@ -43,7 +43,7 @@ public class GameView {
         root.getChildren().add(this.canvas);
 
         this.gameLoop.initializeGame(this.renderer, this.canvas);
-        this.gameLoop.setInitialOffset((int) (this.canvas.getWidth()) / 2, (tileMap[0].length * this.TILE_HEIGHT) / 2);
+        this.gameLoop.setInitialOffset((int) (this.canvas.getWidth()) / 2, (tileMap[0].length * this.TILE_HEIGHT) / 4);
         this.gameLoop.startGame();
 
         this.stage.setScene(new Scene(root));
