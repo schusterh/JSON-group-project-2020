@@ -16,7 +16,7 @@ public class Wirtschaftssimulator extends Application {
 
         Random r = new Random(System.currentTimeMillis());
 
-        MapGenerator mapGen = new MapGenerator(400, 300, r.nextLong());
+        MapGenerator mapGen = new MapGenerator(500, 500, r.nextLong());
         int[][] heightMap = mapGen.generateHeightmap();
 
         Tile[][] tileMap = mapGen.convertHeightMapToTileMap(heightMap);

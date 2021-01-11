@@ -40,8 +40,6 @@ public class DefaultTileSet implements TileSet {
         }
     }
 
-
-
     @Override
     public Image getTile(int index) {
         return this.tileList.get(index);

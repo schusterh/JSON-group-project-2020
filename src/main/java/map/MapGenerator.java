@@ -15,7 +15,7 @@ public class MapGenerator {
     public MapGenerator(int width, int height, long seed) {
         this.mapWidth = width;
         this.mapHeight = height;
-        this.featureSize = (double) width / 20;
+        this.featureSize = 20f;
         this.seed = seed;
     }
 
@@ -62,7 +62,16 @@ public class MapGenerator {
                 Tile tile = new Tile(heightMap[x][y], isLand ? 1 : 0);
 
                 if (isLand) {
-                    tile.tileIndex = random.nextDouble() < 0.1 ? 3 : 1;
+                    double nature = random.nextDouble();
+                    if (nature < 0.1) {
+                        if (nature < 0.020) {
+                            tile.tileIndex = 4;
+                        }
+                        else tile.tileIndex = 3;
+                    }
+
+                    else if (nature < 0.2) tile.tileIndex = 2;
+                    else tile.tileIndex = 1;
                 }
                 tileMap[x][y] = tile;
             }
