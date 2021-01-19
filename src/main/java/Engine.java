@@ -1,5 +1,3 @@
-import java.util.Optional;
-
 public class Engine {
 
     // Attribute
@@ -15,15 +13,7 @@ public class Engine {
     }
 
     // Getter
-    public String getKind() {
-        return kind;
-    }
-    public String getGraphic() {
-        return graphic;
-    }
-    public double getSpeed() {
-        return speed;
-    }
-
-
+    public String getKind() { return kind; }
+    public String getGraphic() { return graphic; }
+    public double getSpeed() { return speed; }
 }
