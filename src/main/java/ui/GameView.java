@@ -1,14 +1,21 @@
 package ui;
 
+
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+
+import javafx.scene.control.Button;
+import javafx.scene.layout.*;
+
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import types.Tile;
 import ui.tiles.DefaultTileSet;
 import ui.tiles.TileRenderLayer;
 import ui.tiles.TileRenderer;
+
+import java.io.File;
 
 public class GameView {
 
@@ -33,6 +40,28 @@ public class GameView {
 
        this.gameLoop = new GameLoop();
        this.renderer = new TileRenderer();
+    }
+
+    public void displayWelcomeScreen() {
+
+        final String TITLE = "Wirtschaftssimulator";
+        final String BUTTON_LABEL = "Choose a scene";
+        this.stage.setTitle(TITLE);
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("JSON-Files", "*.json"));
+
+        VBox root  = new VBox();
+        root.setAlignment(Pos.CENTER);
+        Button chooseSceneButton = new Button(BUTTON_LABEL);
+        chooseSceneButton.setOnAction(e -> {
+            File selectedFile = fileChooser.showOpenDialog(this.stage);
+        });
+
+        root.getChildren().add(chooseSceneButton);
+        Scene welcomeWindow = new Scene(root,1024,768);
+        this.stage.setScene(welcomeWindow);
+        this.stage.show();
     }
 
     public void displayGameScreen(Tile[][] tileMap) {
