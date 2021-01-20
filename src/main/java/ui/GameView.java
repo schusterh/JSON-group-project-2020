@@ -17,7 +17,8 @@ import ui.tiles.TileRenderer;
 
 import java.io.File;
 
-public class GameView {
+public class
+GameView {
 
     Stage stage;
 
