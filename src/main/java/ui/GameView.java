@@ -1,6 +1,6 @@
 package ui;
 
-
+import modell.*;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -16,7 +16,6 @@ import ui.tiles.TileRenderLayer;
 import ui.tiles.TileRenderer;
 
 import java.io.File;
-
 public class
 GameView {
 
@@ -57,6 +56,14 @@ GameView {
         Button chooseSceneButton = new Button(BUTTON_LABEL);
         chooseSceneButton.setOnAction(e -> {
             File selectedFile = fileChooser.showOpenDialog(this.stage);
+            JSONImporter importer = new JSONImporter(selectedFile);
+
+            try {
+                importer.LoadMap();
+            }
+            catch (Exception ex) {
+                System.out.println("error eccoured");
+            }
         });
 
         root.getChildren().add(chooseSceneButton);
