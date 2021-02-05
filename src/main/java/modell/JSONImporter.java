@@ -36,6 +36,8 @@ public class JSONImporter {
         ArrayList<NatureObject> nature_objects = getNatureObjects(js_buildings);
         ArrayList<Tower> towers = getTowers(js_buildings);
         ArrayList<AirportObject> airport_objects = getAirportObjects(js_buildings);
+        Game ggg = new Game(commodities,roads,railways,towers,airport_objects,nature_objects,factories,vehicles,map);
+
 
     }
 
