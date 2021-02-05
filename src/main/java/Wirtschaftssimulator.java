@@ -4,6 +4,9 @@ import map.MapGenerator;
 import types.Tile;
 import ui.GameView;
 
+import java.util.List;
+
+import java.util.Map;
 import java.util.Random;
 
 public class Wirtschaftssimulator extends Application {
@@ -23,6 +26,8 @@ public class Wirtschaftssimulator extends Application {
         Tile[][] tileMap = mapGen.convertHeightMapToTileMap(heightMap);
         this.view.displayWelcomeScreen();
         //this.view.displayGameScreen(tileMap);
+
+
     }
 
     public static void main(String[] args) {
