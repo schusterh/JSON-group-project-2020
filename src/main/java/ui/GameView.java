@@ -1,11 +1,16 @@
 package ui;
 
+import javafx.scene.Group;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import modell.*;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 
-import javafx.scene.control.Button;
 import javafx.scene.layout.*;
 
 import javafx.stage.FileChooser;
@@ -16,8 +21,9 @@ import ui.tiles.TileRenderLayer;
 import ui.tiles.TileRenderer;
 
 import java.io.File;
-public class
-GameView {
+import java.util.ArrayList;
+
+public class GameView {
 
     Stage stage;
 
@@ -73,6 +79,49 @@ GameView {
     }
 
     public void displayGameScreen(Tile[][] tileMap) {
+
+        //Creat MenuBar
+        MenuBar menuBar = new MenuBar();
+
+        //Creat Menus
+        Menu homeMenu = new Menu("Home");
+        Menu bauenMenu = new Menu("Bauen");
+        Menu lebenMenu = new Menu("Leben");
+        Menu exitMenu = new Menu("Exit");
+
+        //Creat MenuItems
+        MenuItem straßenItem = new MenuItem("Straßen");
+        MenuItem gleiseItem = new MenuItem("Gleise");
+        MenuItem bauwerkItem = new MenuItem("Bauwerk");
+        MenuItem bäumeItem = new MenuItem("Bäume");
+
+
+        BorderPane menuLeiste = new BorderPane();
+        // Add menuItems to the Menus
+        bauenMenu.getItems().addAll(straßenItem, gleiseItem, bauwerkItem, bäumeItem);
+
+        // Add Menus to the MenuBar
+        menuBar.getMenus().addAll(homeMenu, bauenMenu, lebenMenu, exitMenu);
+        menuLeiste.setTop(menuBar);
+
+        //Button restartButton = new Button("Bauen");
+        Label messageLabel = new Label("Pflanze neue Bäume:");
+
+        HBox hbox = new HBox();
+
+        BorderPane borderPane = new BorderPane();
+
+        //borderPane.setBottom(restartButton);
+        borderPane.setCenter(hbox);
+        borderPane.setTop(messageLabel);
+        borderPane.setPrefSize(1024,150);
+
+        /*
+        Rectangle leiste = new Rectangle (0,0,1024,20);
+        leiste.setFill(Color.GREY);
+*/
+
+
         DefaultTileSet tileSet = new DefaultTileSet(this.TILE_SET_URI, this.TILE_SET_COLS, this.TILE_SET_ROWS, this.TILE_WIDTH, this.TILE_HEIGHT);
         TileRenderLayer landscapeLayer = new TileRenderLayer(tileMap.length, tileMap[0].length, tileMap, tileSet);
         landscapeLayer.setOffsetFromCenterY(5);
@@ -86,8 +135,25 @@ GameView {
         this.canvas.widthProperty().bind(this.stage.widthProperty());
         this.canvas.heightProperty().bind(this.stage.heightProperty());
 
+
+
+        root.getChildren().add(menuLeiste);
+        //root.getChildren().add(leiste);
+        root.getChildren().add(borderPane);
+
+
         root.getChildren().add(this.canvas);
 
+        //ArrayList<Button> buttons = new ArrayList<>();
+        //hbox.getChildren().add(buttons);
+
+        for (int i=0; i<5; i++){
+            Button button = new Button();
+            //Image imageOk = new Image(getClass().getResourceAsStream("resources/tilesets/baum_02.png"));
+            //button.setGraphic(new ImageView(imageOk));
+            hbox.getChildren().add(button);
+
+        }
 
 
         this.gameLoop.initializeGame(this.renderer, this.canvas);
