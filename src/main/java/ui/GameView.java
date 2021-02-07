@@ -1,9 +1,12 @@
 package ui;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import modell.*;
@@ -94,15 +97,30 @@ public class GameView {
         MenuItem gleiseItem = new MenuItem("Gleise");
         MenuItem bauwerkItem = new MenuItem("Bauwerk");
         MenuItem bäumeItem = new MenuItem("Bäume");
+        MenuItem speichernItem = new MenuItem("Speichern");
+        MenuItem exitItem = new MenuItem("Exit");
 
+        // Set Accelerator for Exit MenuItem.
+        exitItem.setAccelerator(KeyCombination.keyCombination("Ctrl+E"));
+
+        // When user click on the Exit item.
+        exitItem.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                System.exit(0);
+            }
+        });
 
         BorderPane menuLeiste = new BorderPane();
         // Add menuItems to the Menus
         bauenMenu.getItems().addAll(straßenItem, gleiseItem, bauwerkItem, bäumeItem);
+        homeMenu.getItems().addAll(speichernItem,exitItem);
 
         // Add Menus to the MenuBar
         menuBar.getMenus().addAll(homeMenu, bauenMenu, lebenMenu, exitMenu);
         menuLeiste.setTop(menuBar);
+
 
         //Button restartButton = new Button("Bauen");
         Label messageLabel = new Label("Pflanze neue Bäume:");
@@ -116,10 +134,6 @@ public class GameView {
         borderPane.setTop(messageLabel);
         borderPane.setPrefSize(1024,150);
 
-        /*
-        Rectangle leiste = new Rectangle (0,0,1024,20);
-        leiste.setFill(Color.GREY);
-*/
 
 
         DefaultTileSet tileSet = new DefaultTileSet(this.TILE_SET_URI, this.TILE_SET_COLS, this.TILE_SET_ROWS, this.TILE_WIDTH, this.TILE_HEIGHT);
@@ -137,11 +151,18 @@ public class GameView {
 
 
 
+
+        // When user click on the bäume item.
+        bäumeItem.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                root.getChildren().add(borderPane);
+            }
+        });
+
         root.getChildren().add(menuLeiste);
-        //root.getChildren().add(leiste);
-        root.getChildren().add(borderPane);
-
-
+        //root.getChildren().add(borderPane);
         root.getChildren().add(this.canvas);
 
         //ArrayList<Button> buttons = new ArrayList<>();
@@ -154,6 +175,8 @@ public class GameView {
             hbox.getChildren().add(button);
 
         }
+
+
 
 
         this.gameLoop.initializeGame(this.renderer, this.canvas);
