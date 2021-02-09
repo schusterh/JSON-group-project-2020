@@ -42,6 +42,7 @@ public class Factory extends Building{
     private int dz;
 
 
+
     public Factory(String name, int width, int depth, String special, ArrayList<Production> productions, Optional<HashMap<String, Integer>> storage, int dz) {
         super(width,depth);
         this.name = name;
@@ -52,5 +53,9 @@ public class Factory extends Building{
         }
         this.dz = dz;
     }
+    public void produce(ArrayList<Production> productions){
+
+    }
+
 
 }
