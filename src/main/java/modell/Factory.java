@@ -2,43 +2,17 @@ package modell;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
-class Production {
-    private Optional produce;
-    private Optional consume;
-    private int duration;
 
-    public Production(Optional<HashMap<String, Integer>> produce, Optional<HashMap<String, Integer>> consume, int duration) {
-        if (produce.isPresent()) {
-            this.produce = produce;
-        }
-
-        if (consume.isPresent()) {
-            this.consume = consume;
-        }
-        this.duration = duration;
-    }
-
-    public void setProduce(Optional produce) {
-        this.produce = produce;
-    }
-
-    public void setConsume(Optional consume) {
-        this.consume = consume;
-    }
-
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-}
 
 public class Factory extends Building{
 
     private String name;
     private String special;
     private ArrayList<Production> productions;
-    private Optional storage;
+    private HashMap<String, Integer> storage;
     private int dz;
 
 
@@ -48,22 +22,57 @@ public class Factory extends Building{
         this.name = name;
         this.special = special;
         this.productions = productions;
-        if(storage.isPresent()) {
-            this.storage = storage;
-        }
+        this.storage = storage.orElseGet(HashMap::new);
         this.dz = dz;
     }
+
+
     public void produce(){
+        // Einmal durch alle Produktionen durchiterieren
+        for (Production production : productions) {
+            //Wir betrachten nun eine Production. Zuerst müssen wir überprüfen, ob wir genug im storage haben,
+            //um die Produktion ausführen zu können.
+
+            boolean requirementsChecked = false;
+
+            requirementsChecked = production.consume
+                .map(this::consume)
+                .orElseGet(() -> { return true; });
+
+            if (requirementsChecked) {
+                production.produce.ifPresent(products -> {
+                    for (Map.Entry<String, Integer> product : products.entrySet()) {
+                        storage.put(product.getKey(), product.getValue());
+                    }
+                });
+            }
+        }
         // füge zur hashmap storage <kind, amount> den amount hinzu, der bei productions unter dem
         // kind steht. schauen ob der key (kind) vorhanden ist, wenn nicht, hinzufügen + amount hinzufügen, ansonsten amount erhöhen
     }
 
-    public void consume(){
+    public boolean consume(HashMap<String, Integer> consumeRequirements){
         //storage: amount der bei productions consume steht abziehen , falls vorhanden
         // wenn storage einen key hat, der übereinstimmt und der value zu einem key größer oder gleich
         // ist, abziehen, ansonsten nichts abziehen
+        boolean requirementsChecked = true;
+
+        if (!storage.isEmpty()) {
+            for (Map.Entry<String, Integer> requirement : consumeRequirements.entrySet()) {
+                if (!storage.containsKey(requirement.getKey()) || storage.get(requirement.getKey()) < requirement.getValue()) {
+                    requirementsChecked = false;
+                }
+            }
+
+            if (requirementsChecked) {
+                for (Map.Entry<String, Integer> consumeEntity : consumeRequirements.entrySet()) {
+                    storage.put(consumeEntity.getKey(), storage.get(consumeEntity.getKey()) - consumeEntity.getValue());
+                }
+            }
+        } else {
+            requirementsChecked = false;
+        }
+        return requirementsChecked;
     }
-
-
 
 }
