@@ -53,9 +53,17 @@ public class Factory extends Building{
         }
         this.dz = dz;
     }
-    public void produce(ArrayList<Production> productions){
-
+    public void produce(){
+        // füge zur hashmap storage <kind, amount> den amount hinzu, der bei productions unter dem
+        // kind steht. schauen ob der key (kind) vorhanden ist, wenn nicht, hinzufügen + amount hinzufügen, ansonsten amount erhöhen
     }
+
+    public void consume(){
+        //storage: amount der bei productions consume steht abziehen , falls vorhanden
+        // wenn storage einen key hat, der übereinstimmt und der value zu einem key größer oder gleich
+        // ist, abziehen, ansonsten nichts abziehen
+    }
+
 
 
 }
