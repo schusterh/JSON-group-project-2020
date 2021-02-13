@@ -109,6 +109,7 @@ public class GameView {
 
             @Override
             public void handle(ActionEvent event) {
+
                 System.exit(0);
             }
         });
@@ -123,17 +124,20 @@ public class GameView {
         menuLeiste.setTop(menuBar);
 
 
-        //Button restartButton = new Button("Bauen");
+        Button closeButton = new Button("schließen");
         Label messageLabel = new Label("Pflanze neue Bäume:");
 
         HBox hbox = new HBox();
 
-        BorderPane borderPane = new BorderPane();
 
-        //borderPane.setBottom(restartButton);
+        BorderPane borderPane = new BorderPane();
+        borderPane.setStyle("-fx-background-color: #FFFFFF;");
+
+
+        borderPane.setBottom(closeButton);
         borderPane.setCenter(hbox);
         borderPane.setTop(messageLabel);
-        borderPane.setPrefSize(1024,150);
+        //borderPane.setPrefSize(1024,150);
 
 
 
@@ -158,25 +162,51 @@ public class GameView {
 
             @Override
             public void handle(ActionEvent event) {
+
                 topBar.getChildren().add(borderPane);
+
             }
         });
+
+        // Wenn im bäumeBaumenü auf schließen gecklickt wird.
+        closeButton.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+
+                topBar.getChildren().remove(borderPane);
+
+            }
+        });
+
+
+
 
         root.getChildren().add(this.canvas);
         this.topBar.getChildren().add(menuLeiste);
         //root.getChildren().add(borderPane);
         root.getChildren().add(this.topBar);
 
-        //ArrayList<Button> buttons = new ArrayList<>();
-        //hbox.getChildren().add(buttons);
+        ArrayList<Button> button = new ArrayList<>();
+        button.add(new Button ("/tileset/baum_02.png"));
 
-        for (int i=0; i<5; i++){
+        for (Button b : button){
+            Button buttonBaum = new Button();
+            Image imageBaum = new Image(getClass().getResourceAsStream("/tilesets/baum_02.png"));
+            buttonBaum.setGraphic(new ImageView(imageBaum));
+            hbox.getChildren().add(buttonBaum);
+
+        }
+
+
+
+        /*for (int i=0; i<5; i++){
             Button button = new Button();
             Image imageOk = new Image(getClass().getResourceAsStream("/tilesets/baum_02.png"));
             button.setGraphic(new ImageView(imageOk));
             hbox.getChildren().add(button);
 
-        }
+        }*/
 
 
 
