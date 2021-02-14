@@ -188,13 +188,17 @@ public class GameView {
         root.getChildren().add(this.topBar);
 
         ArrayList<Button> button = new ArrayList<>();
-        button.add(new Button ("/tileset/baum_02.png"));
+        button.add(new Button ("/tilesets/baum_01.png"));
+        button.add(new Button ("/tilesets/baum_02.png"));
+        button.add(new Button ("/tilesets/baum_03.png"));
 
         for (Button b : button){
             Button buttonBaum = new Button();
-            Image imageBaum = new Image(getClass().getResourceAsStream("/tilesets/baum_02.png"));
+            Image imageBaum = new Image(getClass().getResourceAsStream(b.getText()));
             buttonBaum.setGraphic(new ImageView(imageBaum));
             hbox.getChildren().add(buttonBaum);
+
+
 
         }
 
