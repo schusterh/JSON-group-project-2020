@@ -94,8 +94,7 @@ public class GameView {
         Menu exitMenu = new Menu("Exit");
 
         //Creat MenuItems
-        MenuItem straßenItem = new MenuItem("Straßen");
-        MenuItem gleiseItem = new MenuItem("Gleise");
+        MenuItem straßenItem = new MenuItem("Straßen/Gleise");
         MenuItem bauwerkItem = new MenuItem("Bauwerk");
         MenuItem bäumeItem = new MenuItem("Bäume");
         MenuItem speichernItem = new MenuItem("Speichern");
@@ -116,7 +115,7 @@ public class GameView {
 
         BorderPane menuLeiste = new BorderPane();
         // Add menuItems to the Menus
-        bauenMenu.getItems().addAll(straßenItem, gleiseItem, bauwerkItem, bäumeItem);
+        bauenMenu.getItems().addAll(straßenItem, bauwerkItem, bäumeItem);
         homeMenu.getItems().addAll(speichernItem,exitItem);
 
         // Add Menus to the MenuBar
@@ -157,25 +156,14 @@ public class GameView {
 
 
 
-        // When user click on the bäume item.
-        bäumeItem.setOnAction(new EventHandler<ActionEvent>() {
 
-            @Override
-            public void handle(ActionEvent event) {
-
-                topBar.getChildren().add(borderPane);
-
-            }
-        });
 
         // Wenn im bäumeBaumenü auf schließen gecklickt wird.
         closeButton.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
             public void handle(ActionEvent event) {
-
                 topBar.getChildren().remove(borderPane);
-
             }
         });
 
@@ -192,15 +180,7 @@ public class GameView {
         button.add(new Button ("/tilesets/baum_02.png"));
         button.add(new Button ("/tilesets/baum_03.png"));
 
-        for (Button b : button){
-            Button buttonBaum = new Button();
-            Image imageBaum = new Image(getClass().getResourceAsStream(b.getText()));
-            buttonBaum.setGraphic(new ImageView(imageBaum));
-            hbox.getChildren().add(buttonBaum);
 
-
-
-        }
 
 
 
@@ -211,6 +191,25 @@ public class GameView {
             hbox.getChildren().add(button);
 
         }*/
+
+
+        // When user click on the bäume item.
+        bäumeItem.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+
+                for (Button b : button){
+                    Button buttonBaum = new Button();
+                    Image imageBaum = new Image (b.getText());
+                    //Image imageBaum = new Image(getClass().getResourceAsStream(b.getText()));
+                    buttonBaum.setGraphic(new ImageView(imageBaum));
+                    hbox.getChildren().add(buttonBaum);
+                }
+
+                topBar.getChildren().add(borderPane);
+            }
+        });
 
 
 
