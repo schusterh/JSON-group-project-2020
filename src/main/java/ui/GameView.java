@@ -108,7 +108,6 @@ public class GameView {
 
             @Override
             public void handle(ActionEvent event) {
-
                 System.exit(0);
             }
         });
@@ -157,31 +156,24 @@ public class GameView {
 
 
 
-
-        // Wenn im bäumeBaumenü auf schließen gecklickt wird.
-        closeButton.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                topBar.getChildren().remove(borderPane);
-            }
-        });
-
-
-
-
         root.getChildren().add(this.canvas);
         this.topBar.getChildren().add(menuLeiste);
         //root.getChildren().add(borderPane);
         root.getChildren().add(this.topBar);
 
-        ArrayList<Button> button = new ArrayList<>();
-        button.add(new Button ("/tilesets/baum_01.png"));
-        button.add(new Button ("/tilesets/baum_02.png"));
-        button.add(new Button ("/tilesets/baum_03.png"));
+        //ArrayList an Naturobjekten zum Bauen
+        ArrayList<Button> buttonBäume = new ArrayList<>();
+        buttonBäume.add(new Button ("/tilesets/baum_01.png"));
+        buttonBäume.add(new Button ("/tilesets/baum_02.png"));
+        buttonBäume.add(new Button ("/tilesets/baum_03.png"));
 
+        //ArrayList an Straßen und Gleisen zum Bauen
+        ArrayList<Button> buttonStraßen = new ArrayList<>();
+        buttonStraßen.add(new Button ("/tilesets/baum_01.png"));
 
-
+        //ArrayList an Bauwerken zum Bauen
+        ArrayList<Button> buttonBauwerke = new ArrayList<>();
+        buttonBauwerke.add(new Button ("/tilesets/baum_01.png"));
 
 
         /*for (int i=0; i<5; i++){
@@ -199,19 +191,59 @@ public class GameView {
             @Override
             public void handle(ActionEvent event) {
 
-                for (Button b : button){
-                    Button buttonBaum = new Button();
+                for (Button b : buttonBäume){
+                    Button bBaum = new Button();
                     Image imageBaum = new Image (b.getText());
                     //Image imageBaum = new Image(getClass().getResourceAsStream(b.getText()));
-                    buttonBaum.setGraphic(new ImageView(imageBaum));
-                    hbox.getChildren().add(buttonBaum);
+                    bBaum.setGraphic(new ImageView(imageBaum));
+                    hbox.getChildren().add(bBaum);
                 }
+                topBar.getChildren().add(borderPane);
+            }
+        });
 
+        // When user click on the Straßen item.
+        straßenItem.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+
+                for (Button b : buttonStraßen){
+                    Button bStraßen = new Button();
+                    Image imageStraßen = new Image (b.getText());
+                    bStraßen.setGraphic(new ImageView(imageStraßen));
+                    hbox.getChildren().add(bStraßen);
+                }
+                topBar.getChildren().add(borderPane);
+            }
+        });
+
+        // When user click on the Bauwerk item.
+        bauwerkItem.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+
+                for (Button b : buttonBauwerke){
+                    Button bBauwerke = new Button();
+                    Image imageBauwerke = new Image (b.getText());
+                    bBauwerke.setGraphic(new ImageView(imageBauwerke));
+                    hbox.getChildren().add(bBauwerke);
+                }
                 topBar.getChildren().add(borderPane);
             }
         });
 
 
+        // Wenn im bäumeBaumenü auf schließen gecklickt wird.
+        closeButton.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                hbox.getChildren().removeAll();
+                topBar.getChildren().remove(borderPane);
+            }
+        });
 
 
         this.gameLoop.initializeGame(this.renderer, this.canvas);
