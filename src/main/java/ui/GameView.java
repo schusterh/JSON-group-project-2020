@@ -62,8 +62,7 @@ GameView {
                 importer.LoadMap();
             }
             catch (Exception ex) {
-
-                System.out.println("error eccoured");
+                ex.printStackTrace();
             }
         });
 

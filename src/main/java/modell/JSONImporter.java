@@ -23,25 +23,40 @@ public class JSONImporter {
 
         String content = Files.readString(Paths.get(this.file.getAbsolutePath()), StandardCharsets.UTF_8);
         JSONObject json = new JSONObject(content);
-        JSONObject js_vehicles = json.getJSONObject("vehicles");
-        ArrayList<Vehicle> vehicles = getVehicles(js_vehicles);
-        JSONObject js_buildings = json.getJSONObject("buildings");
-        ArrayList<Road> roads = getRoads(js_buildings);
-        ArrayList<Railway> railways = getRailways(js_buildings);
-        ArrayList<Factory> factories = getFactories(js_buildings);
-        JSONArray js_commodities = json.getJSONArray("commodities");
-        ArrayList<String> commodities = getCommodities(js_commodities);
-        JSONObject js_map = json.getJSONObject("map");
-        Map map = getMap(js_map);
-        ArrayList<NatureObject> nature_objects = getNatureObjects(js_buildings);
-        ArrayList<Tower> towers = getTowers(js_buildings);
-        ArrayList<AirportObject> airport_objects = getAirportObjects(js_buildings);
-        Game ggg = new Game(commodities,roads,railways,towers,airport_objects,nature_objects,factories,vehicles,map);
+        if (!json.has("buildings")) {
+            throw new Exception("Keine Buildings!");
+        }
+        else if(!json.has("vehicles")) {
+            throw new Exception("Keine Vehicles!");
+        }
+        else if (!json.has("commodities")) {
+            throw new Exception("Keine Commodities!");
+        }
+        else if(!json.has("map")) {
+            throw new Exception("Keine Map");
+        }
+        else {
 
-        return ggg;
+            JSONObject js_vehicles = json.getJSONObject("vehicles");
+            ArrayList<Vehicle> vehicles = getVehicles(js_vehicles);
+            JSONObject js_buildings = json.getJSONObject("buildings");
+            ArrayList<Road> roads = getRoads(js_buildings);
+            ArrayList<Railway> railways = getRailways(js_buildings);
+            ArrayList<Factory> factories = getFactories(js_buildings);
+            JSONArray js_commodities = json.getJSONArray("commodities");
+            ArrayList<String> commodities = getCommodities(js_commodities);
+            JSONObject js_map = json.getJSONObject("map");
+            Map map = getMap(js_map);
+            ArrayList<NatureObject> nature_objects = getNatureObjects(js_buildings);
+            ArrayList<Tower> towers = getTowers(js_buildings);
+            ArrayList<AirportObject> airport_objects = getAirportObjects(js_buildings);
+            Game ggg = new Game(commodities, roads, railways, towers, airport_objects, nature_objects, factories, vehicles, map);
+
+            return ggg;
+        }
     }
 
-    public ArrayList<Vehicle> getVehicles(JSONObject vehicles) {
+    public ArrayList<Vehicle> getVehicles(JSONObject vehicles) throws Exception{
         ArrayList<Vehicle> v = new ArrayList<>();
         for (String key : vehicles.keySet()) {
             JSONObject vehicle = vehicles.getJSONObject(key);
@@ -75,7 +90,7 @@ public class JSONImporter {
         return v;
     }
 
-    public ArrayList<Road> getRoads(JSONObject roads) {
+    public ArrayList<Road> getRoads(JSONObject roads) throws Exception{
         ArrayList<Road> r = new ArrayList<>();
         for(String key : roads.keySet()) {
             if(roads.getJSONObject(key).has("roads")) {
@@ -135,7 +150,7 @@ public class JSONImporter {
                    Optional<String> special,
                    Optional<HashMap<String, String>> combines
      */
-    public ArrayList<Railway> getRailways(JSONObject rails) {
+    public ArrayList<Railway> getRailways(JSONObject rails) throws Exception{
         ArrayList<Railway> r = new ArrayList<>();
 
         for (String key : rails.keySet()) {
@@ -216,7 +231,7 @@ public class JSONImporter {
 // String name, int width, int depth, String special, Production productions, HashMap<String, Integer> storage, int dz
 
 
-    public ArrayList<Factory> getFactories(JSONObject factories) {
+    public ArrayList<Factory> getFactories(JSONObject factories) throws Exception{
         ArrayList<Factory> f = new ArrayList<>();
         for(String key : factories.keySet()) {
             if(factories.getJSONObject(key).has("productions")) {
@@ -273,7 +288,7 @@ public class JSONImporter {
         return f;
     }
 
-    public ArrayList<String> getCommodities(JSONArray comodities) {
+    public ArrayList<String> getCommodities(JSONArray comodities) throws Exception{
         ArrayList<String> c = new ArrayList<>();
         for(int i = 0 ; i < comodities.length(); i++) {
             String item = comodities.getString(i);
@@ -282,7 +297,7 @@ public class JSONImporter {
         return c;
     }
 
-    public Map getMap(JSONObject map) {
+    public Map getMap(JSONObject map) throws Exception{
         String gamemode = map.getString("gamemode");
         String mapgen = map.getString("mapgen");
         int width = map.getInt("width");
@@ -291,7 +306,7 @@ public class JSONImporter {
         return m;
     }
 
-    public ArrayList<NatureObject> getNatureObjects(JSONObject natobs) {
+    public ArrayList<NatureObject> getNatureObjects(JSONObject natobs) throws Exception{
         ArrayList<NatureObject> no  = new ArrayList<>();
         for(String key: natobs.keySet()) {
             if(natobs.getJSONObject(key).has("special") && natobs.getJSONObject(key).getString("special").equals("nature")) {
@@ -312,7 +327,7 @@ public class JSONImporter {
         return no;
     }
 
-    public ArrayList<Tower> getTowers(JSONObject towers) {
+    public ArrayList<Tower> getTowers(JSONObject towers) throws Exception{
         ArrayList<Tower> t = new ArrayList<>();
         for(String key : towers.keySet()) {
             if(key.equals("tower") || key.equals("big tower")) {
@@ -330,7 +345,7 @@ public class JSONImporter {
         }
         return t;
     }
-    public ArrayList<AirportObject> getAirportObjects(JSONObject airobjs) {
+    public ArrayList<AirportObject> getAirportObjects(JSONObject airobjs) throws Exception{
         ArrayList<AirportObject> r = new ArrayList<>();
         for(String key : airobjs.keySet()) {
             if(airobjs.getJSONObject(key).has("planes")) {
