@@ -21,4 +21,13 @@ dependencies {
     implementation 'org.json:json:20171018'
 }
 
+jar {
+    manifest {
+        attributes 'Main-Class': 'Wirtschaftssimulator'
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
 mainClassName = "Wirtschaftssimulator"

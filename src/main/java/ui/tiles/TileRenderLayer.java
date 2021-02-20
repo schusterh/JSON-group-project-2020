@@ -70,9 +70,11 @@ public class TileRenderLayer implements RenderLayer {
             for (int neighborX : neighbors) {
                 for (int neighborY : neighbors) {
                     if (!(neighborX == 0 && neighborY == 0) && !(Math.abs(neighborX) == 1 && Math.abs(neighborY) == 1)) {
-                        int neighborHeight = this.renderMap[x + neighborX][y + neighborY].height;
-                        if (newHeight - neighborHeight > 1 || newHeight - neighborHeight < -1) {
-                            changeRelativeHeightOfTile(x + neighborX, y + neighborY, change);
+                        if (x + neighborX >= 0 && x + neighborX < this.mapWidth && y + neighborY >= 0 && y + neighborY < this.mapHeight) {
+                            int neighborHeight = this.renderMap[x + neighborX][y + neighborY].height;
+                            if (newHeight - neighborHeight > 1 || newHeight - neighborHeight < -1) {
+                                changeRelativeHeightOfTile(x + neighborX, y + neighborY, change);
+                            }
                         }
                     }
                 }
@@ -83,10 +85,14 @@ public class TileRenderLayer implements RenderLayer {
     private ArrayList<Coordinate> getTilesInCircle(int centerX, int centerY, int radius) {
         ArrayList<Coordinate> result = new ArrayList<>();
 
-        for (int y = -radius; y <= radius; y++)
-            for (int x = -radius; x <= radius; x++)
-                if ((x * x) + (y * y) <= (radius * radius))
-                    result.add(new Coordinate(centerX + x, centerY + y));
+        for (int y = -radius; y <= radius; y++) {
+            for (int x = -radius; x <= radius; x++) {
+                if ((x * x) + (y * y) <= (radius * radius)) {
+                    if (centerX + x >= 0 && centerX + x < this.mapWidth && centerY + y >= 0 && centerY + y < this.mapHeight)
+                        result.add(new Coordinate(centerX + x, centerY + y));
+                }
+            }
+        }
 
         return result;
     }
