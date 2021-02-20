@@ -64,17 +64,4 @@ public class Railway extends Building {
     public Optional getSpecial() {
         return special;
     }
-
-    public HashMap addPoints(Double startX, Double startY){
-        HashMap addToGrid = new HashMap();
-        if (points.isPresent()) {
-            HashMap<String,ArrayList<Double>> newPoints = (HashMap<String, ArrayList<Double>>) points.get();
-            for (String point : newPoints.keySet()){
-                Double xCoor = newPoints.get(point).get(0);
-                Double yCoor = newPoints.get(point).get(1);
-                addToGrid.put(point, Arrays.asList(startX+xCoor,startY+yCoor));
-            }
-        }
-        return addToGrid;
-    }
 }
