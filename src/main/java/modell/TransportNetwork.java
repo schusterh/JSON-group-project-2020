@@ -1,6 +1,7 @@
 package modell;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 class Station {
     HashMap<String,Integer> holdingArea;
@@ -26,34 +27,78 @@ class Station {
         this.label = label;
     }
 }
+class Point {
+    Double x;
+    Double y;
+    Point (Double x, Double y){
+        this.x = x;
+        this.y = y;
+    }
+
+    public Double getX() {
+        return x;
+    }
+
+    public Double getY() {
+        return y;
+    }
+}
+
 public class TransportNetwork {
     private HashMap<Station, HashMap<Station,Integer>> adjStations;
     public TransportNetwork(HashMap<Station, HashMap<Station,Integer>> adjStations){
         this.adjStations = adjStations;
+    }
+    public HashMap<Point, ArrayList<Point>> connections;
+    public ArrayList<Point> points;
+
+    public void addBuild(Double xPos, Double yPos, HashMap<String,ArrayList<Double>> newPoints, ArrayList<ArrayList<String>> newConnect){
+        Double diff = 0.2;
+        for (String name : newPoints.keySet()){
+            Point p = new Point (newPoints.get(name).get(0)+xPos, newPoints.get(name).get(1)+yPos);
+            if (!points.stream().anyMatch(z -> z.getX() - p.getX() <= diff && z.getY() - p.getY() <= diff)){
+                points.add(p);
+                connections.put(p,new ArrayList<>());
+            }
+            for (ArrayList<String> c : newConnect){
+                if (c.contains(name)){
+                    String connection = String.valueOf(c.stream().filter(x -> !(x.equals(name))));
+                    Point connectPoint = new Point(newPoints.get(connection).get(0)+xPos,newPoints.get(connection).get(1)+yPos);
+                    if (!points.stream().anyMatch(z -> z.getX() - connectPoint.getX() <= diff && z.getY() - connectPoint.getY() <= diff)){
+                        points.add(connectPoint);
+                        connections.put(connectPoint,new ArrayList<>());
+                        if (!connections.get(p).contains(connectPoint)){
+                            connections.get(p).add(connectPoint);
+                            connections.get(connectPoint).add(p);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public HashMap<Station, HashMap<Station,Integer>> getAdjStations() {
         return adjStations;
     }
 
-    void addStation(String label){
+    public void addStation(String label){
         adjStations.putIfAbsent(new Station(label),new HashMap<>());
     }
 
-    void removeStation(String label){
+    public void removeStation(String label){
         Station s = new Station(label);
         adjStations.values().forEach(e -> e.remove(s));
         adjStations.remove(new Station(label));
     }
 
-    void addConnection(String label1, String label2,Integer distance){
+    public void addConnection(String label1, String label2, Integer distance){
         Station s1 = new Station(label1);
         Station s2 = new Station(label2);
         adjStations.get(s1).put(s2,distance);
         adjStations.get(s2).put(s1,distance);
     }
 
-    void removeConnection(String label1, String label2){
+    public void removeConnection(String label1, String label2){
         Station s1 = new Station(label1);
         Station s2 = new Station(label2);
         HashMap<Station,Integer> connectS1 = adjStations.get(s1);
