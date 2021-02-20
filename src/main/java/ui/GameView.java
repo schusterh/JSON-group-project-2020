@@ -31,6 +31,7 @@ public class GameView {
 
     Stage stage;
 
+
     GameLoop gameLoop;
     TileRenderer renderer;
 
@@ -169,7 +170,8 @@ public class GameView {
 
         //ArrayList an Straßen und Gleisen zum Bauen
         ArrayList<Button> buttonStraßen = new ArrayList<>();
-        buttonStraßen.add(new Button ("/tilesets/baum_01.png"));
+        buttonStraßen.add(new Button ("/tilesets/strase_01.png"));
+        buttonStraßen.add(new Button ("/tilesets/strase_02.png"));
 
         //ArrayList an Bauwerken zum Bauen
         ArrayList<Button> buttonBauwerke = new ArrayList<>();
@@ -235,7 +237,7 @@ public class GameView {
         });
 
 
-        // Wenn im bäumeBaumenü auf schließen gecklickt wird.
+        // Wenn im Baumenü auf schließen gecklickt wird.
         closeButton.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
