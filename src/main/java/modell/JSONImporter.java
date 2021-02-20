@@ -19,7 +19,7 @@ public class JSONImporter {
         this.file = file;
     }
 
-    public void LoadMap() throws Exception {
+    public Game LoadMap() throws Exception {
 
         String content = Files.readString(Paths.get(this.file.getAbsolutePath()), StandardCharsets.UTF_8);
         JSONObject json = new JSONObject(content);
@@ -38,13 +38,14 @@ public class JSONImporter {
         ArrayList<AirportObject> airport_objects = getAirportObjects(js_buildings);
         Game ggg = new Game(commodities,roads,railways,towers,airport_objects,nature_objects,factories,vehicles,map);
 
-
+        return ggg;
     }
 
     public ArrayList<Vehicle> getVehicles(JSONObject vehicles) {
         ArrayList<Vehicle> v = new ArrayList<>();
         for (String key : vehicles.keySet()) {
             JSONObject vehicle = vehicles.getJSONObject(key);
+
             String name = key;
             String kind = vehicle.getString("kind");
             String graphic = vehicle.getString("graphic");
