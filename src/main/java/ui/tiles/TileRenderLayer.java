@@ -26,7 +26,7 @@ public class TileRenderLayer implements RenderLayer {
     private final int mapWidth;
     private final int mapHeight;
 
-    private int tileOffsetY = 13;
+    private int tileOffsetY = 1000;
 
     boolean isInteractable = false;
 
@@ -121,7 +121,7 @@ public class TileRenderLayer implements RenderLayer {
 
         double heightOffset = this.renderMap[x][y].height * this.tileOffsetY;
         double posX = ((x - y) * (double) (tileResolution[0] / 2) + offsetX) * zoomFactor;
-        double posY = ((x + y) * (double) (tileResolution[1] / 4) + offsetY - heightOffset) * zoomFactor;
+        double posY = ((x + y) * (double) (tileResolution[1] / 4) + offsetY - heightOffset) * zoomFactor + 10;
 
         double[] polyPoiX = new double[]{
                 posX,
