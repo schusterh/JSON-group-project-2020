@@ -1,5 +1,6 @@
 package modell;
 
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -45,6 +46,7 @@ class Point {
 }
 
 public class TransportNetwork {
+    ArrayList<String> station_names = new ArrayList<>();
     private HashMap<Station, HashMap<Station,Integer>> adjStations;
     public TransportNetwork(HashMap<Station, HashMap<Station,Integer>> adjStations){
         this.adjStations = adjStations;
@@ -114,4 +116,20 @@ public class TransportNetwork {
     HashMap<Station, Integer> getAdjStations(String label){
         return adjStations.get(new Station(label));
     }
+
+    public String stationname_generator() {
+        String generatedString = null;
+        boolean notGenerated = true;
+        while (notGenerated) {
+            byte[] array = new byte[3];
+            new Random().nextBytes(array);
+             generatedString = new String(array, Charset.forName("UTF-8"));
+            if (!station_names.contains(generatedString)) {
+                station_names.add(generatedString);
+                return generatedString;
+            }
+        }
+        return generatedString;
+    }
+
 }
