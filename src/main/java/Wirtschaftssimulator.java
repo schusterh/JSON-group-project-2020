@@ -24,8 +24,8 @@ public class Wirtschaftssimulator extends Application {
         int[][] heightMap = mapGen.generateHeightmap();
 
         Tile[][] tileMap = mapGen.convertHeightMapToTileMap(heightMap);
-        this.view.displayWelcomeScreen();
-        //this.view.displayGameScreen(tileMap);
+        //this.view.displayWelcomeScreen();
+        this.view.displayGameScreen(tileMap);
 
 
     }
