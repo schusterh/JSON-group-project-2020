@@ -37,7 +37,7 @@ public class GameController {
         this.timeline.setCycleCount(Timeline.INDEFINITE);
     }
 
-    public void startGame() {it 
+    public void startGame() {
         Random r = new Random(System.currentTimeMillis());
         MapGenerator mapGen = new MapGenerator(this.prerequisites.getMap().getWidth(), prerequisites.getMap().getDepth(), r.nextLong());
         int[][] heightMap = mapGen.generateHeightmap();
