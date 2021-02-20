@@ -52,4 +52,14 @@ public class Road extends Building {
     public int getDz() {
         return dz;
     }
+
+    public HashMap addPoints(Double startX, Double startY){
+        HashMap addToGrid = new HashMap();
+        for (String point : points.keySet()){
+            Double xCoor = points.get(point).get(0);
+            Double yCoor = points.get(point).get(1);
+            addToGrid.put(point, Arrays.asList(startX+xCoor,startY+yCoor));
+        }
+        return addToGrid;
+    }
 }

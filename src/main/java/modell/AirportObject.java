@@ -1,8 +1,6 @@
 package modell;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 
 public class AirportObject extends Building {
     private String name;
@@ -25,5 +23,15 @@ public class AirportObject extends Building {
         }
         this.planes = planes;
         this.dz = dz;
+    }
+
+    public HashMap addPoints(Double startX, Double startY){
+        HashMap addToGrid = new HashMap();
+        for (String point : points.keySet()){
+            Double xCoor = points.get(point).get(0);
+            Double yCoor = points.get(point).get(1);
+            addToGrid.put(point, Arrays.asList(startX+xCoor,startY+yCoor));
+        }
+        return addToGrid;
     }
 }
