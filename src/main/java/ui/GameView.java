@@ -27,13 +27,13 @@ GameView {
     HBox topBar;
     Canvas canvas;
 
-    final String TILE_SET_URI = "tilesets/1BitPixelArtTileSet.png";
+    final String TILE_SET_URI = "tilesets/finalTiles.png";
 
-    final int TILE_SET_COLS = 5;
+    final int TILE_SET_COLS = 4;
     final int TILE_SET_ROWS = 1;
 
-    final int TILE_WIDTH = 32;
-    final int TILE_HEIGHT = 32;
+    final int TILE_WIDTH = 138;
+    final int TILE_HEIGHT = 138;
 
     public GameView(Stage stage) {
        this.stage = stage;
@@ -62,6 +62,7 @@ GameView {
                 importer.LoadMap();
             }
             catch (Exception ex) {
+
                 System.out.println("error eccoured");
             }
         });
@@ -75,7 +76,7 @@ GameView {
     public void displayGameScreen(Tile[][] tileMap) {
         DefaultTileSet tileSet = new DefaultTileSet(this.TILE_SET_URI, this.TILE_SET_COLS, this.TILE_SET_ROWS, this.TILE_WIDTH, this.TILE_HEIGHT);
         TileRenderLayer landscapeLayer = new TileRenderLayer(tileMap.length, tileMap[0].length, tileMap, tileSet);
-        landscapeLayer.setOffsetFromCenterY(5);
+        landscapeLayer.setOffsetFromCenterY(26);
         landscapeLayer.makeInteractable(this.gameLoop);
         this.renderer.addRenderLayer(landscapeLayer);
 
@@ -88,11 +89,9 @@ GameView {
 
         root.getChildren().add(this.canvas);
 
-
-
         this.gameLoop.initializeGame(this.renderer, this.canvas);
         this.gameLoop.setInitialOffset((int) (this.canvas.getWidth()) / 2, (tileMap[0].length * this.TILE_HEIGHT) / 4);
-        this.gameLoop.setPanStep(10);
+        this.gameLoop.setPanStep(26);
         this.gameLoop.startGame();
 
         this.stage.setScene(new Scene(root, 1024, 768));

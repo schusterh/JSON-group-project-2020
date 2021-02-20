@@ -65,7 +65,7 @@ public class MapGenerator {
                     double nature = random.nextDouble();
                     if (nature < 0.1) {
                         if (nature < 0.020) {
-                            tile.tileIndex = 4;
+                            tile.tileIndex = 3;
                         }
                         else tile.tileIndex = 3;
                     }
