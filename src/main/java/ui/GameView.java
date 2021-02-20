@@ -42,35 +42,6 @@ GameView {
        this.renderer = new TileRenderer();
     }
 
-    public void displayWelcomeScreen() {
-
-        final String TITLE = "Wirtschaftssimulator";
-        final String BUTTON_LABEL = "Choose a scene";
-        this.stage.setTitle(TITLE);
-
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("JSON-Files", "*.json"));
-
-        VBox root  = new VBox();
-        root.setAlignment(Pos.CENTER);
-        Button chooseSceneButton = new Button(BUTTON_LABEL);
-        chooseSceneButton.setOnAction(e -> {
-            File selectedFile = fileChooser.showOpenDialog(this.stage);
-            JSONImporter importer = new JSONImporter(selectedFile);
-
-            try {
-                importer.LoadMap();
-            }
-            catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        });
-
-        root.getChildren().add(chooseSceneButton);
-        Scene welcomeWindow = new Scene(root,1024,768);
-        this.stage.setScene(welcomeWindow);
-        this.stage.show();
-    }
 
     public void displayGameScreen(Tile[][] tileMap) {
         DefaultTileSet tileSet = new DefaultTileSet(this.TILE_SET_URI, this.TILE_SET_COLS, this.TILE_SET_ROWS, this.TILE_WIDTH, this.TILE_HEIGHT);

@@ -44,7 +44,7 @@ public class MenuView {
                 this.controller.createGame(prerequisites, this.stage);
             }
             catch (Exception ex) {
-                System.out.println("error eccoured");
+                System.out.println(ex.getMessage());
             }
         });
 
