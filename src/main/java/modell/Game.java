@@ -1,6 +1,7 @@
 package modell;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Game {
 
@@ -13,6 +14,7 @@ public class Game {
     ArrayList<Tower> towers;
     ArrayList<AirportObject> airport_objects;
     Map map;
+    HashMap<Station, HashMap<Station,Integer>> transportNetwork;
 
     public Game(ArrayList<String> commodities, ArrayList<Road> roads, ArrayList<Railway> railways, ArrayList<Tower> towers
     , ArrayList<AirportObject> airport_objects, ArrayList<NatureObject> nature_objects, ArrayList<Factory> factories,
@@ -26,6 +28,7 @@ public class Game {
         this.factories = factories;
         this.vehicles = vehicles;
         this.map = map;
+        this.transportNetwork = new HashMap<>();
     }
 
     public ArrayList<Railway> getRailways() {
@@ -62,5 +65,9 @@ public class Game {
 
     public Map getMap() {
         return map;
+    }
+
+    public HashMap<Station, HashMap<Station, Integer>> getTransportNetwork() {
+        return transportNetwork;
     }
 }
