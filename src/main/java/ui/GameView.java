@@ -1,5 +1,6 @@
 package ui;
 
+import Controller.GameController;
 import modell.*;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -22,6 +23,9 @@ GameView {
 
     Stage stage;
 
+    Game model;
+    GameController controller;
+
     GameLoop gameLoop;
     TileRenderer renderer;
 
@@ -36,43 +40,15 @@ GameView {
     final int TILE_WIDTH = 138;
     final int TILE_HEIGHT = 138;
 
-    public GameView(Stage stage) {
+    public GameView(Game model, GameController controller, Stage stage) {
+       this.model = model;
+       this.controller = controller;
        this.stage = stage;
 
        this.gameLoop = new GameLoop();
        this.renderer = new TileRenderer();
     }
 
-    public void displayWelcomeScreen() {
-
-        final String TITLE = "Wirtschaftssimulator";
-        final String BUTTON_LABEL = "Choose a scene";
-        this.stage.setTitle(TITLE);
-
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("JSON-Files", "*.json"));
-
-        VBox root  = new VBox();
-        root.setAlignment(Pos.CENTER);
-        Button chooseSceneButton = new Button(BUTTON_LABEL);
-        chooseSceneButton.setOnAction(e -> {
-            File selectedFile = fileChooser.showOpenDialog(this.stage);
-            JSONImporter importer = new JSONImporter(selectedFile);
-
-            try {
-                importer.LoadMap();
-            }
-            catch (Exception ex) {
-
-                System.out.println("error eccoured");
-            }
-        });
-
-        root.getChildren().add(chooseSceneButton);
-        Scene welcomeWindow = new Scene(root,1024,768);
-        this.stage.setScene(welcomeWindow);
-        this.stage.show();
-    }
 
     public void displayGameScreen() {
         LandscapeLayer landscapeLayer = new LandscapeLayer(this.model., tileMap[0].length, tileMap, tileSet);

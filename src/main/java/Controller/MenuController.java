@@ -32,7 +32,7 @@ public class MenuController {
 
     public void createGame(Game prerequisites, Stage stage) {
         this.gameController = new GameController(prerequisites, TICKLENGTH);
-        this.gameView = new GameView(stage);
+        this.gameView = new GameView(prerequisites, this.gameController, stage);
         this.gameController.setView(this.gameView);
 
         this.gameController.startGame();

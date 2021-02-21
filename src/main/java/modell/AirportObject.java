@@ -1,8 +1,6 @@
 package modell;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 
 public class AirportObject extends Building {
     private String name;
@@ -26,4 +24,5 @@ public class AirportObject extends Building {
         this.planes = planes;
         this.dz = dz;
     }
+
 }
