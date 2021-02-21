@@ -8,7 +8,7 @@ import ui.RenderLayer;
 
 import java.util.ArrayList;
 
-public class TileRenderLayer implements RenderLayer {
+public class LandscapeLayer implements RenderLayer {
 
     private class Coordinate {
         int x;
@@ -36,7 +36,7 @@ public class TileRenderLayer implements RenderLayer {
 
     GameLoop gameLoop;
 
-    public TileRenderLayer(int mapWidth, int mapHeight, Tile[][] tileMap, DefaultTileSet tileSet) {
+    public LandscapeLayer(int mapWidth, int mapHeight, Tile[][] tileMap, DefaultTileSet tileSet) {
         this.mapWidth = mapWidth;
         this.mapHeight= mapHeight;
         this.renderMap = tileMap;
@@ -126,8 +126,8 @@ public class TileRenderLayer implements RenderLayer {
     private void paintTileSelected(GraphicsContext gc, int x, int y, int offsetX, int offsetY, int[] tileResolution, double zoomFactor) {
 
         double heightOffset = this.renderMap[x][y].height * this.tileOffsetY;
-        double posX = ((x - y) * (double) (tileResolution[0] / 2) + offsetX) * zoomFactor;
-        double posY = ((x + y) * (double) (tileResolution[1] / 4) + offsetY - heightOffset) * zoomFactor + 10;
+        double posX = ((x + y) * (double) (tileResolution[0] / 2) + offsetX) * zoomFactor;
+        double posY = ((x - y) * (double) (tileResolution[1] / 4) + offsetY - heightOffset) * zoomFactor + 10;
 
         double[] polyPoiX = new double[]{
                 posX,
@@ -143,6 +143,8 @@ public class TileRenderLayer implements RenderLayer {
         gc.setFill(new Color(0.41, 0.41, 0.41, 0.3));
         gc.fillPolygon(polyPoiX, polyPoiY, 4);
         gc.strokePolygon(polyPoiX, polyPoiY, 4);
+        gc.setFill(new Color(1, 1, 1, 1));
+        gc.fillText("[x: " + x + ", y: " + y + "]", posX + tileResolution[0]/4, posY + tileResolution[1]/2);
     }
 
     @Override
@@ -150,11 +152,11 @@ public class TileRenderLayer implements RenderLayer {
         int[] tileResolution = this.tileSet.getTileResolution();
         int[] mousePosition = this.gameLoop.getMousePosition();
 
-        for (int x = 0; x < this.mapWidth; x++) {
-            for (int y = 0; y < this.mapHeight; y++) {
+        for (int y = this.mapHeight-1; y > 0; y--) {
+            for (int x = 0; x < this.mapWidth; x++) {
                 double heightOffset = this.renderMap[x][y].height * this.tileOffsetY;
-                double posX = ( (x - y) * (double) (tileResolution[0] / 2) + offsetX ) * zoomFactor;
-                double posY = ( (x + y) * (double) (tileResolution[1] / 4) + offsetY - heightOffset) * zoomFactor;
+                double posX = ( (x + y) * (double) (tileResolution[0] / 2) + offsetX ) * zoomFactor;
+                double posY = ( (x - y) * (double) (tileResolution[1] / 4) + offsetY - heightOffset) * zoomFactor;
 
                 if (posX > -this.tileSet.TILE_WIDTH*2 && posX < gc.getCanvas().getWidth() && posY > -this.tileSet.TILE_HEIGHT*2 && posY < gc.getCanvas().getHeight()) {
                     gc.drawImage(tileSet.getTile(this.renderMap[x][y].tileIndex), posX, posY, tileResolution[0] * zoomFactor, tileResolution[1] * zoomFactor);

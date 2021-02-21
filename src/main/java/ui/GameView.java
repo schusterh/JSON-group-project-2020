@@ -11,8 +11,9 @@ import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import types.Tile;
+import ui.tiles.BuildingLayer;
 import ui.tiles.DefaultTileSet;
-import ui.tiles.TileRenderLayer;
+import ui.tiles.LandscapeLayer;
 import ui.tiles.TileRenderer;
 
 import java.io.File;
@@ -75,10 +76,12 @@ GameView {
 
     public void displayGameScreen(Tile[][] tileMap) {
         DefaultTileSet tileSet = new DefaultTileSet(this.TILE_SET_URI, this.TILE_SET_COLS, this.TILE_SET_ROWS, this.TILE_WIDTH, this.TILE_HEIGHT);
-        TileRenderLayer landscapeLayer = new TileRenderLayer(tileMap.length, tileMap[0].length, tileMap, tileSet);
+        LandscapeLayer landscapeLayer = new LandscapeLayer(tileMap.length, tileMap[0].length, tileMap, tileSet);
+        BuildingLayer buildingLayer = new BuildingLayer(this.TILE_WIDTH);
         landscapeLayer.setOffsetFromCenterY(26);
         landscapeLayer.makeInteractable(this.gameLoop);
-        this.renderer.addRenderLayer(landscapeLayer);
+        this.renderer.addLandscapeLayer(landscapeLayer);
+        this.renderer.addBuildingLayer(buildingLayer);
 
 
         VBox root = new VBox();
@@ -90,7 +93,7 @@ GameView {
         root.getChildren().add(this.canvas);
 
         this.gameLoop.initializeGame(this.renderer, this.canvas);
-        this.gameLoop.setInitialOffset((int) (this.canvas.getWidth()) / 2, (tileMap[0].length * this.TILE_HEIGHT) / 4);
+        //this.gameLoop.setInitialOffset((int) (this.canvas.getWidth()) / 2, -(tileMap[0].length * this.TILE_HEIGHT) / 4);
         this.gameLoop.setPanStep(26);
         this.gameLoop.startGame();
 
