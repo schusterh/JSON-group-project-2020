@@ -44,6 +44,7 @@ class Point {
         return y;
     }
 }
+
 class TrafficRoute {
     ArrayList<Station> stations;
     String vehicleType;
@@ -72,15 +73,35 @@ class TrafficRoute {
     public ArrayList<Vehicle> getVehicles() {
         return vehicles;
     }
+
+    public void addStation(Station station){
+        this.stations.add(station);
+    }
+
+    public void removeStation(Station station){
+        this.stations.remove(station);
+    }
+
+    public void manageVehicles(){
+        if (this.vehicles.size() > vehicleAmount){
+            this.vehicles.remove(-1);
+        }
+        if (this.vehicles.size() < vehicleAmount){
+            this.vehicles.add(this.vehicles.get(-1));
+        }
+        vehicles.removeIf(v -> !v.getKind().equals(this.getVehicleType()));
+    }
 }
+
 public class TransportNetwork {
     ArrayList<String> station_names = new ArrayList<>();
     private HashMap<Station, HashMap<Station,Integer>> adjStations;
+    public HashMap<Point, ArrayList<Point>> connections;
+    public ArrayList<Point> points;
+
     public TransportNetwork(HashMap<Station, HashMap<Station,Integer>> adjStations){
         this.adjStations = adjStations;
     }
-    public HashMap<Point, ArrayList<Point>> connections;
-    public ArrayList<Point> points;
 
     public void addBuild(Double xPos, Double yPos, HashMap<String,ArrayList<Double>> newPoints, ArrayList<ArrayList<String>> newConnect){
         Double diff = 0.2;
@@ -151,7 +172,7 @@ public class TransportNetwork {
         while (notGenerated) {
             byte[] array = new byte[3];
             new Random().nextBytes(array);
-             generatedString = new String(array, Charset.forName("UTF-8"));
+            generatedString = new String(array, Charset.forName("UTF-8"));
             if (!station_names.contains(generatedString)) {
                 station_names.add(generatedString);
                 return generatedString;
