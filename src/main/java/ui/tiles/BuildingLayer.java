@@ -2,6 +2,7 @@ package ui.tiles;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import modell.Building;
 import ui.RenderLayer;
 
 import java.util.ArrayList;
@@ -43,18 +44,20 @@ public class BuildingLayer implements RenderLayer {
         this.tileDimension = tileDimension;
 
         this.buildings.add(new BuildingGraphic(3, 3, 4, 4, "glasfabrik"));
+        this.buildings.add(new BuildingGraphic(12, 14, 4, 4, "glasfabrik"));
     }
 
     @Override
     public void draw(GraphicsContext gc, int offsetX, int offsetY, double zoomFactor) {
         this.buildings = this.buildings.stream()
                 .sorted(Comparator.comparingInt(BuildingGraphic::getStartY))
+                .sorted(Comparator.comparingInt(BuildingGraphic::getStartX))
                 .collect(Collectors.toList());
 
         for (BuildingGraphic building : buildings) {
             double posX = (( building.startX + building.startY) * (double) (tileDimension / 2) + offsetX) * zoomFactor;
-            double heightOffset = building.graphic.getHeight() * zoomFactor - (building.width * tileDimension/4) + tileDimension/2;
-            double posY = ((building.startX - building.startY) * (double) (tileDimension / 4) - heightOffset + offsetY) * zoomFactor;
+            double heightOffset = (building.graphic.getHeight() * zoomFactor) - ((tileDimension/4) * building.width) - tileDimension/2;
+            double posY = ((building.startX - building.startY) * (double) (tileDimension / 4) -heightOffset + offsetY) * zoomFactor;
 
             gc.drawImage(building.graphic, posX, posY, building.graphic.getWidth() * zoomFactor, building.graphic.getHeight() * zoomFactor);
         }

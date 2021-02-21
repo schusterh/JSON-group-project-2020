@@ -38,12 +38,7 @@ public class GameController {
     }
 
     public void startGame() {
-        Random r = new Random(System.currentTimeMillis());
-        MapGenerator mapGen = new MapGenerator(this.prerequisites.getMap().getWidth(), prerequisites.getMap().getDepth(), r.nextLong());
-        int[][] heightMap = mapGen.generateHeightmap();
-
-        Tile[][] tileMap = mapGen.convertHeightMapToTileMap(heightMap);
-        this.view.displayGameScreen(tileMap);
+        this.view.displayGameScreen();
 
         this.startAnimation();
     }

@@ -36,11 +36,13 @@ public class LandscapeLayer implements RenderLayer {
 
     GameLoop gameLoop;
 
-    public LandscapeLayer(int mapWidth, int mapHeight, Tile[][] tileMap, DefaultTileSet tileSet) {
+    public LandscapeLayer(int mapWidth, int mapHeight, Tile[][] tileMap) {
         this.mapWidth = mapWidth;
         this.mapHeight= mapHeight;
         this.renderMap = tileMap;
         this.tileSet = tileSet;
+
+        DefaultTileSet tileSet = new DefaultTileSet(this.TILE_SET_URI, this.TILE_SET_COLS, this.TILE_SET_ROWS, this.TILE_WIDTH, this.TILE_HEIGHT);
     }
 
     public void setOffsetFromCenterY(int offsetY) {

@@ -74,9 +74,8 @@ GameView {
         this.stage.show();
     }
 
-    public void displayGameScreen(Tile[][] tileMap) {
-        DefaultTileSet tileSet = new DefaultTileSet(this.TILE_SET_URI, this.TILE_SET_COLS, this.TILE_SET_ROWS, this.TILE_WIDTH, this.TILE_HEIGHT);
-        LandscapeLayer landscapeLayer = new LandscapeLayer(tileMap.length, tileMap[0].length, tileMap, tileSet);
+    public void displayGameScreen() {
+        LandscapeLayer landscapeLayer = new LandscapeLayer(this.model., tileMap[0].length, tileMap, tileSet);
         BuildingLayer buildingLayer = new BuildingLayer(this.TILE_WIDTH);
         landscapeLayer.setOffsetFromCenterY(26);
         landscapeLayer.makeInteractable(this.gameLoop);
