@@ -44,7 +44,35 @@ class Point {
         return y;
     }
 }
+class TrafficRoute {
+    ArrayList<Station> stations;
+    String vehicleType;
+    int vehicleAmount;
+    ArrayList<Vehicle> vehicles;
 
+    public TrafficRoute(ArrayList<Station> stations, String vehicleType, int vehicleAmount, ArrayList<Vehicle> vehicles){
+        this.stations = stations;
+        this.vehicleType = vehicleType;
+        this.vehicleAmount = vehicleAmount;
+        this.vehicles = vehicles;
+    }
+
+    public ArrayList<Station> getStations() {
+        return stations;
+    }
+
+    public String getVehicleType() {
+        return vehicleType;
+    }
+
+    public int getVehicleAmount() {
+        return vehicleAmount;
+    }
+
+    public ArrayList<Vehicle> getVehicles() {
+        return vehicles;
+    }
+}
 public class TransportNetwork {
     ArrayList<String> station_names = new ArrayList<>();
     private HashMap<Station, HashMap<Station,Integer>> adjStations;
@@ -58,7 +86,7 @@ public class TransportNetwork {
         Double diff = 0.2;
         for (String name : newPoints.keySet()){
             Point p = new Point (newPoints.get(name).get(0)+xPos, newPoints.get(name).get(1)+yPos);
-            if (!points.stream().anyMatch(z -> Math.abs(z.getX()) - Math.abs((p.getX())) <= diff && Math.abs(z.getY()) - Math.abs(p.getY()) <= diff)) {
+            if (points.stream().noneMatch(z -> Math.abs(z.getX()) - Math.abs((p.getX())) <= diff && Math.abs(z.getY()) - Math.abs(p.getY()) <= diff)) {
                 points.add(p);
                 connections.put(p, new ArrayList<>());
             }
@@ -66,7 +94,7 @@ public class TransportNetwork {
                 if (c.contains(name)){
                     String connection = String.valueOf(c.stream().filter(x -> !(x.equals(name))));
                     Point connectPoint = new Point(newPoints.get(connection).get(0)+xPos,newPoints.get(connection).get(1)+yPos);
-                    if (!points.stream().anyMatch(z -> Math.abs(z.getX()) - Math.abs(connectPoint.getX()) <= diff && Math.abs(z.getY()) - Math.abs(connectPoint.getY()) <= diff)){
+                    if (points.stream().noneMatch(z -> Math.abs(z.getX()) - Math.abs(connectPoint.getX()) <= diff && Math.abs(z.getY()) - Math.abs(connectPoint.getY()) <= diff)){
                         points.add(connectPoint);
                         connections.put(connectPoint,new ArrayList<>());
                         if (!connections.get(p).contains(connectPoint)){
