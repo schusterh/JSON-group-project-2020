@@ -58,15 +58,15 @@ public class TransportNetwork {
         Double diff = 0.2;
         for (String name : newPoints.keySet()){
             Point p = new Point (newPoints.get(name).get(0)+xPos, newPoints.get(name).get(1)+yPos);
-            if (!points.stream().anyMatch(z -> z.getX() - p.getX() <= diff && z.getY() - p.getY() <= diff)){
+            if (!points.stream().anyMatch(z -> Math.abs(z.getX()) - Math.abs((p.getX())) <= diff && Math.abs(z.getY()) - Math.abs(p.getY()) <= diff)) {
                 points.add(p);
-                connections.put(p,new ArrayList<>());
+                connections.put(p, new ArrayList<>());
             }
             for (ArrayList<String> c : newConnect){
                 if (c.contains(name)){
                     String connection = String.valueOf(c.stream().filter(x -> !(x.equals(name))));
                     Point connectPoint = new Point(newPoints.get(connection).get(0)+xPos,newPoints.get(connection).get(1)+yPos);
-                    if (!points.stream().anyMatch(z -> z.getX() - connectPoint.getX() <= diff && z.getY() - connectPoint.getY() <= diff)){
+                    if (!points.stream().anyMatch(z -> Math.abs(z.getX()) - Math.abs(connectPoint.getX()) <= diff && Math.abs(z.getY()) - Math.abs(connectPoint.getY()) <= diff)){
                         points.add(connectPoint);
                         connections.put(connectPoint,new ArrayList<>());
                         if (!connections.get(p).contains(connectPoint)){
