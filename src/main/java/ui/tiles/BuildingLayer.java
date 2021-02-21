@@ -5,6 +5,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import modell.Building;
 import modell.Game;
+import types.OnMapBuilding;
 import ui.RenderLayer;
 
 import java.util.ArrayList;
@@ -51,28 +52,15 @@ public class BuildingLayer implements RenderLayer {
         this.model = model;
         this.controller = controller;
         this.tileHeightOffset = tileHeightOffset;
-
-        this.controller.plainGround(3, 3, 4, 4);
-        //this.buildings.add(new BuildingGraphic(3, 3, 4, 4, "glasfabrik"));
-        this.buildings.add(new BuildingGraphic(3, 3, 4, 4, "glasfabrik"));
-    }
-
-    public void addBuilding (Building model, int startX, int startY) {
-        this.controller.plainGround(startX, startY, model.getWidth(), model.getDepth());
-        this.buildings.add(new BuildingGraphic(3, 3, 4, 4, "glasfabrik"));
+        this.controller.addBuildingToMap(this.model.getFactories().get(6), 3, 3, 2);
     }
 
     @Override
     public void draw(GraphicsContext gc, int offsetX, int offsetY, double zoomFactor) {
-        this.buildings = this.buildings.stream()
-                .sorted(Comparator.comparingInt(BuildingGraphic::getStartY))
-                .sorted(Comparator.comparingInt(BuildingGraphic::getStartX))
-                .collect(Collectors.toList());
-
-        for (BuildingGraphic building : buildings) {
+        for (OnMapBuilding building : this.model.getBuildingsOnMap()) {
             double posX = (( building.startX + building.startY) * (double) (tileDimension / 2) + offsetX) * zoomFactor;
             double heightOffset = (-tileDimension) + (double) (tileDimension/4) + building.graphic.getHeight() - (double) (building.width * tileDimension/4);
-            double posY = ((building.startX - building.startY) * (double) (tileDimension / 4) - heightOffset - this.tileHeightOffset + offsetY) * zoomFactor;
+            double posY = ((building.startX - building.startY) * (double) (tileDimension / 4) - heightOffset - (building.height * this.tileHeightOffset) + offsetY) * zoomFactor;
 
             gc.drawImage(building.graphic, posX, posY, building.graphic.getWidth() * zoomFactor, building.graphic.getHeight() * zoomFactor);
         }

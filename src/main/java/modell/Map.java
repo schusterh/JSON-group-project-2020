@@ -89,11 +89,11 @@ public class Map {
         }
     }
 
-    public void plainGround(int startX, int startY, int width, int depth) {
+    public void plainGround(int startX, int startY, int width, int depth, int height) {
         for (int x = startX; x < (startX + width); x++) {
             for (int y = startY; y < (startY + depth); y++) {
                 this.landscapeMap[x][y].tileIndex = 4;
-                this.landscapeMap[x][y].height = 1;
+                this.landscapeMap[x][y].height = height;
                 System.out.println("Set Tileindex at [" + x + ", " + y + "]");
             }
         }

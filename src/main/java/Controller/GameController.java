@@ -6,8 +6,10 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.util.Duration;
 import map.MapGenerator;
+import modell.Building;
 import modell.Game;
 import types.Coordinate;
+import types.OnMapBuilding;
 import types.Tile;
 import ui.GameView;
 
@@ -49,8 +51,12 @@ public class GameController {
         this.model.getMap().decreaseHeightOfSelectedTiles(selectedTiles);
     }
 
-    public void plainGround(int startX, int startY, int width, int depth) {
-        this.model.getMap().plainGround(startX, startY, width, depth);
+    public void plainGround(int startX, int startY, int width, int depth, int height) {
+        this.model.getMap().plainGround(startX, startY, width, depth, height);
+    }
+
+    public void addBuildingToMap(Building model, int startX, int startY, int height) {
+        this.model.addBuildingToMap(model, startX, startY, height);
     }
 
     public void startGame() {
