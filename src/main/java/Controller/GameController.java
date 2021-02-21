@@ -7,22 +7,24 @@ import javafx.event.EventHandler;
 import javafx.util.Duration;
 import map.MapGenerator;
 import modell.Game;
+import types.Coordinate;
 import types.Tile;
 import ui.GameView;
 
 import javax.swing.text.View;
+import java.util.ArrayList;
 import java.util.Random;
 
 
 public class GameController {
 
-    Game prerequisites;
+    Game model;
     GameView view;
     Timeline timeline;
     EventHandler<ActionEvent> timelineTask;
 
     public GameController(Game model, int tickLength) {
-        this.prerequisites = model;
+        this.model = model;
 
         this.timelineTask = event -> {
             //model.handleUpdate();
@@ -37,8 +39,23 @@ public class GameController {
         this.timeline.setCycleCount(Timeline.INDEFINITE);
     }
 
+    public void increaseHeightOfSelectedTiles() {
+        ArrayList<Coordinate> selectedTiles = this.view.getLandscapeLayer().getSelectedTiles();
+        this.model.getMap().increaseHeightOfSelectedTiles(selectedTiles);
+    }
+
+    public void decreaseHeightOfSelectedTiles() {
+        ArrayList<Coordinate> selectedTiles = this.view.getLandscapeLayer().getSelectedTiles();
+        this.model.getMap().decreaseHeightOfSelectedTiles(selectedTiles);
+    }
+
+    public void plainGround(int startX, int startY, int width, int depth) {
+        this.model.getMap().plainGround(startX, startY, width, depth);
+    }
+
     public void startGame() {
         this.view.displayGameScreen();
+        System.out.println("WELL2?");
 
         this.startAnimation();
     }

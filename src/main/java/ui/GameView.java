@@ -29,34 +29,33 @@ GameView {
     GameLoop gameLoop;
     TileRenderer renderer;
 
+    LandscapeLayer landscapeLayer;
+    BuildingLayer buildingLayer;
+
     HBox topBar;
     Canvas canvas;
 
-    final String TILE_SET_URI = "tilesets/finalTiles.png";
-
-    final int TILE_SET_COLS = 4;
-    final int TILE_SET_ROWS = 1;
-
-    final int TILE_WIDTH = 138;
-    final int TILE_HEIGHT = 138;
+    final int TILE_DIMENSION = 138;
+    final int TILE_HEIGHT_OFFSET = 26;
 
     public GameView(Game model, GameController controller, Stage stage) {
        this.model = model;
        this.controller = controller;
        this.stage = stage;
 
-       this.gameLoop = new GameLoop();
+       this.gameLoop = new GameLoop(controller);
        this.renderer = new TileRenderer();
     }
 
 
     public void displayGameScreen() {
-        LandscapeLayer landscapeLayer = new LandscapeLayer(this.model., tileMap[0].length, tileMap, tileSet);
-        BuildingLayer buildingLayer = new BuildingLayer(this.TILE_WIDTH);
-        landscapeLayer.setOffsetFromCenterY(26);
+        this.landscapeLayer = new LandscapeLayer(this.model, this.controller, this.TILE_DIMENSION, this.TILE_HEIGHT_OFFSET);
+        System.out.println("BLUBS?");
+        this.buildingLayer = new BuildingLayer(this.model, this.controller, this.TILE_DIMENSION, this.TILE_HEIGHT_OFFSET);
         landscapeLayer.makeInteractable(this.gameLoop);
         this.renderer.addLandscapeLayer(landscapeLayer);
         this.renderer.addBuildingLayer(buildingLayer);
+        System.out.println("Layer added");
 
 
         VBox root = new VBox();
@@ -76,5 +75,13 @@ GameView {
         this.stage.show();
 
         this.gameLoop.addInputHandler(this.stage.getScene());
+    }
+
+    public LandscapeLayer getLandscapeLayer() {
+        return landscapeLayer;
+    }
+
+    public BuildingLayer getBuildingLayer() {
+        return buildingLayer;
     }
 }

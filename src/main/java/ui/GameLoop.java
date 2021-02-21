@@ -1,5 +1,6 @@
 package ui;
 
+import Controller.GameController;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -16,6 +17,8 @@ public class GameLoop {
     Canvas canvas;
     GraphicsContext gc;
 
+    GameController controller;
+
     ArrayList<String> input = new ArrayList<>();
 
     AnimationTimer timer;
@@ -29,6 +32,10 @@ public class GameLoop {
     int panStep = 10;
 
     int selectionRadius = 0;
+
+    public GameLoop(GameController controller) {
+        this.controller = controller;
+    }
 
     private void prepareCanvas() {
         this.gc.setFill(Color.web("#555568"));
@@ -141,11 +148,11 @@ public class GameLoop {
             this.input.remove("COMMA");
         }
         if (this.input.contains("CLICK_PRIMARY")) {
-            this.renderer.getLandscapeLayer().increaseHeightOfSelectedTiles();
+            this.controller.increaseHeightOfSelectedTiles();
             this.input.remove("CLICK_PRIMARY");
         }
         if (this.input.contains("CLICK_SECONDARY")) {
-            this.renderer.getLandscapeLayer().decreaseHeightOfSelectedTiles();
+            this.controller.decreaseHeightOfSelectedTiles();
             this.input.remove("CLICK_SECONDARY");
         }
 

@@ -1,32 +1,35 @@
 package ui.tiles;
 
+import Controller.GameController;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import modell.Game;
+import modell.Map;
+import types.Coordinate;
 import types.Tile;
 import ui.GameLoop;
 import ui.RenderLayer;
 
 import java.util.ArrayList;
 
+
+
 public class LandscapeLayer implements RenderLayer {
 
-    private class Coordinate {
-        int x;
-        int y;
+    final String TILE_SET_URI = "tilesets/finalTiles.png";
 
-        public Coordinate(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-    }
+    final int TILE_SET_COLS = 5;
+    final int TILE_SET_ROWS = 1;
 
-    Tile[][] renderMap;
+
+    Game model;
+    GameController controller;
     DefaultTileSet tileSet;
 
     private final int mapWidth;
     private final int mapHeight;
 
-    private int tileOffsetY = 1000;
+    private int tileOffsetY;
 
     boolean isInteractable = false;
 
@@ -36,13 +39,13 @@ public class LandscapeLayer implements RenderLayer {
 
     GameLoop gameLoop;
 
-    public LandscapeLayer(int mapWidth, int mapHeight, Tile[][] tileMap) {
-        this.mapWidth = mapWidth;
-        this.mapHeight= mapHeight;
-        this.renderMap = tileMap;
-        this.tileSet = tileSet;
-
-        DefaultTileSet tileSet = new DefaultTileSet(this.TILE_SET_URI, this.TILE_SET_COLS, this.TILE_SET_ROWS, this.TILE_WIDTH, this.TILE_HEIGHT);
+    public LandscapeLayer(Game model, GameController controller, int tileDimension, int tileOffsetY) {
+        this.model = model;
+        this.controller = controller;
+        this.mapWidth = model.getMap().getWidth();
+        this.mapHeight= model.getMap().getDepth();
+        this.tileOffsetY = tileOffsetY;
+        this.tileSet = new DefaultTileSet(this.TILE_SET_URI, this.TILE_SET_COLS, this.TILE_SET_ROWS, tileDimension, tileDimension);
     }
 
     public void setOffsetFromCenterY(int offsetY) {
@@ -58,32 +61,6 @@ public class LandscapeLayer implements RenderLayer {
         return (yp - y1) * (x2 - x1) - (xp -x1) * (y2 - y1) > 0 ? 1 : 0;
     }
 
-    private void changeRelativeHeightOfTile(int x, int y, int change) {
-        int oldHeight = this.renderMap[x][y].height;
-        int newHeight = oldHeight + change;
-        if (newHeight >= -1 && newHeight <= 6) {
-            if (newHeight == 0 && oldHeight == -1) {
-                this.renderMap[x][y].tileIndex = 1;
-            } else if (newHeight == -1) {
-                this.renderMap[x][y].tileIndex = 0;
-            }
-            this.renderMap[x][y].height = newHeight;
-            int[] neighbors = new int[]{-1, 0, 1};
-            for (int neighborX : neighbors) {
-                for (int neighborY : neighbors) {
-                    if (!(neighborX == 0 && neighborY == 0) && !(Math.abs(neighborX) == 1 && Math.abs(neighborY) == 1)) {
-                        if (x + neighborX >= 0 && x + neighborX < this.mapWidth && y + neighborY >= 0 && y + neighborY < this.mapHeight) {
-                            int neighborHeight = this.renderMap[x + neighborX][y + neighborY].height;
-                            if (newHeight - neighborHeight > 1 || newHeight - neighborHeight < -1) {
-                                changeRelativeHeightOfTile(x + neighborX, y + neighborY, change);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     private ArrayList<Coordinate> getTilesInCircle(int centerX, int centerY, int radius) {
         ArrayList<Coordinate> result = new ArrayList<>();
 
@@ -95,20 +72,7 @@ public class LandscapeLayer implements RenderLayer {
                 }
             }
         }
-
         return result;
-    }
-
-    public void increaseHeightOfSelectedTiles() {
-        for (Coordinate tileCoord : this.selectedTiles) {
-            this.changeRelativeHeightOfTile(tileCoord.x, tileCoord.y, 1);
-        }
-    }
-
-    public void decreaseHeightOfSelectedTiles() {
-        for (Coordinate tileCoord : this.selectedTiles) {
-            this.changeRelativeHeightOfTile(tileCoord.x, tileCoord.y, -1);
-        }
     }
 
     private boolean isInsidePolygon(double xp, double yp, int polyPoiNum, double[] polyX, double[] polyY) {
@@ -127,7 +91,7 @@ public class LandscapeLayer implements RenderLayer {
 
     private void paintTileSelected(GraphicsContext gc, int x, int y, int offsetX, int offsetY, int[] tileResolution, double zoomFactor) {
 
-        double heightOffset = this.renderMap[x][y].height * this.tileOffsetY;
+        double heightOffset = this.model.getMap().getTile(x, y).height * this.tileOffsetY;
         double posX = ((x + y) * (double) (tileResolution[0] / 2) + offsetX) * zoomFactor;
         double posY = ((x - y) * (double) (tileResolution[1] / 4) + offsetY - heightOffset) * zoomFactor + 10;
 
@@ -146,7 +110,7 @@ public class LandscapeLayer implements RenderLayer {
         gc.fillPolygon(polyPoiX, polyPoiY, 4);
         gc.strokePolygon(polyPoiX, polyPoiY, 4);
         gc.setFill(new Color(1, 1, 1, 1));
-        gc.fillText("[x: " + x + ", y: " + y + "]", posX + tileResolution[0]/4, posY + tileResolution[1]/2);
+        gc.fillText("[x: " + x + ", y: " + y + "]", posX + (double)tileResolution[0]/4, posY + (double) tileResolution[1]/2);
     }
 
     @Override
@@ -156,12 +120,12 @@ public class LandscapeLayer implements RenderLayer {
 
         for (int y = this.mapHeight-1; y > 0; y--) {
             for (int x = 0; x < this.mapWidth; x++) {
-                double heightOffset = this.renderMap[x][y].height * this.tileOffsetY;
+                double heightOffset = this.model.getMap().getTile(x, y).height * this.tileOffsetY;
                 double posX = ( (x + y) * (double) (tileResolution[0] / 2) + offsetX ) * zoomFactor;
                 double posY = ( (x - y) * (double) (tileResolution[1] / 4) + offsetY - heightOffset) * zoomFactor;
 
                 if (posX > -this.tileSet.TILE_WIDTH*2 && posX < gc.getCanvas().getWidth() && posY > -this.tileSet.TILE_HEIGHT*2 && posY < gc.getCanvas().getHeight()) {
-                    gc.drawImage(tileSet.getTile(this.renderMap[x][y].tileIndex), posX, posY, tileResolution[0] * zoomFactor, tileResolution[1] * zoomFactor);
+                    gc.drawImage(tileSet.getTile(this.model.getMap().getTile(x, y).tileIndex), posX, posY, tileResolution[0] * zoomFactor, tileResolution[1] * zoomFactor);
 
                     if (isInteractable) {
                         double[] polyPoiX = new double[]{
@@ -185,5 +149,9 @@ public class LandscapeLayer implements RenderLayer {
         for (Coordinate tileCoord : this.selectedTiles) {
             this.paintTileSelected(gc, tileCoord.x, tileCoord.y, offsetX, offsetY, tileResolution, zoomFactor);
         }
+    }
+
+    public ArrayList<Coordinate> getSelectedTiles() {
+        return selectedTiles;
     }
 }
