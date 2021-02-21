@@ -1,5 +1,6 @@
 package ui;
 
+import Controller.GameController;
 import modell.*;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -21,6 +22,9 @@ GameView {
 
     Stage stage;
 
+    Game model;
+    GameController controller;
+
     GameLoop gameLoop;
     TileRenderer renderer;
 
@@ -35,7 +39,9 @@ GameView {
     final int TILE_WIDTH = 138;
     final int TILE_HEIGHT = 138;
 
-    public GameView(Stage stage) {
+    public GameView(Game model, GameController controller, Stage stage) {
+       this.model = model;
+       this.controller = controller;
        this.stage = stage;
 
        this.gameLoop = new GameLoop();
