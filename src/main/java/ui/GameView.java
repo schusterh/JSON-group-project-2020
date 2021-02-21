@@ -43,6 +43,8 @@ GameView {
     final int TILE_WIDTH = 138;
     final int TILE_HEIGHT = 138;
 
+     JSONImporter model;
+
     public GameView(Stage stage) {
        this.stage = stage;
 
@@ -75,6 +77,13 @@ GameView {
             }
         });
 
+        ImageView backgroundImage = new ImageView("/Menü_Hintergrund.png");
+        backgroundImage.setX(10);
+        backgroundImage.setY(10);
+        backgroundImage.setPreserveRatio(true);
+        backgroundImage.setScaleX(1024);
+
+
         root.getChildren().add(chooseSceneButton);
         Scene welcomeWindow = new Scene(root,1024,768);
         this.stage.setScene(welcomeWindow);
@@ -88,16 +97,16 @@ GameView {
 
         //Creat Menus
         Menu homeMenu = new Menu("Home");
-        Menu bauenMenu = new Menu("Bauen");
-        Menu lebenMenu = new Menu("Leben");
+        Menu bauenMenu = new Menu("Building");
+        Menu lebenMenu = new Menu("Live");
         Menu exitMenu = new Menu("Exit");
 
         //Creat MenuItems
-        MenuItem straßenItem = new MenuItem("Straßen und Gleise");
+        MenuItem straßenItem = new MenuItem("Roads and Rails");
         //MenuItem gleiseItem = new MenuItem("Gleise");
-        MenuItem bauwerkItem = new MenuItem("Bauwerk");
-        MenuItem bäumeItem = new MenuItem("Bäume");
-        MenuItem speichernItem = new MenuItem("Speichern");
+        MenuItem bauwerkItem = new MenuItem("Buildings");
+        MenuItem bäumeItem = new MenuItem("Natur");
+        MenuItem speichernItem = new MenuItem("Save");
         MenuItem exitItem = new MenuItem("Exit");
 
         // Set Accelerator for Exit MenuItem.
@@ -122,8 +131,8 @@ GameView {
         menuLeiste.setTop(menuBar);
 
 
-        Button closeButton = new Button("schließen");
-        Label messageLabel = new Label("Pflanze neue Bäume:");
+        Button closeButton = new Button("Close");
+        //Label messageLabel = new Label("Pflanze neue Bäume:");
 
         HBox hbox = new HBox();
 
@@ -134,7 +143,7 @@ GameView {
 
         borderPane.setBottom(closeButton);
         borderPane.setCenter(hbox);
-        borderPane.setTop(messageLabel);
+        //borderPane.setTop(messageLabel);
         //borderPane.setPrefSize(1024,150);
 
 
@@ -145,9 +154,11 @@ GameView {
         this.renderer.addRenderLayer(landscapeLayer);
 
         StackPane root = new StackPane();
+
         //VBox root = new VBox();
         //this.topBar = new HBox();
         this.topBar = new VBox();
+        this.topBar.setPickOnBounds(false);
         this.canvas = new Canvas(1024, 768);
         this.canvas.widthProperty().bind(this.stage.widthProperty());
         this.canvas.heightProperty().bind(this.stage.heightProperty());
@@ -171,7 +182,14 @@ GameView {
         this.topBar.getChildren().add(menuLeiste);
         root.getChildren().add(this.topBar);
 
+
         ArrayList<Button> buttonBaum = new ArrayList<>();
+        for (NatureObject nature : this.model.getNatureObjects()) {
+            if (nature.getBuildmenu()) {
+                buttonBaum.add(new Button (getClass().getResourceAsStream("/tilesets/" + nature.getName())));
+            }
+        }
+
         buttonBaum.add(new Button ("/tilesets/baum_01.png"));
         buttonBaum.add(new Button ("/tilesets/baum_02.png"));
         buttonBaum.add(new Button ("/tilesets/baum_03.png"));

@@ -3,8 +3,8 @@ package modell;
 import java.util.Optional;
 
 public class NatureObject extends Building {
-    private String name;
-    private Optional buildmenu;
+    public String name;
+    public Optional buildmenu;
     private String special;
     private int dz;
 
