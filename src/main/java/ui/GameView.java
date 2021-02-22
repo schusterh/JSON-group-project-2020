@@ -6,6 +6,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCombination;
+import Controller.GameController;
 import modell.*;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -16,8 +17,9 @@ import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import types.Tile;
+import ui.tiles.BuildingLayer;
 import ui.tiles.DefaultTileSet;
-import ui.tiles.TileRenderLayer;
+import ui.tiles.LandscapeLayer;
 import ui.tiles.TileRenderer;
 
 import java.io.File;
@@ -28,50 +30,32 @@ GameView {
 
     Stage stage;
 
+    Game model;
+    GameController controller;
+
     GameLoop gameLoop;
     TileRenderer renderer;
 
     //HBox topBar;
     VBox topBar;
+    LandscapeLayer landscapeLayer;
+    BuildingLayer buildingLayer;
+
+    HBox topBar;
     Canvas canvas;
 
-    final String TILE_SET_URI = "tilesets/finalTiles.png";
+    final int TILE_DIMENSION = 138;
+    final int TILE_HEIGHT_OFFSET = 26;
 
-    final int TILE_SET_COLS = 4;
-    final int TILE_SET_ROWS = 1;
-
-    final int TILE_WIDTH = 138;
-    final int TILE_HEIGHT = 138;
-
-     JSONImporter model;
-
-    public GameView(Stage stage) {
+    public GameView(Game model, GameController controller, Stage stage) {
+       this.model = model;
+       this.controller = controller;
        this.stage = stage;
 
-       this.gameLoop = new GameLoop();
+       this.gameLoop = new GameLoop(controller);
        this.renderer = new TileRenderer();
     }
 
-    public void displayWelcomeScreen() {
-
-        final String TITLE = "Wirtschaftssimulator";
-        final String BUTTON_LABEL = "Choose a scene";
-        this.stage.setTitle(TITLE);
-
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("JSON-Files", "*.json"));
-
-        VBox root  = new VBox();
-        root.setAlignment(Pos.CENTER);
-        Button chooseSceneButton = new Button(BUTTON_LABEL);
-        chooseSceneButton.setOnAction(e -> {
-            File selectedFile = fileChooser.showOpenDialog(this.stage);
-            JSONImporter importer = new JSONImporter(selectedFile);
-
-            try {
-                importer.LoadMap();
-            }
-            catch (Exception ex) {
 
                 System.out.println("error eccoured");
             }
@@ -150,8 +134,14 @@ GameView {
         DefaultTileSet tileSet = new DefaultTileSet(this.TILE_SET_URI, this.TILE_SET_COLS, this.TILE_SET_ROWS, this.TILE_WIDTH, this.TILE_HEIGHT);
         TileRenderLayer landscapeLayer = new TileRenderLayer(tileMap.length, tileMap[0].length, tileMap, tileSet);
         landscapeLayer.setOffsetFromCenterY(26);
+    public void displayGameScreen() {
+        this.landscapeLayer = new LandscapeLayer(this.model, this.controller, this.TILE_DIMENSION, this.TILE_HEIGHT_OFFSET);
+        System.out.println("BLUBS?");
+        this.buildingLayer = new BuildingLayer(this.model, this.controller, this.TILE_DIMENSION, this.TILE_HEIGHT_OFFSET);
         landscapeLayer.makeInteractable(this.gameLoop);
-        this.renderer.addRenderLayer(landscapeLayer);
+        this.renderer.addLandscapeLayer(landscapeLayer);
+        this.renderer.addBuildingLayer(buildingLayer);
+        System.out.println("Layer added");
 
         StackPane root = new StackPane();
 
@@ -240,5 +230,13 @@ GameView {
         this.stage.show();
 
         this.gameLoop.addInputHandler(this.stage.getScene());
+    }
+
+    public LandscapeLayer getLandscapeLayer() {
+        return landscapeLayer;
+    }
+
+    public BuildingLayer getBuildingLayer() {
+        return buildingLayer;
     }
 }

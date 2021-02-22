@@ -1,6 +1,13 @@
 package modell;
 
+import types.OnMapBuilding;
+import ui.tiles.BuildingLayer;
+
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Game {
 
@@ -12,7 +19,9 @@ public class Game {
     ArrayList<NatureObject> nature_objects ;
     ArrayList<Tower> towers;
     ArrayList<AirportObject> airport_objects;
+    List<OnMapBuilding> buildingsOnMap;
     Map map;
+    HashMap<Station, HashMap<Station,Integer>> transportNetwork;
 
     public Game(ArrayList<String> commodities, ArrayList<Road> roads, ArrayList<Railway> railways, ArrayList<Tower> towers
     , ArrayList<AirportObject> airport_objects, ArrayList<NatureObject> nature_objects, ArrayList<Factory> factories,
@@ -25,7 +34,9 @@ public class Game {
         this.nature_objects = nature_objects;
         this.factories = factories;
         this.vehicles = vehicles;
+        this.buildingsOnMap = new ArrayList<>();
         this.map = map;
+        this.transportNetwork = new HashMap<>();
     }
 
     public ArrayList<Railway> getRailways() {
@@ -60,7 +71,22 @@ public class Game {
         return towers;
     }
 
+    public List<OnMapBuilding> getBuildingsOnMap() { return buildingsOnMap; }
+
+    public void addBuildingToMap(Building model, int startX, int startY, int height) {
+        this.map.plainGround(startX, startY, model.getWidth(), model.getDepth(), height);
+        this.buildingsOnMap.add(new OnMapBuilding(model, startX, startY, height));
+        this.buildingsOnMap = this.buildingsOnMap.stream()
+                .sorted(Comparator.comparingInt(OnMapBuilding::getStartY))
+                .sorted(Comparator.comparingInt(OnMapBuilding::getStartX))
+                .collect(Collectors.toList());
+    }
+
     public Map getMap() {
         return map;
+    }
+
+    public HashMap<Station, HashMap<Station, Integer>> getTransportNetwork() {
+        return transportNetwork;
     }
 }

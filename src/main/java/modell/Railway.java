@@ -1,10 +1,6 @@
 package modell;
 
-import modell.Building;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 
 public class Railway extends Building {
 
@@ -68,5 +64,4 @@ public class Railway extends Building {
     public Optional getSpecial() {
         return special;
     }
-
 }
