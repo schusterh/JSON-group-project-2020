@@ -26,6 +26,8 @@ public class Factory extends Building{
         this.dz = dz;
     }
 
+    public String getName() { return name; }
+
 
     public void produce(){
         // Einmal durch alle Produktionen durchiterieren

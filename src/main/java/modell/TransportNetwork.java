@@ -45,20 +45,69 @@ class Point {
     }
 }
 
+class TrafficRoute {
+    ArrayList<Station> stations;
+    String vehicleType;
+    int vehicleAmount;
+    ArrayList<Vehicle> vehicles;
+
+    public TrafficRoute(ArrayList<Station> stations, String vehicleType, int vehicleAmount, ArrayList<Vehicle> vehicles){
+        this.stations = stations;
+        this.vehicleType = vehicleType;
+        this.vehicleAmount = vehicleAmount;
+        this.vehicles = vehicles;
+    }
+
+    public ArrayList<Station> getStations() {
+        return stations;
+    }
+
+    public String getVehicleType() {
+        return vehicleType;
+    }
+
+    public int getVehicleAmount() {
+        return vehicleAmount;
+    }
+
+    public ArrayList<Vehicle> getVehicles() {
+        return vehicles;
+    }
+
+    public void addStation(Station station){
+        this.stations.add(station);
+    }
+
+    public void removeStation(Station station){
+        this.stations.remove(station);
+    }
+
+    public void manageVehicles(){
+        if (this.vehicles.size() > vehicleAmount){
+            this.vehicles.remove(-1);
+        }
+        if (this.vehicles.size() < vehicleAmount){
+            this.vehicles.add(this.vehicles.get(-1));
+        }
+        vehicles.removeIf(v -> !v.getKind().equals(this.getVehicleType()));
+    }
+}
+
 public class TransportNetwork {
     ArrayList<String> station_names = new ArrayList<>();
     private HashMap<Station, HashMap<Station,Integer>> adjStations;
+    public HashMap<Point, ArrayList<Point>> connections;
+    public ArrayList<Point> points;
+
     public TransportNetwork(HashMap<Station, HashMap<Station,Integer>> adjStations){
         this.adjStations = adjStations;
     }
-    public HashMap<Point, ArrayList<Point>> connections;
-    public ArrayList<Point> points;
 
     public void addBuild(Double xPos, Double yPos, HashMap<String,ArrayList<Double>> newPoints, ArrayList<ArrayList<String>> newConnect){
         Double diff = 0.2;
         for (String name : newPoints.keySet()){
             Point p = new Point (newPoints.get(name).get(0)+xPos, newPoints.get(name).get(1)+yPos);
-            if (!points.stream().anyMatch(z -> Math.abs(z.getX()) - Math.abs((p.getX())) <= diff && Math.abs(z.getY()) - Math.abs(p.getY()) <= diff)) {
+            if (points.stream().noneMatch(z -> Math.abs(z.getX()) - Math.abs((p.getX())) <= diff && Math.abs(z.getY()) - Math.abs(p.getY()) <= diff)) {
                 points.add(p);
                 connections.put(p, new ArrayList<>());
             }
@@ -66,7 +115,7 @@ public class TransportNetwork {
                 if (c.contains(name)){
                     String connection = String.valueOf(c.stream().filter(x -> !(x.equals(name))));
                     Point connectPoint = new Point(newPoints.get(connection).get(0)+xPos,newPoints.get(connection).get(1)+yPos);
-                    if (!points.stream().anyMatch(z -> Math.abs(z.getX()) - Math.abs(connectPoint.getX()) <= diff && Math.abs(z.getY()) - Math.abs(connectPoint.getY()) <= diff)){
+                    if (points.stream().noneMatch(z -> Math.abs(z.getX()) - Math.abs(connectPoint.getX()) <= diff && Math.abs(z.getY()) - Math.abs(connectPoint.getY()) <= diff)){
                         points.add(connectPoint);
                         connections.put(connectPoint,new ArrayList<>());
                         if (!connections.get(p).contains(connectPoint)){
@@ -123,7 +172,7 @@ public class TransportNetwork {
         while (notGenerated) {
             byte[] array = new byte[3];
             new Random().nextBytes(array);
-             generatedString = new String(array, Charset.forName("UTF-8"));
+            generatedString = new String(array, Charset.forName("UTF-8"));
             if (!station_names.contains(generatedString)) {
                 station_names.add(generatedString);
                 return generatedString;
