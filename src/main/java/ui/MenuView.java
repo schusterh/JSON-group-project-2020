@@ -5,8 +5,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.Image;
+import javafx.scene.layout.*;
 import javafx.scene.shape.Box;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -64,8 +64,8 @@ public class MenuView {
                 VBox layout= new VBox(10);
                 layout.getChildren().addAll(label1, button1);
                 layout.setAlignment(Pos.CENTER);
-                Scene scene1= new Scene(layout, 300, 250);
-                popupwindow.setScene(scene1);
+                Scene error_scene= new Scene(layout, 300, 250);
+                popupwindow.setScene(error_scene);
                 popupwindow.showAndWait();
 
         }
@@ -73,6 +73,10 @@ public class MenuView {
 
         root.getChildren().add(chooseSceneButton);
         Scene welcomeWindow = new Scene(root,1024,768);
+
+
+
+
         this.stage.setScene(welcomeWindow);
         this.stage.show();
     }

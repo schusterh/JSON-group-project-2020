@@ -33,4 +33,8 @@ public class Vehicle {
     public String getGraphic() { return graphic; }
     public  Optional<ArrayList<HashMap<String,Integer>>> getCargo() { return cargo; }
     public double getSpeed() { return speed; }
+
+
+
 }
+
