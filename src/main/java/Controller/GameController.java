@@ -51,8 +51,8 @@ public class GameController {
         this.model.getMap().decreaseHeightOfSelectedTiles(selectedTiles);
     }
 
-    public void plainGround(int startX, int startY, int width, int depth, int height) {
-        this.model.getMap().plainGround(startX, startY, width, depth, height);
+    public void plainGround(int startX, int startY, int width, int depth, int height, boolean isConcrete) {
+        this.model.getMap().plainGround(startX, startY, width, depth, height, isConcrete);
     }
 
     public void addBuildingToMap(Building model, int startX, int startY, int height) {

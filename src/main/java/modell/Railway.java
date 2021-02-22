@@ -22,7 +22,7 @@ public class Railway extends Building {
                    Optional<ArrayList<String>> signals,
                    Optional<String> special,
                    Optional<HashMap<String, String>> combines) {
-        super(width,depth);
+        super(width,depth, name);
         this.name = name;
         if (buildmenu.isPresent()){this.buildmenu = buildmenu;}
         if (points.isPresent()){this.points = points;}

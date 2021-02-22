@@ -51,7 +51,7 @@ public class Game {
         return roads;
     }
 
-    public ArrayList<NatureObject> getNature_objects() {
+    public ArrayList<NatureObject> getNatureObjects() {
         return nature_objects;
     }
 
@@ -63,7 +63,7 @@ public class Game {
         return vehicles;
     }
 
-    public ArrayList<AirportObject> getAirport_objects() {
+    public ArrayList<AirportObject> getAirportObjects() {
         return airport_objects;
     }
 
@@ -74,7 +74,7 @@ public class Game {
     public List<OnMapBuilding> getBuildingsOnMap() { return buildingsOnMap; }
 
     public void addBuildingToMap(Building model, int startX, int startY, int height) {
-        this.map.plainGround(startX, startY, model.getWidth(), model.getDepth(), height);
+        this.map.plainGround(startX, startY, model.getWidth(), model.getDepth(), height, model.getClass() == NatureObject.class ? false : true);
         this.buildingsOnMap.add(new OnMapBuilding(model, startX, startY, height));
         this.buildingsOnMap = this.buildingsOnMap.stream()
                 .sorted(Comparator.comparingInt(OnMapBuilding::getStartY))

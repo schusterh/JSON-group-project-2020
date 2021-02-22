@@ -18,7 +18,7 @@ public class Factory extends Building{
 
 
     public Factory(String name, int width, int depth, String special, ArrayList<Production> productions, Optional<HashMap<String, Integer>> storage, int dz) {
-        super(width,depth);
+        super(width,depth, name);
         this.name = name;
         this.special = special;
         this.productions = productions;

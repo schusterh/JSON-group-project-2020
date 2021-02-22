@@ -4,21 +4,20 @@ import java.util.Optional;
 
 public class NatureObject extends Building {
     public String name;
-    public Optional buildmenu;
+    public String buildmenu;
     private String special;
     private int dz;
 
-    public NatureObject(String name,int width, int depth, Optional<String> buildmenu, String special, int dz) {
-        super(width,depth);
+    public NatureObject(String name, int width, int depth, Optional<String> buildmenu, String special, int dz) {
+        super(width,depth, name);
         this.name = name;
-        if (buildmenu.isPresent()) {
-            this.buildmenu = buildmenu;
-        }
+        this.buildmenu = "";
+        buildmenu.ifPresent(s -> this.buildmenu = s);
         this.special = special;
         this.dz = dz;
     }
 
-    public Optional getBuildmenu() {
+    public String getBuildmenu() {
         return buildmenu;
     }
 

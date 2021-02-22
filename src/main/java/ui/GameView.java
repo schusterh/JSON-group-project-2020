@@ -8,21 +8,16 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCombination;
 import Controller.GameController;
 import modell.*;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 
 import javafx.scene.layout.*;
 
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import types.Tile;
 import ui.tiles.BuildingLayer;
-import ui.tiles.DefaultTileSet;
 import ui.tiles.LandscapeLayer;
 import ui.tiles.TileRenderer;
 
-import java.io.File;
 import java.util.ArrayList;
 
 public class
@@ -41,7 +36,6 @@ GameView {
     LandscapeLayer landscapeLayer;
     BuildingLayer buildingLayer;
 
-    HBox topBar;
     Canvas canvas;
 
     final int TILE_DIMENSION = 138;
@@ -56,25 +50,7 @@ GameView {
        this.renderer = new TileRenderer();
     }
 
-
-                System.out.println("error eccoured");
-            }
-        });
-
-        ImageView backgroundImage = new ImageView("/Menü_Hintergrund.png");
-        backgroundImage.setX(10);
-        backgroundImage.setY(10);
-        backgroundImage.setPreserveRatio(true);
-        backgroundImage.setScaleX(1024);
-
-
-        root.getChildren().add(chooseSceneButton);
-        Scene welcomeWindow = new Scene(root,1024,768);
-        this.stage.setScene(welcomeWindow);
-        this.stage.show();
-    }
-
-    public void displayGameScreen(Tile[][] tileMap) {
+    public void displayGameScreen() {
 
         //Creat MenuBar
         MenuBar menuBar = new MenuBar();
@@ -108,7 +84,7 @@ GameView {
         BorderPane menuLeiste = new BorderPane();
         // Add menuItems to the Menus
         bauenMenu.getItems().addAll(straßenItem, bauwerkItem, bäumeItem);
-        homeMenu.getItems().addAll(speichernItem,exitItem);
+        homeMenu.getItems().addAll(speichernItem, exitItem);
 
         // Add Menus to the MenuBar
         menuBar.getMenus().addAll(homeMenu, bauenMenu, lebenMenu, exitMenu);
@@ -130,11 +106,6 @@ GameView {
         //borderPane.setTop(messageLabel);
         //borderPane.setPrefSize(1024,150);
 
-
-        DefaultTileSet tileSet = new DefaultTileSet(this.TILE_SET_URI, this.TILE_SET_COLS, this.TILE_SET_ROWS, this.TILE_WIDTH, this.TILE_HEIGHT);
-        TileRenderLayer landscapeLayer = new TileRenderLayer(tileMap.length, tileMap[0].length, tileMap, tileSet);
-        landscapeLayer.setOffsetFromCenterY(26);
-    public void displayGameScreen() {
         this.landscapeLayer = new LandscapeLayer(this.model, this.controller, this.TILE_DIMENSION, this.TILE_HEIGHT_OFFSET);
         System.out.println("BLUBS?");
         this.buildingLayer = new BuildingLayer(this.model, this.controller, this.TILE_DIMENSION, this.TILE_HEIGHT_OFFSET);
@@ -175,21 +146,31 @@ GameView {
 
         ArrayList<Button> buttonBaum = new ArrayList<>();
         for (NatureObject nature : this.model.getNatureObjects()) {
-            if (nature.getBuildmenu()) {
-                buttonBaum.add(new Button (getClass().getResourceAsStream("/tilesets/" + nature.getName())));
+            System.out.println("adjkladsjkl");
+            System.out.println(nature.getBuildmenu());
+            if (nature.getBuildmenu().equals("nature")) {
+                System.out.println("NAME: " + nature.getName());
+                System.out.println("PATH: " + "/buildings/" + nature.getName() + ".png");
+                Button b = new Button();
+                b.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + nature.getName() + ".png"))));
+
+                b.setOnAction(event -> {
+                    controller.addBuildingToMap(nature, 1, 2, 1);
+                    controller.addBuildingToMap(nature, 1, 3, 1);
+                    controller.addBuildingToMap(nature, 1, 4, 1);
+                });
+                buttonBaum.add(b);
+                hbox.getChildren().add(b);
             }
         }
-
-        buttonBaum.add(new Button ("/tilesets/baum_01.png"));
-        buttonBaum.add(new Button ("/tilesets/baum_02.png"));
-        buttonBaum.add(new Button ("/tilesets/baum_03.png"));
+        topBar.getChildren().add(borderPane);
 
         ArrayList<Button> buttonRoad = new ArrayList<>();
         buttonRoad.add(new Button ("/tilesets/strase_01.png"));
         buttonRoad.add(new Button ("/tilesets/strase_02.png"));
 
         // When user click on the bäume item.
-        bäumeItem.setOnAction(new EventHandler<ActionEvent>() {
+        /*bäumeItem.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
             public void handle(ActionEvent event) {
@@ -198,10 +179,11 @@ GameView {
                     Image imageBaum = new Image(getClass().getResourceAsStream(b.getText()));
                     bBaum.setGraphic(new ImageView(imageBaum));
                     hbox.getChildren().add(bBaum);
+                    System.out.println("BAUM PFLANZEN YO");
                 }
                 topBar.getChildren().add(borderPane);
             }
-        });
+        });*/
 
         // When user click on the road item.
         straßenItem.setOnAction(new EventHandler<ActionEvent>() {
@@ -222,7 +204,7 @@ GameView {
 
 
         this.gameLoop.initializeGame(this.renderer, this.canvas);
-        this.gameLoop.setInitialOffset((int) (this.canvas.getWidth()) / 2, (tileMap[0].length * this.TILE_HEIGHT) / 4);
+        //this.gameLoop.setInitialOffset((int) (this.canvas.getWidth()) / 2, (this.model.getMap().getWidth() * TILE_DIMENSION) / 4);
         this.gameLoop.setPanStep(26);
         this.gameLoop.startGame();
 

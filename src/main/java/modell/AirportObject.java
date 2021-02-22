@@ -13,7 +13,7 @@ public class AirportObject extends Building {
 
     public AirportObject(int width, int depth, String name, String buildmenu, String special,
                          HashMap<String, ArrayList<Double>> points, Optional<ArrayList<String>> entry, ArrayList<ArrayList<String>> planes, int dz) {
-        super(width, depth);
+        super(width, depth, name);
         this.name = name;
         this.buildmenu = buildmenu;
         this.special = special;
