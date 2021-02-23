@@ -11,23 +11,24 @@ import java.util.stream.Collectors;
 
 public class Game {
 
-    ArrayList<Vehicle> vehicles;
-    ArrayList<Road> roads;
-    ArrayList<Railway> railways;
-    ArrayList<Factory> factories;
-    ArrayList<String> commodities;
-    ArrayList<NatureObject> nature_objects ;
-    ArrayList<Tower> towers;
-    ArrayList<AirportObject> airport_objects;
-    List<OnMapBuilding> buildingsOnMap;
-    Map map;
-    HashMap<Station, HashMap<Station,Integer>> transportNetwork;
+    private ArrayList<Vehicle> vehicles;
+    private ArrayList<Road> roads;
+    private ArrayList<Railway> railways;
+    private ArrayList<Factory> factories;
+    private ArrayList<String> commodities;
+    private ArrayList<NatureObject> nature_objects ;
+    private ArrayList<Tower> towers;
+    private ArrayList<AirportObject> airport_objects;
+    private List<OnMapBuilding> buildingsOnMap;
+    private Map map;
+    private ArrayList<String> music;
+    private HashMap<Station, HashMap<Station,Integer>> transportNetwork;
 
     int[] currentMouseTileIndex;
 
     public Game(ArrayList<String> commodities, ArrayList<Road> roads, ArrayList<Railway> railways, ArrayList<Tower> towers
     , ArrayList<AirportObject> airport_objects, ArrayList<NatureObject> nature_objects, ArrayList<Factory> factories,
-                ArrayList<Vehicle> vehicles, Map map) {
+                ArrayList<Vehicle> vehicles, Map map, ArrayList<String> music) {
         this.commodities = commodities;
         this.roads = roads;
         this.railways = railways;
@@ -39,6 +40,7 @@ public class Game {
         this.buildingsOnMap = new ArrayList<>();
         this.map = map;
         this.transportNetwork = new HashMap<>();
+        this.music = music;
     }
 
     public ArrayList<Railway> getRailways() {
@@ -106,5 +108,13 @@ public class Game {
 
     public HashMap<Station, HashMap<Station, Integer>> getTransportNetwork() {
         return transportNetwork;
+    }
+
+    public String getBackgroundMusic() {
+        return this.music.get(0);
+    }
+
+    public String getMenuMusic() {
+        return this.music.get(1);
     }
 }
