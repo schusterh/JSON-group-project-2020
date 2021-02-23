@@ -20,20 +20,20 @@ public class JSONImporter {
     }
 
     public Game LoadMap() throws Exception {
-        String ERROR_MESSAGE = "Nicht genügend Objekte im Szenario!";
+        String ERROR_MESSAGE = "Not enogh objects in the scenario!";
         String content = Files.readString(Paths.get(this.file.getAbsolutePath()), StandardCharsets.UTF_8);
         JSONObject json = new JSONObject(content);
         if (!json.has("buildings")) {
-            throw new Exception("Keine Buildings!");
+            throw new Exception("No buildings found!");
         }
         else if(!json.has("vehicles")) {
-            throw new Exception("Keine Vehicles!");
+            throw new Exception("No vehicles found!");
         }
         else if (!json.has("commodities")) {
-            throw new Exception("Keine Commodities!");
+            throw new Exception("No commodities found!");
         }
         else if(!json.has("map")) {
-            throw new Exception("Keine Map");
+            throw new Exception("No map found!");
         }
         else {
 
@@ -60,7 +60,7 @@ public class JSONImporter {
     }
 
     public ArrayList<Vehicle> getVehicles(JSONObject vehicles) throws Exception{
-        String ERROR_MESSAGE = "Fehler! Vehicle entspricht keinem gültigen Format!";
+        String ERROR_MESSAGE = "Error! The vehicle is not in a supported format!";
         ArrayList<Vehicle> v = new ArrayList<>();
         for (String key : vehicles.keySet()) {
             JSONObject vehicle = vehicles.getJSONObject(key);
@@ -101,7 +101,7 @@ public class JSONImporter {
     }
 
     public ArrayList<Road> getRoads(JSONObject roads) throws Exception {
-        String ERROR_MESSAGE = "Fehler! Road entspricht keinem gültigen Format!";
+        String ERROR_MESSAGE = "Error! The road is not in a supported format!";
         ArrayList<Road> r = new ArrayList<>();
         for (String key : roads.keySet()) {
             if (roads.getJSONObject(key).has("roads")) {
@@ -237,7 +237,7 @@ public class JSONImporter {
 
 
     public ArrayList<Factory> getFactories(JSONObject factories) throws Exception{
-        String ERROR_MESSAGE = "Fehler! Factory entspricht keinem gültigen Format!";
+        String ERROR_MESSAGE = "Error! The factory is not in a supported format!";
         ArrayList<Factory> f = new ArrayList<>();
         for(String key : factories.keySet()) {
             if (factories.getJSONObject(key).has("productions")) {
@@ -298,7 +298,7 @@ public class JSONImporter {
     }
 
     public ArrayList<String> getCommodities(JSONArray comodities) throws Exception{
-        String ERROR_MESSAGE = "Fehler! Commodities sind leer!";
+        String ERROR_MESSAGE = "Error! The commodity is not in a supported format!";
         ArrayList<String> c = new ArrayList<>();
         if (comodities.length() == 0) {
             throw new Exception(ERROR_MESSAGE);
@@ -313,7 +313,7 @@ public class JSONImporter {
     }
 
     public Map getMap(JSONObject map) throws Exception{
-        String ERROR_MESSAGE = "Fehler! Map Attribut entspricht keinem gültigen Format!";
+        String ERROR_MESSAGE = "Error! The map is not in a supported format!";
         if (!map.has("gamemode") || !map.has("mapgen") || !map.has("width") || !map.has("depth")) {
             throw new Exception(ERROR_MESSAGE);
         }
@@ -328,7 +328,7 @@ public class JSONImporter {
     }
 
     public ArrayList<NatureObject> getNatureObjects(JSONObject natobs) throws Exception{
-        String ERROR_MESSAGE = "Fehler! Nature-Objekt entspricht keinem gültigen Format!";
+        String ERROR_MESSAGE = "Error! The nature object is not in a supported format!";
         ArrayList<NatureObject> no  = new ArrayList<>();
         for(String key: natobs.keySet()) {
             if(natobs.getJSONObject(key).has("special") && natobs.getJSONObject(key).getString("special").equals("nature")) {
@@ -355,7 +355,7 @@ public class JSONImporter {
     }
 
     public ArrayList<Tower> getTowers(JSONObject towers) throws Exception{
-        String ERROR_MESSAGE = "Fehler! Tower-Objekt entspricht keinem gültigen Format!";
+        String ERROR_MESSAGE = "Error! The tower is not in a supported format!";
         ArrayList<Tower> t = new ArrayList<>();
         for(String key : towers.keySet()) {
             if(key.equals("tower") || key.equals("big tower")) {
@@ -379,7 +379,7 @@ public class JSONImporter {
         return t;
     }
     public ArrayList<AirportObject> getAirportObjects(JSONObject airobjs) throws Exception{
-        String ERROR_MESSAGE = "Fehler! Airport Objekt entspricht keinem gültigen Format!";
+        String ERROR_MESSAGE = "Error! The airport object is not in a supported format!";
         ArrayList<AirportObject> r = new ArrayList<>();
         for(String key : airobjs.keySet()) {
             if(airobjs.getJSONObject(key).has("planes")) {
