@@ -21,7 +21,7 @@ public class JSONImporter {
 
     public Game LoadMap() throws Exception {
         String ERROR_MESSAGE = "Not enogh objects in the scenario!";
-        final String STANDARD_BG_MUSIC = "src\\main\\resources\\happy_tune.mp3";
+        final String STANDARD_BG_MUSIC = "happy_tune.mp3";
         final String STANDARD_MN_MUSIC = "";
 
         String content = Files.readString(Paths.get(this.file.getAbsolutePath()), StandardCharsets.UTF_8);
