@@ -41,10 +41,16 @@ public class MenuView {
         Button chooseSceneButton = new Button(BUTTON_LABEL);
 
         chooseSceneButton.setOnAction(e -> {
+            try {
             File selectedFile = fileChooser.showOpenDialog(this.stage);
+
+            if(selectedFile == null) {
+                throw new Exception("Please choose a scenario file!");
+            }
+
             JSONImporter importer = new JSONImporter(selectedFile);
 
-            try {
+
                 Game prerequisites = importer.LoadMap();
                 this.controller.createGame(prerequisites, this.stage);
             }
