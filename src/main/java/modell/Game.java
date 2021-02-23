@@ -23,6 +23,8 @@ public class Game {
     Map map;
     HashMap<Station, HashMap<Station,Integer>> transportNetwork;
 
+    int[] currentMouseTileIndex;
+
     public Game(ArrayList<String> commodities, ArrayList<Road> roads, ArrayList<Railway> railways, ArrayList<Tower> towers
     , ArrayList<AirportObject> airport_objects, ArrayList<NatureObject> nature_objects, ArrayList<Factory> factories,
                 ArrayList<Vehicle> vehicles, Map map) {
@@ -74,8 +76,18 @@ public class Game {
     public List<OnMapBuilding> getBuildingsOnMap() { return buildingsOnMap; }
 
     public void addBuildingToMap(Building model, int startX, int startY, int height) {
-        this.map.plainGround(startX, startY, model.getWidth(), model.getDepth(), height, model.getClass() == NatureObject.class ? false : true);
+        this.map.plainGround(startX, startY, model.getWidth(), model.getDepth(), height, model.getClass() != NatureObject.class);
         this.buildingsOnMap.add(new OnMapBuilding(model, startX, startY, height));
+        this.sortBuildings();
+    }
+
+    public void addBuildingToMap(OnMapBuilding pendingBuilding) {
+        this.map.plainGround(pendingBuilding.startX, pendingBuilding.startY, pendingBuilding.width, pendingBuilding.depth, pendingBuilding.height, pendingBuilding.model.getClass() != NatureObject.class);
+        this.buildingsOnMap.add(pendingBuilding);
+        this.sortBuildings();
+    }
+
+    private void sortBuildings() {
         this.buildingsOnMap = this.buildingsOnMap.stream()
                 .sorted(Comparator.comparingInt(OnMapBuilding::getStartY))
                 .sorted(Comparator.comparingInt(OnMapBuilding::getStartX))
@@ -85,6 +97,12 @@ public class Game {
     public Map getMap() {
         return map;
     }
+
+    public void setCurrentMouseTileIndex(int[] pos) {
+        this.currentMouseTileIndex = pos;
+    }
+
+    public int[] getCurrentMouseTileIndex() { return currentMouseTileIndex; }
 
     public HashMap<Station, HashMap<Station, Integer>> getTransportNetwork() {
         return transportNetwork;

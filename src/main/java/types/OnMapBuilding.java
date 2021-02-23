@@ -5,6 +5,7 @@ import modell.Building;
 
 public class OnMapBuilding {
 
+    public Building model;
     public int startX;
     public int startY;
     public int width;
@@ -13,6 +14,7 @@ public class OnMapBuilding {
     public Image graphic;
 
     public OnMapBuilding(Building building, int startX, int startY, int height) {
+        this.model = building;
         this.startX = startX;
         this.startY = startY;
         this.width = building.getWidth();
