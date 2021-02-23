@@ -22,9 +22,6 @@ public class JSONImporter {
     public Game LoadMap() throws Exception {
         String ERROR_MESSAGE = "Not enogh objects in the scenario!";
         String content = Files.readString(Paths.get(this.file.getAbsolutePath()), StandardCharsets.UTF_8);
-        if (!content.startsWith("{") || !content.endsWith("}")) {
-            throw new Exception("This is not a JSON-File!");
-        }
         JSONObject json = new JSONObject(content);
         if (!json.has("buildings")) {
             throw new Exception("No buildings found!");
