@@ -14,11 +14,14 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.layout.*;
 
 import javafx.stage.Stage;
+import types.GameMode;
 import ui.tiles.BuildingLayer;
 import ui.tiles.LandscapeLayer;
 import ui.tiles.TileRenderer;
 
 import java.util.ArrayList;
+
+
 
 public class
 GameView {
@@ -31,12 +34,12 @@ GameView {
     GameLoop gameLoop;
     TileRenderer renderer;
 
-    //HBox topBar;
     VBox topBar;
     LandscapeLayer landscapeLayer;
     BuildingLayer buildingLayer;
 
     Canvas canvas;
+
 
     final int TILE_DIMENSION = 138;
     final int TILE_HEIGHT_OFFSET = 26;
@@ -47,6 +50,7 @@ GameView {
        this.stage = stage;
 
        this.gameLoop = new GameLoop(controller);
+       this.controller.setGameLoop(this.gameLoop);
        this.renderer = new TileRenderer();
     }
 
@@ -59,6 +63,7 @@ GameView {
         Menu homeMenu = new Menu("Home");
         Menu bauenMenu = new Menu("Building");
         Menu lebenMenu = new Menu("Live");
+        Menu landscapeMenu = new Menu("Terrain");
         Menu exitMenu = new Menu("Exit");
 
         //Creat MenuItems
@@ -69,25 +74,24 @@ GameView {
         MenuItem speichernItem = new MenuItem("Save");
         MenuItem exitItem = new MenuItem("Exit");
 
+        MenuItem landscapeItem = new MenuItem("Shape");
+
         // Set Accelerator for Exit MenuItem.
         exitItem.setAccelerator(KeyCombination.keyCombination("Ctrl+E"));
 
-        // When user click on the Exit item.
-        exitItem.setOnAction(new EventHandler<ActionEvent>() {
+        landscapeItem.setOnAction(event -> controller.setGameMode(GameMode.TERRAIN));
 
-            @Override
-            public void handle(ActionEvent event) {
-                System.exit(0);
-            }
-        });
+        // When user click on the Exit item.
+        exitItem.setOnAction(event -> System.exit(0));
 
         BorderPane menuLeiste = new BorderPane();
         // Add menuItems to the Menus
         bauenMenu.getItems().addAll(straßenItem, bauwerkItem, bäumeItem);
         homeMenu.getItems().addAll(speichernItem, exitItem);
+        landscapeMenu.getItems().add(landscapeItem);
 
         // Add Menus to the MenuBar
-        menuBar.getMenus().addAll(homeMenu, bauenMenu, lebenMenu, exitMenu);
+        menuBar.getMenus().addAll(homeMenu, bauenMenu, lebenMenu, landscapeMenu, exitMenu);
         menuLeiste.setTop(menuBar);
 
 
@@ -116,7 +120,6 @@ GameView {
 
         StackPane root = new StackPane();
 
-        //VBox root = new VBox();
         //this.topBar = new HBox();
         this.topBar = new VBox();
         this.topBar.setPickOnBounds(false);
@@ -124,17 +127,11 @@ GameView {
         this.canvas.widthProperty().bind(this.stage.widthProperty());
         this.canvas.heightProperty().bind(this.stage.heightProperty());
 
-
-
         // Wenn im bäumeBaumenü auf schließen gecklickt wird.
-        closeButton.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                topBar.getChildren().remove(borderPane);
-                borderPane.getChildren().removeAll();
-                hbox.getChildren().removeAll();
-            }
+        closeButton.setOnAction(event -> {
+            topBar.getChildren().remove(borderPane);
+            borderPane.getChildren().removeAll();
+            hbox.getChildren().removeAll();
         });
 
 
@@ -158,6 +155,7 @@ GameView {
                     controller.addBuildingToMap(nature, 1, 2, 1);
                     controller.addBuildingToMap(nature, 1, 3, 1);
                     controller.addBuildingToMap(nature, 1, 4, 1);
+                    buildingLayer.placeBuilding(nature);
                 });
                 buttonBaum.add(b);
                 hbox.getChildren().add(b);
@@ -186,18 +184,14 @@ GameView {
         });*/
 
         // When user click on the road item.
-        straßenItem.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                for (Button b : buttonRoad){
+        straßenItem.setOnAction(event -> {
+                for (Button b : buttonRoad) {
                     Button bRoad = new Button();
-                    Image imageRoad= new Image(getClass().getResourceAsStream(b.getText()));
+                    Image imageRoad = new Image(getClass().getResourceAsStream(b.getText()));
                     bRoad.setGraphic(new ImageView(imageRoad));
                     hbox.getChildren().add(bRoad);
                 }
                 topBar.getChildren().add(borderPane);
-            }
         });
 
 
@@ -213,6 +207,8 @@ GameView {
 
         this.gameLoop.addInputHandler(this.stage.getScene());
     }
+
+
 
     public LandscapeLayer getLandscapeLayer() {
         return landscapeLayer;
