@@ -1,21 +1,19 @@
 package Controller;
 
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.util.Duration;
-import map.MapGenerator;
 import modell.Building;
 import modell.Game;
 import types.Coordinate;
-import types.OnMapBuilding;
-import types.Tile;
 import ui.GameView;
 
-import javax.swing.text.View;
+import javax.print.attribute.standard.Media;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Random;
 
 
 public class GameController {
@@ -79,4 +77,15 @@ public class GameController {
        // this.view.startview();
         this.startAnimation();
     }
+
+    // kriege diesen Media Player nicht importiert, ist nur ne dummy methode, ich hab noch keine audio dateien hinzugefügt...
+    public void music() {
+        MediaPlayer mediaPlayer;
+        String s = "home.mp3";
+        Media h = new Media(Paths.get(s).toUri().toString());
+        mediaPlayer = new MediaPlayer(h);
+        mediaPlayer.play();
+
+    }
+
 }
