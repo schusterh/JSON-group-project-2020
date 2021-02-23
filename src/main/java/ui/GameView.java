@@ -141,24 +141,68 @@ GameView {
         root.getChildren().add(this.topBar);
 
 
-        ArrayList<Button> buttonBaum = new ArrayList<>();
-        for (NatureObject nature : this.model.getNatureObjects()) {
-            System.out.println("adjkladsjkl");
-            System.out.println(nature.getBuildmenu());
-            if (nature.getBuildmenu().equals("nature")) {
-                System.out.println("NAME: " + nature.getName());
-                System.out.println("PATH: " + "/buildings/" + nature.getName() + ".png");
-                Button b = new Button();
-                b.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + nature.getName() + ".png"))));
 
-                b.setOnAction(event -> {
+        //ArrayList<Button> buttonBaum = new ArrayList<>();
+        for (NatureObject nature : this.model.getNatureObjects()) {
+
+            if (nature.getBuildmenu().equals("nature")) {
+                Button bNatur = new Button();
+                bNatur.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/natur/" + nature.getName() + ".png"))));
+
+                bNatur.setOnAction(event -> {
                     buildingLayer.placeBuilding(nature);
                 });
-                buttonBaum.add(b);
-                hbox.getChildren().add(b);
+                hbox.getChildren().add(bNatur);
             }
         }
-        topBar.getChildren().add(borderPane);
+
+
+        /*for (Building building : this.model.getBuilding()) {
+
+            if (nature.getBuildmenu().equals("nature")) {
+                Button bNatur = new Button();
+                bNatur.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/natur/" + nature.getName() + ".png"))));
+
+                bNatur.setOnAction(event -> {
+                    buildingLayer.placeBuilding(nature);
+                });
+                hbox.getChildren().add(bNatur);
+            }
+        }*/
+
+
+        for (Road road : this.model.getRoads()) {
+
+            if (road.getBuildmenu().equals("road")) {
+                Button bRoad = new Button();
+                bRoad.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/roads/" + road.getName() + ".png"))));
+
+                bRoad.setOnAction(event -> {
+                    buildingLayer.placeBuilding(road);
+                });
+                hbox.getChildren().add(bRoad);
+            }
+        }
+
+
+        bäumeItem.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                topBar.getChildren().add(borderPane);
+            }
+        });
+
+        straßenItem.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                topBar.getChildren().add(borderPane);
+            }
+        });
+
+
+
 
         ArrayList<Button> buttonRoad = new ArrayList<>();
         buttonRoad.add(new Button ("/tilesets/strase_01.png"));
