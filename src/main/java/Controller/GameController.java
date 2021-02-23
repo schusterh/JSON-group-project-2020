@@ -75,7 +75,6 @@ public class GameController {
         this.startAnimation();
 
         music.playBackgroundMusic();
-
     }
 
     public void setCurrentMouseTileIndex(int[] pos) {
