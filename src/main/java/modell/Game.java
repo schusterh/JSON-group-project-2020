@@ -73,6 +73,31 @@ public class Game {
 
     public List<OnMapBuilding> getBuildingsOnMap() { return buildingsOnMap; }
 
+    public Factory findTarget(Factory f, String commodity){
+        HashMap<Factory, Double> possibleTargets = new HashMap<>();
+        ArrayList<Factory> possTargets = new ArrayList<>();
+        for (Factory g : this.getFactories()) {
+            g.getProductions().stream().filter(p -> p.getConsume()
+                    .isPresent()).filter(p -> p.getConsume().get()
+                    .containsKey(commodity))
+                    .forEach(p -> possibleTargets.put(g, null));
+            double weight = (double) (g.getStorage().get(commodity) - g.getCurrentStorage().get(commodity))
+                    / transportNetwork.get(f).get(g);
+            possibleTargets.put(g, weight);
+            possTargets.add(g);
+        }
+        double totalWeight = 0.0d;
+        for (Factory factory : possTargets) {
+            totalWeight += possibleTargets.get(factory);
+        }
+        int randomIndex = 0;
+        for (double r = Math.random() * totalWeight; randomIndex < possTargets.size() -1; ++randomIndex){
+            r -= possibleTargets.get(possTargets.get(randomIndex));
+            if (r <= 0.0) break;
+        }
+        return possTargets.get(randomIndex);
+    }
+
     public void addBuildingToMap(Building model, int startX, int startY, int height) {
         this.map.plainGround(startX, startY, model.getWidth(), model.getDepth(), height);
         this.buildingsOnMap.add(new OnMapBuilding(model, startX, startY, height));
