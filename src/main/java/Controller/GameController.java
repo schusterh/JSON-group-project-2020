@@ -5,14 +5,13 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+
 import javafx.util.Duration;
 import modell.Building;
 import modell.Game;
+import modell.MusicPlayer;
 import types.Coordinate;
 import ui.GameView;
-
-import javax.print.attribute.standard.Media;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 
 
@@ -22,6 +21,7 @@ public class GameController {
     GameView view;
     Timeline timeline;
     EventHandler<ActionEvent> timelineTask;
+    MusicPlayer music = new MusicPlayer("src\\main\\resources\\happy_tune.mp3","");
 
     public GameController(Game model, int tickLength) {
         this.model = model;
@@ -60,8 +60,9 @@ public class GameController {
     public void startGame() {
         this.view.displayGameScreen();
         System.out.println("WELL2?");
-
         this.startAnimation();
+        music.playBackgroundMusic();
+
     }
 
     public void startAnimation() {
@@ -78,14 +79,6 @@ public class GameController {
         this.startAnimation();
     }
 
-    // kriege diesen Media Player nicht importiert, ist nur ne dummy methode, ich hab noch keine audio dateien hinzugefügt...
-    public void music() {
-        MediaPlayer mediaPlayer;
-        String s = "home.mp3";
-        Media h = new Media(Paths.get(s).toUri().toString());
-        mediaPlayer = new MediaPlayer(h);
-        mediaPlayer.play();
 
-    }
 
 }
