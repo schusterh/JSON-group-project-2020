@@ -1,21 +1,18 @@
 package Controller;
 
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+
 import javafx.util.Duration;
-import map.MapGenerator;
 import modell.Building;
 import modell.Game;
+import modell.MusicPlayer;
 import types.Coordinate;
-import types.OnMapBuilding;
-import types.Tile;
 import ui.GameView;
-
-import javax.swing.text.View;
 import java.util.ArrayList;
-import java.util.Random;
 
 
 public class GameController {
@@ -24,9 +21,11 @@ public class GameController {
     GameView view;
     Timeline timeline;
     EventHandler<ActionEvent> timelineTask;
+    MusicPlayer music;
 
     public GameController(Game model, int tickLength) {
         this.model = model;
+        music = new MusicPlayer(this.model.getBackgroundMusic(), this.model.getMenuMusic());
 
         this.timelineTask = event -> {
             //model.handleUpdate();
@@ -62,8 +61,10 @@ public class GameController {
     public void startGame() {
         this.view.displayGameScreen();
         System.out.println("WELL2?");
-
         this.startAnimation();
+
+        music.playBackgroundMusic();
+
     }
 
     public void startAnimation() {
@@ -79,4 +80,7 @@ public class GameController {
        // this.view.startview();
         this.startAnimation();
     }
+
+
+
 }

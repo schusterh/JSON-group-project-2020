@@ -13,12 +13,13 @@ repositories {
 
 javafx {
     version = "15.0.1"
-    modules = [ 'javafx.controls' ]
+    modules = [ 'javafx.controls', 'javafx.media' ]
 }
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     implementation 'org.json:json:20171018'
+    implementation group: 'org.openjfx', name: 'javafx-media', version: '15.0.1'
 }
 
 jar {
@@ -31,3 +32,4 @@ jar {
 }
 
 mainClassName = "Wirtschaftssimulator"
+
