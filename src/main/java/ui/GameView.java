@@ -152,9 +152,6 @@ GameView {
                 b.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + nature.getName() + ".png"))));
 
                 b.setOnAction(event -> {
-                    controller.addBuildingToMap(nature, 1, 2, 1);
-                    controller.addBuildingToMap(nature, 1, 3, 1);
-                    controller.addBuildingToMap(nature, 1, 4, 1);
                     buildingLayer.placeBuilding(nature);
                 });
                 buttonBaum.add(b);
