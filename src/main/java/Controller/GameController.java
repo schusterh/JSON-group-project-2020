@@ -21,10 +21,11 @@ public class GameController {
     GameView view;
     Timeline timeline;
     EventHandler<ActionEvent> timelineTask;
-    MusicPlayer music = new MusicPlayer("src\\main\\resources\\happy_tune.mp3","");
+    MusicPlayer music;
 
     public GameController(Game model, int tickLength) {
         this.model = model;
+        music = new MusicPlayer(this.model.getBackgroundMusic(), this.model.getMenuMusic());
 
         this.timelineTask = event -> {
             //model.handleUpdate();
@@ -61,6 +62,7 @@ public class GameController {
         this.view.displayGameScreen();
         System.out.println("WELL2?");
         this.startAnimation();
+
         music.playBackgroundMusic();
 
     }
