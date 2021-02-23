@@ -11,17 +11,22 @@ public  class MusicPlayer {
     MediaPlayer mediaPlayer;
 
     public MusicPlayer(String bm_file_path, String mm_file_path) {
-        this.bm_file_path = bm_file_path;
-        this.mm_file_path = mm_file_path;
+        this.bm_file_path = getClass().getResource("/music/" + bm_file_path).toString();
+        this.mm_file_path = getClass().getResource("/music/" + mm_file_path).toString();
     }
 
     public void playBackgroundMusic() {
 
-
-        Media h = new Media(Paths.get(this.bm_file_path).toUri().toString());
+        Media h = new Media(this.bm_file_path);
         mediaPlayer = new MediaPlayer(h);
         mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
         mediaPlayer.play();
     }
 
+    public void playMenuMusic() {
+        Media h = new Media(this.mm_file_path);
+        mediaPlayer = new MediaPlayer(h);
+        mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+        mediaPlayer.play();
+    }
 }
