@@ -4,8 +4,12 @@ import Controller.MenuController;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.layout.*;
+import javafx.scene.shape.Box;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import modell.Game;
 import modell.JSONImporter;
@@ -35,21 +39,50 @@ public class MenuView {
         VBox root  = new VBox();
         root.setAlignment(Pos.CENTER);
         Button chooseSceneButton = new Button(BUTTON_LABEL);
+
         chooseSceneButton.setOnAction(e -> {
+            try {
             File selectedFile = fileChooser.showOpenDialog(this.stage);
+
+            if(selectedFile == null) {
+                throw new Exception("Please choose a scenario file!");
+            }
+
             JSONImporter importer = new JSONImporter(selectedFile);
 
-            try {
+
                 Game prerequisites = importer.LoadMap();
                 this.controller.createGame(prerequisites, this.stage);
             }
             catch (Exception ex) {
-                System.out.println(ex.getMessage());
-            }
+                Stage popupwindow=new Stage();
+
+                popupwindow.initModality(Modality.APPLICATION_MODAL);
+                popupwindow.setTitle("Error!");
+
+
+                Label label1= new Label(ex.getMessage());
+
+
+                Button button1= new Button("Close");
+
+                button1.setOnAction(d -> popupwindow.close());
+                VBox layout= new VBox(10);
+                layout.getChildren().addAll(label1, button1);
+                layout.setAlignment(Pos.CENTER);
+                Scene error_scene= new Scene(layout, 300, 250);
+                popupwindow.setScene(error_scene);
+                popupwindow.showAndWait();
+
+        }
         });
 
         root.getChildren().add(chooseSceneButton);
         Scene welcomeWindow = new Scene(root,1024,768);
+
+
+
+
         this.stage.setScene(welcomeWindow);
         this.stage.show();
     }
