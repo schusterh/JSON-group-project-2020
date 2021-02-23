@@ -21,6 +21,9 @@ public class JSONImporter {
 
     public Game LoadMap() throws Exception {
         String ERROR_MESSAGE = "Not enogh objects in the scenario!";
+        final String STANDARD_BG_MUSIC = "src\\main\\resources\\happy_tune.mp3";
+        final String STANDARD_MN_MUSIC = "";
+
         String content = Files.readString(Paths.get(this.file.getAbsolutePath()), StandardCharsets.UTF_8);
         JSONObject json = new JSONObject(content);
         if (!json.has("buildings")) {
@@ -50,10 +53,21 @@ public class JSONImporter {
             ArrayList<NatureObject> nature_objects = getNatureObjects(js_buildings);
             ArrayList<Tower> towers = getTowers(js_buildings);
             ArrayList<AirportObject> airport_objects = getAirportObjects(js_buildings);
+            ArrayList<String> music;
+            if(json.has("music")) {
+                JSONObject json_music = json.getJSONObject("music");
+                music = getMusic(json_music);
+            }
+            else {
+                music = new ArrayList<>();
+                music.add(STANDARD_BG_MUSIC);
+                music.add(STANDARD_MN_MUSIC);
+            }
+
             if(commodities == null || roads == null || railways == null || towers == null || airport_objects == null || nature_objects == null || factories == null || vehicles == null) {
                 throw new Exception(ERROR_MESSAGE);
             }
-            Game ggg = new Game(commodities, roads, railways, towers, airport_objects, nature_objects, factories, vehicles, map);
+            Game ggg = new Game(commodities, roads, railways, towers, airport_objects, nature_objects, factories, vehicles, map,music);
 
             return ggg;
         }
@@ -438,6 +452,15 @@ public class JSONImporter {
             }
         }
         return r;
+    }
+
+    public ArrayList<String> getMusic(JSONObject music) {
+        ArrayList<String> m = new ArrayList<>(2);
+        String path_to_backgroundmusic = music.getString("background_music_path");
+        m.add(path_to_backgroundmusic);
+        String path_to_menumusic = music.getString("menu_music_path");
+        m.add(path_to_menumusic);
+        return m;
     }
 }
 
