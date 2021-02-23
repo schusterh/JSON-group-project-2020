@@ -2,10 +2,12 @@ package ui;
 
 import Controller.MenuController;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Box;
 import javafx.stage.FileChooser;
@@ -36,9 +38,13 @@ public class MenuView {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("JSON-Files", "*.json"));
 
-        VBox root  = new VBox();
-        root.setAlignment(Pos.CENTER);
+        Group root  = new Group();
+        //VBox VBox = new VBox();
+        //VBox.setAlignment(Pos.CENTER);
+
         Button chooseSceneButton = new Button(BUTTON_LABEL);
+        chooseSceneButton.setTranslateX(500);
+        chooseSceneButton.setTranslateY(380);
 
         chooseSceneButton.setOnAction(e -> {
             try {
@@ -77,7 +83,18 @@ public class MenuView {
         }
         });
 
+       // Image Hintergundimage = new Image("/Menu_Hintergrund.png");
+        Image Hintergundimage = new Image("/Hintergrund.jpg");
+
+        ImageView imageView = new ImageView();
+        imageView.setImage(Hintergundimage);
+        root.getChildren().add(imageView);
+
+        imageView.setFitWidth(1024);
+        imageView.setFitHeight(768);
+
         root.getChildren().add(chooseSceneButton);
+        //root.getChildren().add(VBox);
         Scene welcomeWindow = new Scene(root,1024,768);
 
 
