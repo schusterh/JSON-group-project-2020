@@ -67,8 +67,8 @@ GameView {
         Menu exitMenu = new Menu("Exit");
 
         //Creat MenuItems
-        MenuItem straßenItem = new MenuItem("Roads and Rails");
-        //MenuItem gleiseItem = new MenuItem("Gleise");
+        MenuItem straßenItem = new MenuItem("Roads");
+        MenuItem gleiseItem = new MenuItem("Rails");
         MenuItem bauwerkItem = new MenuItem("Buildings");
         MenuItem bäumeItem = new MenuItem("Natur");
         MenuItem speichernItem = new MenuItem("Save");
@@ -86,7 +86,7 @@ GameView {
 
         BorderPane menuLeiste = new BorderPane();
         // Add menuItems to the Menus
-        bauenMenu.getItems().addAll(straßenItem, bauwerkItem, bäumeItem);
+        bauenMenu.getItems().addAll(straßenItem, gleiseItem, bauwerkItem, bäumeItem);
         homeMenu.getItems().addAll(speichernItem, exitItem);
         landscapeMenu.getItems().add(landscapeItem);
 
@@ -98,15 +98,17 @@ GameView {
         Button closeButton = new Button("Close");
         //Label messageLabel = new Label("Pflanze neue Bäume:");
 
-        HBox hbox = new HBox();
-
+        //HBox hbox = new HBox();
+        HBox hboxNatur = new HBox();
+        HBox hboxRoad = new HBox();
+        HBox hboxBuildings = new HBox();
 
         BorderPane borderPane = new BorderPane();
         borderPane.setStyle("-fx-background-color: #FFFFFF;");
 
 
         borderPane.setBottom(closeButton);
-        borderPane.setCenter(hbox);
+        //borderPane.setCenter(hbox);
         //borderPane.setTop(messageLabel);
         //borderPane.setPrefSize(1024,150);
 
@@ -131,7 +133,7 @@ GameView {
         closeButton.setOnAction(event -> {
             topBar.getChildren().remove(borderPane);
             borderPane.getChildren().removeAll();
-            hbox.getChildren().removeAll();
+            hboxNatur.getChildren().removeAll();
         });
 
 
@@ -152,43 +154,46 @@ GameView {
                 bNatur.setOnAction(event -> {
                     buildingLayer.placeBuilding(nature);
                 });
-                hbox.getChildren().add(bNatur);
+                hboxNatur.getChildren().add(bNatur);
             }
         }
 
 
         /*for (Building building : this.model.getBuilding()) {
 
-            if (nature.getBuildmenu().equals("nature")) {
-                Button bNatur = new Button();
-                bNatur.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/natur/" + nature.getName() + ".png"))));
+            if (building.getBuildmenu().equals("building")) {
+                Button bBuildings = new Button();
+                bBuildings.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + building.getName() + ".png"))));
 
-                bNatur.setOnAction(event -> {
+                bBuildings.setOnAction(event -> {
                     buildingLayer.placeBuilding(nature);
                 });
-                hbox.getChildren().add(bNatur);
+                hboxBuildings.getChildren().add(bBuildings);
             }
         }*/
 
 
         for (Road road : this.model.getRoads()) {
 
-            if (road.getBuildmenu().equals("road")) {
+            if (road.getBuildmenu().isPresent() && road.getBuildmenu().get().equals("road")) {
                 Button bRoad = new Button();
                 bRoad.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/roads/" + road.getName() + ".png"))));
 
                 bRoad.setOnAction(event -> {
                     buildingLayer.placeBuilding(road);
                 });
-                hbox.getChildren().add(bRoad);
+                hboxRoad.getChildren().add(bRoad);
             }
         }
+
 
 
         bäumeItem.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
             public void handle(ActionEvent event) {
+                topBar.getChildren().remove(borderPane);
+                borderPane.setCenter(hboxNatur);
                 topBar.getChildren().add(borderPane);
             }
         });
@@ -197,13 +202,15 @@ GameView {
 
             @Override
             public void handle(ActionEvent event) {
+                topBar.getChildren().remove(borderPane);
+                borderPane.setCenter(hboxRoad);
                 topBar.getChildren().add(borderPane);
             }
         });
 
 
 
-
+/*
         ArrayList<Button> buttonRoad = new ArrayList<>();
         buttonRoad.add(new Button ("/tilesets/strase_01.png"));
         buttonRoad.add(new Button ("/tilesets/strase_02.png"));
@@ -225,7 +232,7 @@ GameView {
         });*/
 
         // When user click on the road item.
-        straßenItem.setOnAction(event -> {
+       /* straßenItem.setOnAction(event -> {
                 for (Button b : buttonRoad) {
                     Button bRoad = new Button();
                     Image imageRoad = new Image(getClass().getResourceAsStream(b.getText()));
@@ -233,7 +240,7 @@ GameView {
                     hbox.getChildren().add(bRoad);
                 }
                 topBar.getChildren().add(borderPane);
-        });
+        });*/
 
 
 

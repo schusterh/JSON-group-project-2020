@@ -22,7 +22,7 @@ public class Game {
     private List<OnMapBuilding> buildingsOnMap;
     private Map map;
     private ArrayList<String> music;
-    private HashMap<Station, HashMap<Station,Integer>> transportNetwork;
+    private TransportNetwork transportNetwork;
 
     int[] currentMouseTileIndex;
 
@@ -39,7 +39,6 @@ public class Game {
         this.vehicles = vehicles;
         this.buildingsOnMap = new ArrayList<>();
         this.map = map;
-        this.transportNetwork = new HashMap<>();
         this.music = music;
     }
 
@@ -77,6 +76,33 @@ public class Game {
 
     public List<OnMapBuilding> getBuildingsOnMap() { return buildingsOnMap; }
 
+    public Factory findTarget(Factory f, String commodity){
+        HashMap<Factory, Double> possibleTargets = new HashMap<>();
+        ArrayList<Factory> possTargets = new ArrayList<>();
+        for (Factory g : this.getFactories()) {
+            g.getProductions().stream().filter(p -> p.getConsume()
+                    .isPresent()).filter(p -> p.getConsume().get()
+                    .containsKey(commodity))
+                    .forEach(p -> possibleTargets.put(g, null));
+            Station nearF = transportNetwork.getNearStations(f);
+            Station nearG = transportNetwork.getNearStations(g);
+            double weight = (double) (g.getStorage().get(commodity) - g.getCurrentStorage().get(commodity))
+                    / transportNetwork.getAdjStations(nearF).get(nearG);
+            possibleTargets.put(g, weight);
+            possTargets.add(g);
+        }
+        double totalWeight = 0.0d;
+        for (Factory factory : possTargets) {
+            totalWeight += possibleTargets.get(factory);
+        }
+        int randomIndex = 0;
+        for (double r = Math.random() * totalWeight; randomIndex < possTargets.size() -1; ++randomIndex){
+            r -= possibleTargets.get(possTargets.get(randomIndex));
+            if (r <= 0.0) break;
+        }
+        return possTargets.get(randomIndex);
+    }
+
     public void addBuildingToMap(Building model, int startX, int startY, int height) {
         this.map.plainGround(startX, startY, model.getWidth(), model.getDepth(), height, model.getClass() != NatureObject.class);
         this.buildingsOnMap.add(new OnMapBuilding(model, startX, startY, height));
@@ -100,13 +126,14 @@ public class Game {
         return map;
     }
 
+
     public void setCurrentMouseTileIndex(int[] pos) {
         this.currentMouseTileIndex = pos;
     }
 
     public int[] getCurrentMouseTileIndex() { return currentMouseTileIndex; }
 
-    public HashMap<Station, HashMap<Station, Integer>> getTransportNetwork() {
+    public TransportNetwork getTransportNetwork() {
         return transportNetwork;
     }
 
