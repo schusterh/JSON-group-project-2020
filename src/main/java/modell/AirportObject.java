@@ -21,6 +21,7 @@ public class AirportObject extends Building {
         this.entry = entry;
         this.planes = planes;
         this.dz = dz;
-    }
 
+    }
+    public Optional getBuildmenu() { return this.buildmenu; }
 }

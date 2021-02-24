@@ -69,7 +69,7 @@ GameView {
         //Creat MenuItems
         MenuItem straßenItem = new MenuItem("Roads");
         MenuItem gleiseItem = new MenuItem("Rails");
-        MenuItem bauwerkItem = new MenuItem("Buildings");
+        MenuItem airportItem = new MenuItem("Airport");
         MenuItem bäumeItem = new MenuItem("Natur");
         MenuItem speichernItem = new MenuItem("Save");
         MenuItem exitItem = new MenuItem("Exit");
@@ -86,7 +86,7 @@ GameView {
 
         BorderPane menuLeiste = new BorderPane();
         // Add menuItems to the Menus
-        bauenMenu.getItems().addAll(straßenItem, gleiseItem, bauwerkItem, bäumeItem);
+        bauenMenu.getItems().addAll(straßenItem, gleiseItem, airportItem, bäumeItem);
         homeMenu.getItems().addAll(speichernItem, exitItem);
         landscapeMenu.getItems().add(landscapeItem);
 
@@ -101,7 +101,9 @@ GameView {
         //HBox hbox = new HBox();
         HBox hboxNatur = new HBox();
         HBox hboxRoad = new HBox();
-        HBox hboxBuildings = new HBox();
+        //HBox hboxBuildings = new HBox();
+        HBox hboxRailway = new HBox();
+        HBox hboxAirport = new HBox();
 
         BorderPane borderPane = new BorderPane();
         borderPane.setStyle("-fx-background-color: #FFFFFF;");
@@ -147,9 +149,13 @@ GameView {
         //ArrayList<Button> buttonBaum = new ArrayList<>();
         for (NatureObject nature : this.model.getNatureObjects()) {
 
-            if (nature.getBuildmenu().equals("nature")) {
+            if (nature.getBuildmenu().isPresent() && nature.getBuildmenu().get().equals("nature")) {
                 Button bNatur = new Button();
-                bNatur.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/natur/" + nature.getName() + ".png"))));
+                ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + nature.getName() + ".png")));
+                imageView.setPreserveRatio(true);
+                imageView.setFitHeight(100);
+
+                bNatur.setGraphic(imageView);
 
                 bNatur.setOnAction(event -> {
                     buildingLayer.placeBuilding(nature);
@@ -157,36 +163,6 @@ GameView {
                 hboxNatur.getChildren().add(bNatur);
             }
         }
-
-
-        /*for (Building building : this.model.getBuilding()) {
-
-            if (building.getBuildmenu().equals("building")) {
-                Button bBuildings = new Button();
-                bBuildings.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + building.getName() + ".png"))));
-
-                bBuildings.setOnAction(event -> {
-                    buildingLayer.placeBuilding(nature);
-                });
-                hboxBuildings.getChildren().add(bBuildings);
-            }
-        }*/
-
-
-        for (Road road : this.model.getRoads()) {
-
-            if (road.getBuildmenu().isPresent() && road.getBuildmenu().get().equals("road")) {
-                Button bRoad = new Button();
-                bRoad.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/roads/" + road.getName() + ".png"))));
-
-                bRoad.setOnAction(event -> {
-                    buildingLayer.placeBuilding(road);
-                });
-                hboxRoad.getChildren().add(bRoad);
-            }
-        }
-
-
 
         bäumeItem.setOnAction(new EventHandler<ActionEvent>() {
 
@@ -197,6 +173,24 @@ GameView {
                 topBar.getChildren().add(borderPane);
             }
         });
+
+
+        for (Road road : this.model.getRoads()) {
+
+            if (road.getBuildmenu().isPresent() && road.getBuildmenu().get().equals("road")) {
+                Button bRoad = new Button();
+                ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + road.getName() + ".png")));
+                imageView.setPreserveRatio(true);
+                imageView.setFitHeight(100);
+                bRoad.setGraphic(imageView);
+
+                bRoad.setOnAction(event -> {
+                    buildingLayer.placeBuilding(road);
+                });
+                hboxRoad.getChildren().add(bRoad);
+            }
+        }
+
 
         straßenItem.setOnAction(new EventHandler<ActionEvent>() {
 
@@ -209,6 +203,60 @@ GameView {
         });
 
 
+        for (Railway railway : this.model.getRailways()) {
+
+            if (railway.getBuildmenu().isPresent() && railway.getBuildmenu().get().equals("rail")) {
+                Button bRailway = new Button();
+                ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + railway.getName() + ".png")));
+                imageView.setPreserveRatio(true);
+                imageView.setFitHeight(100);
+                bRailway.setGraphic(imageView);
+
+                bRailway.setOnAction(event -> {
+                    buildingLayer.placeBuilding(railway);
+                });
+                hboxRailway.getChildren().add(bRailway);
+            }
+        }
+
+
+        gleiseItem.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                topBar.getChildren().remove(borderPane);
+                borderPane.setCenter(hboxRailway);
+                topBar.getChildren().add(borderPane);
+            }
+        });
+
+
+        for (AirportObject airport : this.model.getAirportObjects()) {
+
+            if (airport.getBuildmenu().isPresent() && airport.getBuildmenu().get().equals("airport")) {
+                Button bAirport = new Button();
+                ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + airport.getName() + ".png")));
+                imageView.setPreserveRatio(true);
+                imageView.setFitHeight(100);
+
+                bAirport.setGraphic(imageView);
+
+                bAirport.setOnAction(event -> {
+                    buildingLayer.placeBuilding(airport);
+                });
+                hboxAirport.getChildren().add(bAirport);
+            }
+        }
+
+        airportItem.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                topBar.getChildren().remove(borderPane);
+                borderPane.setCenter(hboxAirport);
+                topBar.getChildren().add(borderPane);
+            }
+        });
 
 /*
         ArrayList<Button> buttonRoad = new ArrayList<>();
