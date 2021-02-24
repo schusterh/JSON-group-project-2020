@@ -18,13 +18,13 @@ public class Vehicle {
 
     // Konstruktor
     public Vehicle(String name,String kind, String graphic, double speed, Optional<ArrayList<HashMap<String,Integer>>> cargo){
+
         this.name = name;
         this.kind = kind;
         this.graphic = graphic;
         this.speed = speed;
-        if (cargo.isPresent()) {
-            this.cargo = cargo;
-        }
+        this.cargo = cargo;
+
     }
 
     // Getter

@@ -22,15 +22,16 @@ public class Railway extends Building {
                    Optional<ArrayList<String>> signals,
                    Optional<String> special,
                    Optional<HashMap<String, String>> combines) {
+
         super(width,depth);
         this.name = name;
-        if (buildmenu.isPresent()){this.buildmenu = buildmenu;}
-        if (points.isPresent()){this.points = points;}
-        if (rails.isPresent()){this.rails = rails;}
-        if (dz.isPresent()){this.dz=dz;}
-        if(signals.isPresent()){this.signals = signals;}
-        if(special.isPresent()){this.special = special;}
-        if(combines.isPresent()){this.combines = combines;}
+        this.buildmenu = buildmenu;
+        this.points = points;
+        this.rails = rails;
+        this.dz=dz;
+        this.signals = signals;
+        this.special = special;
+        this.combines = combines;
     }
 
     public String getName() {
