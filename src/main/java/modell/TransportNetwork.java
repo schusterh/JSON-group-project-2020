@@ -30,6 +30,14 @@ class Station extends Building{
     public void setLabel(String label) {
         this.label = label;
     }
+
+    public Factory getNearFactory() {
+        return nearFactory;
+    }
+
+    public void setNearFactory(Factory nearFactory) {
+        this.nearFactory = nearFactory;
+    }
 }
 class Point {
     Double x;
@@ -99,6 +107,7 @@ class TrafficRoute {
         }
         vehicles.removeIf(v -> !v.getKind().equals(this.getVehicleType()));
     }
+
 }
 
 public class TransportNetwork {
@@ -108,13 +117,17 @@ public class TransportNetwork {
     public ArrayList<Point> points;
     public ArrayList<Station> stations;
     public ArrayList<TrafficRoute> trafficRoutes;
+    public HashMap<Factory,Station> nearStations;
 
     public TransportNetwork(HashMap<Station, HashMap<Station,Integer>> adjStations){
         this.adjStations = adjStations;
     }
 
-    public void addBuild(Double xPos, Double yPos, HashMap<String,ArrayList<Double>> newPoints, ArrayList<ArrayList<String>> newConnect){
+    public void addTrafficSection(Double xPos, Double yPos, HashMap<String,ArrayList<Double>> newPoints, ArrayList<ArrayList<String>> newConnect){
+        //nur für road, rail und airportObject
+
         double diff = 0.2;
+
         for (String name : newPoints.keySet()){
             Point p = new Point (newPoints.get(name).get(0)+xPos, newPoints.get(name).get(1)+yPos);
             if (points.stream().noneMatch(z -> Math.abs(z.getX()) - Math.abs((p.getX())) <= diff && Math.abs(z.getY()) - Math.abs(p.getY()) <= diff)) {
@@ -162,6 +175,10 @@ public class TransportNetwork {
         if (connectS2 != null){
             connectS2.remove(s1);
         }
+    }
+
+    public Station getNearStations(Factory f) {
+        return nearStations.get(f);
     }
 
     HashMap<Station, Integer> getAdjStations(Station s){

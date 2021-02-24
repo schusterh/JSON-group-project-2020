@@ -22,7 +22,7 @@ public class Game {
     private List<OnMapBuilding> buildingsOnMap;
     private Map map;
     private ArrayList<String> music;
-    private HashMap<Station, HashMap<Station,Integer>> transportNetwork;
+    private TransportNetwork transportNetwork;
 
     public Game(ArrayList<String> commodities, ArrayList<Road> roads, ArrayList<Railway> railways, ArrayList<Tower> towers
     , ArrayList<AirportObject> airport_objects, ArrayList<NatureObject> nature_objects, ArrayList<Factory> factories,
@@ -37,7 +37,6 @@ public class Game {
         this.vehicles = vehicles;
         this.buildingsOnMap = new ArrayList<>();
         this.map = map;
-        this.transportNetwork = new HashMap<>();
         this.music = music;
     }
 
@@ -83,8 +82,10 @@ public class Game {
                     .isPresent()).filter(p -> p.getConsume().get()
                     .containsKey(commodity))
                     .forEach(p -> possibleTargets.put(g, null));
+            Station nearF = transportNetwork.getNearStations(f);
+            Station nearG = transportNetwork.getNearStations(g);
             double weight = (double) (g.getStorage().get(commodity) - g.getCurrentStorage().get(commodity))
-                    / transportNetwork.get(f).get(g);
+                    / transportNetwork.getAdjStations(nearF).get(nearG);
             possibleTargets.put(g, weight);
             possTargets.add(g);
         }
@@ -107,13 +108,16 @@ public class Game {
                 .sorted(Comparator.comparingInt(OnMapBuilding::getStartY))
                 .sorted(Comparator.comparingInt(OnMapBuilding::getStartX))
                 .collect(Collectors.toList());
+        if (model instanceof Road || model instanceof Railway || model instanceof AirportObject){
+
+        }
     }
 
     public Map getMap() {
         return map;
     }
 
-    public HashMap<Station, HashMap<Station, Integer>> getTransportNetwork() {
+    public TransportNetwork getTransportNetwork() {
         return transportNetwork;
     }
 
