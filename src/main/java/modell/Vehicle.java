@@ -14,7 +14,9 @@ public class Vehicle {
     private Optional<ArrayList<HashMap<String,Integer>>> cargo;
     private double speed;
     private HashMap<String,Integer> currentCargo;
+    private Station currentStation;
     private HashMap<TrafficRoute,Station> nextStation;
+    private HashMap<Station,Integer> path;
 
     // Konstruktor
     public Vehicle(String name,String kind, String graphic, double speed, Optional<ArrayList<HashMap<String,Integer>>> cargo){
@@ -37,6 +39,14 @@ public class Vehicle {
     public  Optional<ArrayList<HashMap<String,Integer>>> getCargo() { return cargo; }
     public double getSpeed() { return speed; }
 
+    public Station getCurrentStation() {
+        return currentStation;
+    }
+
+    public void setPath(HashMap<Station, Integer> path) {
+        this.path = path;
+    }
+
     public int loadCargo(String cargoType, Integer cargoAmount){
 
         if (cargoAmount<0) {throw new IllegalArgumentException("Cargo Amount should be positive");}
@@ -57,5 +67,8 @@ public class Vehicle {
     public void unloadCargo(String cargoType){
         currentCargo.remove(cargoType);
     }
+
+
+
 }
 

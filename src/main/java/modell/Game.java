@@ -3,10 +3,7 @@ package modell;
 import types.OnMapBuilding;
 import ui.tiles.BuildingLayer;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Game {
@@ -74,6 +71,7 @@ public class Game {
 
     public List<OnMapBuilding> getBuildingsOnMap() { return buildingsOnMap; }
 
+
     public Factory findTarget(Factory f, String commodity){
         HashMap<Factory, Double> possibleTargets = new HashMap<>();
         ArrayList<Factory> possTargets = new ArrayList<>();
@@ -100,6 +98,66 @@ public class Game {
         }
         return possTargets.get(randomIndex);
     }
+    public ArrayList<Station> bfs (Station startStation, Station targetStation){
+        ArrayList<Station> shortestPath = new ArrayList<>();
+        PriorityQueue<PrioPair> pq = new PriorityQueue<>();
+        HashMap<Station, Station> origins = new HashMap<>();
+        pq.add(new PrioPair(startStation,0));
+        boolean targetFound = false;
+        while (!targetFound){
+            if (pq.peek() != null) {
+                PrioPair currentPair = pq.peek();
+                Station currentStation = currentPair.getStation();
+                HashMap<Station, Integer> nextStations = getTransportNetwork().getAdjStations(currentStation);
+                for (Station s : nextStations.keySet()) {
+                    int dist = nextStations.get(s) + currentPair.getDistance();
+                    if (origins.containsKey(s)){
+                        int previousDist = pq.stream().filter(x -> x.getStation()
+                                .equals(s))
+                                .findFirst()
+                                .orElseThrow()
+                                .getDistance();
+                        if (previousDist<dist){
+                            pq.remove(s);
+                            origins.remove(s);
+                            origins.put(s,currentStation);
+                        }
+                    } else { origins.put(s,currentStation); }
+
+                    pq.add(new PrioPair(s, dist));
+                    if (s == targetStation) {
+                        targetFound = true;
+                    }
+                }
+                pq.remove(currentPair);
+            } else {
+                throw new IllegalArgumentException("No connecting path can be found.");
+            }
+        }
+        shortestPath.add(targetStation);
+        Station backtrack = origins.get(targetStation);
+        while (backtrack != null){
+            shortestPath.add(0,backtrack);
+            backtrack = origins.get(backtrack);
+        }
+        return shortestPath;
+    }
+    public HashMap<Station,Integer> findPath(Vehicle v, int startTick, Station target){
+        HashMap<Station,Integer> path = new HashMap<>();
+        if (v.getKind().equals("road vehicle")){
+            ArrayList <Station> stations = bfs(v.getCurrentStation(),target);
+            for (int i = 0; i < stations.size(); ++i){
+                path.put(stations.get(i),i);
+            }
+        } else if (v.getKind().equals("plane")){
+
+        } else if (v.getKind().equals("wagon")){
+
+        }
+        return path;
+    }
+
+
 
     public void addBuildingToMap(Building model, int startX, int startY, int height) {
         this.map.plainGround(startX, startY, model.getWidth(), model.getDepth(), height);
@@ -127,5 +185,34 @@ public class Game {
 
     public String getMenuMusic() {
         return this.music.get(1);
+    }
+}
+class PrioPair implements Comparable<PrioPair>{
+    final Station station;
+    final Integer distance;
+
+    public PrioPair(Station station, Integer distance){
+        this.station = station;
+        this.distance = distance;
+    }
+    @Override
+    public int compareTo(PrioPair other) {
+        return (this.distance - other.distance);
+    }
+
+    public Station getStation() {
+        return station;
+    }
+
+    public Integer getDistance() {
+        return distance;
+    }
+
+    boolean containsStation(Station s){
+        if(this.getStation().equals(s)){
+            return true;
+        } else {
+            return false;
+        }
     }
 }
