@@ -11,9 +11,7 @@ public class NatureObject extends Building {
     public NatureObject(String name,int width, int depth, Optional<String> buildmenu, String special, int dz) {
         super(width,depth);
         this.name = name;
-        if (buildmenu.isPresent()) {
-            this.buildmenu = buildmenu;
-        }
+        this.buildmenu = buildmenu;
         this.special = special;
         this.dz = dz;
     }

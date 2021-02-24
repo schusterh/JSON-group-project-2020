@@ -18,9 +18,7 @@ public class AirportObject extends Building {
         this.buildmenu = buildmenu;
         this.special = special;
         this.points = points;
-        if(entry.isPresent()) {
-            this.entry = entry;
-        }
+        this.entry = entry;
         this.planes = planes;
         this.dz = dz;
     }
