@@ -18,6 +18,8 @@ import modell.JSONImporter;
 import types.Tile;
 
 import java.io.File;
+import java.util.Stack;
+
 
 public class MenuView {
 
@@ -38,13 +40,12 @@ public class MenuView {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("JSON-Files", "*.json"));
 
-        Group root  = new Group();
-        //VBox VBox = new VBox();
-        //VBox.setAlignment(Pos.CENTER);
+        StackPane root  = new StackPane();
+
+
 
         Button chooseSceneButton = new Button(BUTTON_LABEL);
-        chooseSceneButton.setTranslateX(500);
-        chooseSceneButton.setTranslateY(380);
+
 
         chooseSceneButton.setOnAction(e -> {
             try {
@@ -83,18 +84,18 @@ public class MenuView {
         }
         });
 
-       // Image Hintergundimage = new Image("/Menu_Hintergrund.png");
+
         Image Hintergundimage = new Image("/Hintergrund.jpg");
 
         ImageView imageView = new ImageView();
         imageView.setImage(Hintergundimage);
         root.getChildren().add(imageView);
+        imageView.fitWidthProperty().bind(stage.widthProperty());
+        imageView.fitHeightProperty().bind(stage.heightProperty());
 
-        imageView.setFitWidth(1024);
-        imageView.setFitHeight(768);
-
+        chooseSceneButton.setStyle("-fx-padding: 16px 32px;");
         root.getChildren().add(chooseSceneButton);
-        //root.getChildren().add(VBox);
+        root.setAlignment(chooseSceneButton,Pos.CENTER);
         Scene welcomeWindow = new Scene(root,1024,768);
 
 
