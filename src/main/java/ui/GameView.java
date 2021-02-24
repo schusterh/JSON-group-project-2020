@@ -145,8 +145,6 @@ GameView {
         root.getChildren().add(this.topBar);
 
 
-
-        //ArrayList<Button> buttonBaum = new ArrayList<>();
         for (NatureObject nature : this.model.getNatureObjects()) {
 
             if (nature.getBuildmenu().isPresent() && nature.getBuildmenu().get().equals("nature")) {
@@ -258,10 +256,6 @@ GameView {
             }
         });
 
-/*
-        ArrayList<Button> buttonRoad = new ArrayList<>();
-        buttonRoad.add(new Button ("/tilesets/strase_01.png"));
-        buttonRoad.add(new Button ("/tilesets/strase_02.png"));
 
         // When user click on the bäume item.
         /*bäumeItem.setOnAction(new EventHandler<ActionEvent>() {
