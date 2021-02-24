@@ -1,14 +1,17 @@
 package modell;
 
+import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.stream.Stream;
 
-class Station {
+class Station extends Building{
     HashMap<String,Integer> holdingArea;
     String label;
-    Station(String label){
-        this.label = label;
+    Factory nearFactory;
+
+    Station(int width, int depth){
+        super(width,depth);
         this.holdingArea = new HashMap<>();
     }
 
@@ -26,6 +29,14 @@ class Station {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public Factory getNearFactory() {
+        return nearFactory;
+    }
+
+    public void setNearFactory(Factory nearFactory) {
+        this.nearFactory = nearFactory;
     }
 }
 class Point {
@@ -45,6 +56,11 @@ class Point {
     }
 }
 
+/*
+Routen verbinden mehrere Stationen miteinander, beginnen und enden an Stationen und haben
+festgelegte Verkehrsmittel. Sie müssen nicht zwangsweise Fabriken verbinden.
+Wenn die Anzahl oder der Typ von Fahrzeugen nicht stimmt, werden diese gelöscht.
+ */
 class TrafficRoute {
     ArrayList<Station> stations;
     String vehicleType;
@@ -84,27 +100,34 @@ class TrafficRoute {
 
     public void manageVehicles(){
         if (this.vehicles.size() > vehicleAmount){
-            this.vehicles.remove(-1);
+            this.vehicles.remove(0);
         }
         if (this.vehicles.size() < vehicleAmount){
-            this.vehicles.add(this.vehicles.get(-1));
+            this.vehicles.add(this.vehicles.get(0));
         }
         vehicles.removeIf(v -> !v.getKind().equals(this.getVehicleType()));
     }
+
 }
 
 public class TransportNetwork {
     ArrayList<String> station_names = new ArrayList<>();
-    private HashMap<Station, HashMap<Station,Integer>> adjStations;
+    public HashMap<Station, HashMap<Station,Integer>> adjStations;
     public HashMap<Point, ArrayList<Point>> connections;
     public ArrayList<Point> points;
+    public ArrayList<Station> stations;
+    public ArrayList<TrafficRoute> trafficRoutes;
+    public HashMap<Factory,Station> nearStations;
 
     public TransportNetwork(HashMap<Station, HashMap<Station,Integer>> adjStations){
         this.adjStations = adjStations;
     }
 
-    public void addBuild(Double xPos, Double yPos, HashMap<String,ArrayList<Double>> newPoints, ArrayList<ArrayList<String>> newConnect){
-        Double diff = 0.2;
+    public void addTrafficSection(Double xPos, Double yPos, HashMap<String,ArrayList<Double>> newPoints, ArrayList<ArrayList<String>> newConnect){
+        //nur für road, rail und airportObject
+
+        double diff = 0.2;
+
         for (String name : newPoints.keySet()){
             Point p = new Point (newPoints.get(name).get(0)+xPos, newPoints.get(name).get(1)+yPos);
             if (points.stream().noneMatch(z -> Math.abs(z.getX()) - Math.abs((p.getX())) <= diff && Math.abs(z.getY()) - Math.abs(p.getY()) <= diff)) {
@@ -128,30 +151,22 @@ public class TransportNetwork {
         }
     }
 
-    public HashMap<Station, HashMap<Station,Integer>> getAdjStations() {
-        return adjStations;
+    public void addStation(Station s){
+        adjStations.putIfAbsent(s,new HashMap<>());
+        s.setLabel(stationnameGenerator());
     }
 
-    public void addStation(String label){
-        adjStations.putIfAbsent(new Station(label),new HashMap<>());
-    }
-
-    public void removeStation(String label){
-        Station s = new Station(label);
+    public void removeStation(Station s){
         adjStations.values().forEach(e -> e.remove(s));
-        adjStations.remove(new Station(label));
+        adjStations.remove(s);
     }
 
-    public void addConnection(String label1, String label2, Integer distance){
-        Station s1 = new Station(label1);
-        Station s2 = new Station(label2);
+    public void addConnection(Station s1, Station s2, Integer distance){
         adjStations.get(s1).put(s2,distance);
         adjStations.get(s2).put(s1,distance);
     }
 
-    public void removeConnection(String label1, String label2){
-        Station s1 = new Station(label1);
-        Station s2 = new Station(label2);
+    public void removeConnection(Station s1, Station s2){
         HashMap<Station,Integer> connectS1 = adjStations.get(s1);
         HashMap<Station,Integer> connectS2 = adjStations.get(s2);
         if (connectS1 != null){
@@ -162,11 +177,15 @@ public class TransportNetwork {
         }
     }
 
-    HashMap<Station, Integer> getAdjStations(String label){
-        return adjStations.get(new Station(label));
+    public Station getNearStations(Factory f) {
+        return nearStations.get(f);
     }
 
-    public String stationname_generator() {
+    HashMap<Station, Integer> getAdjStations(Station s){
+        return adjStations.get(s);
+    }
+
+    public String stationnameGenerator() {
         String generatedString = null;
         boolean notGenerated = true;
         while (notGenerated) {
@@ -175,10 +194,82 @@ public class TransportNetwork {
             generatedString = new String(array, Charset.forName("UTF-8"));
             if (!station_names.contains(generatedString)) {
                 station_names.add(generatedString);
-                return generatedString;
+                notGenerated = false;
             }
         }
         return generatedString;
     }
 
+    public ArrayList<Station> bfs (Station startStation, Station targetStation){
+        ArrayList<Station> shortestPath = new ArrayList<>();
+        PriorityQueue<PrioPair> pq = new PriorityQueue<>();
+        HashMap<Station, Station> origins = new HashMap<>();
+        pq.add(new PrioPair(startStation,0));
+        boolean targetFound = false;
+        while (!targetFound){
+            if (pq.peek() != null) {
+                PrioPair currentPair = pq.peek();
+                Station currentStation = currentPair.getStation();
+                HashMap<Station, Integer> nextStations = getAdjStations(currentStation);
+                for (Station s : nextStations.keySet()) {
+                    int dist = nextStations.get(s) + currentPair.getDistance();
+                    if (origins.containsKey(s)){
+                        int previousDist = pq.stream().filter(x -> x.getStation()
+                                .equals(s))
+                                .findFirst()
+                                .orElseThrow()
+                                .getDistance();
+                        if (previousDist<dist){
+                            pq.remove(s);
+                            origins.remove(s);
+                            origins.put(s,currentStation);
+                        }
+                    } else { origins.put(s,currentStation); }
+
+                    pq.add(new PrioPair(s, dist));
+                    if (s == targetStation) {
+                        targetFound = true;
+                    }
+                }
+                pq.remove(currentPair);
+            } else {
+                throw new IllegalArgumentException("No connecting path can be found.");
+            }
+        }
+        shortestPath.add(targetStation);
+        Station backtrack = origins.get(targetStation);
+        while (backtrack != null){
+            shortestPath.add(backtrack);
+            backtrack = origins.get(backtrack);
+        }
+        return shortestPath;
+    }
+}
+class PrioPair implements Comparable<PrioPair>{
+    final Station station;
+    final Integer distance;
+
+    public PrioPair(Station station, Integer distance){
+        this.station = station;
+        this.distance = distance;
+    }
+    @Override
+    public int compareTo(PrioPair other) {
+        return (this.distance - other.distance);
+    }
+
+    public Station getStation() {
+        return station;
+    }
+
+    public Integer getDistance() {
+        return distance;
+    }
+    boolean containsStation(Station s){
+        if(this.getStation().equals(s)){
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
