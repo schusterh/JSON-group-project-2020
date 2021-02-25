@@ -15,7 +15,7 @@ public class Factory extends Building{
     private HashMap<String, Integer> storage;
     private HashMap<String, Integer> currentStorage;
     private int dz;
-
+    private String prodMessage;
 
 
     public Factory(String name, int width, int depth, String special, ArrayList<Production> productions, Optional<HashMap<String, Integer>> storage, int dz) {
@@ -30,7 +30,6 @@ public class Factory extends Building{
 
     public String getName() { return name; }
 
-
     public void produce(){
         // Einmal durch alle Produktionen durchiterieren
         for (Production production : productions) {
@@ -43,6 +42,7 @@ public class Factory extends Building{
                 .map(this::consume)
                 .orElseGet(() -> { return true; });
 
+
             if (requirementsChecked) {
                 production.produce.ifPresent(products -> {
                     for (Map.Entry<String, Integer> product : products.entrySet()) {
@@ -50,6 +50,7 @@ public class Factory extends Building{
                     }
                 });
             }
+            else this.prodMessage = "Keine Ressourcen :(";
         }
         // füge zur hashmap storage <kind, amount> den amount hinzu, der bei productions unter dem
         // kind steht. schauen ob der key (kind) vorhanden ist, wenn nicht, hinzufügen + amount hinzufügen, ansonsten amount erhöhen
@@ -89,5 +90,9 @@ public class Factory extends Building{
 
     public ArrayList<Production> getProductions() {
         return productions;
+    }
+
+    public String getProdMessage() {
+        return prodMessage;
     }
 }
