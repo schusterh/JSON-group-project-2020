@@ -24,9 +24,9 @@ public class Road extends Building {
         this.points = points;
         this.roads = roads;
         this.dz = dz;
-        if (buildmenu.isPresent()) {this.buildmenu = buildmenu;}
-        if (combines.isPresent()) {this.combines = combines;}
-        if(special.isPresent()) {this.special = special;}
+        this.buildmenu = buildmenu;
+        this.combines = combines;
+        this.special = special;
 
     }
 

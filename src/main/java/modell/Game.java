@@ -126,6 +126,7 @@ public class Game {
         return map;
     }
 
+
     public void setCurrentMouseTileIndex(int[] pos) {
         this.currentMouseTileIndex = pos;
     }

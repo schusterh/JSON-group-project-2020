@@ -67,9 +67,9 @@ GameView {
         Menu exitMenu = new Menu("Exit");
 
         //Creat MenuItems
-        MenuItem straßenItem = new MenuItem("Roads and Rails");
-        //MenuItem gleiseItem = new MenuItem("Gleise");
-        MenuItem bauwerkItem = new MenuItem("Buildings");
+        MenuItem straßenItem = new MenuItem("Roads");
+        MenuItem gleiseItem = new MenuItem("Rails");
+        MenuItem airportItem = new MenuItem("Airport");
         MenuItem bäumeItem = new MenuItem("Natur");
         MenuItem speichernItem = new MenuItem("Save");
         MenuItem exitItem = new MenuItem("Exit");
@@ -86,7 +86,7 @@ GameView {
 
         BorderPane menuLeiste = new BorderPane();
         // Add menuItems to the Menus
-        bauenMenu.getItems().addAll(straßenItem, bauwerkItem, bäumeItem);
+        bauenMenu.getItems().addAll(straßenItem, gleiseItem, airportItem, bäumeItem);
         homeMenu.getItems().addAll(speichernItem, exitItem);
         landscapeMenu.getItems().add(landscapeItem);
 
@@ -98,15 +98,19 @@ GameView {
         Button closeButton = new Button("Close");
         //Label messageLabel = new Label("Pflanze neue Bäume:");
 
-        HBox hbox = new HBox();
-
+        //HBox hbox = new HBox();
+        HBox hboxNatur = new HBox();
+        HBox hboxRoad = new HBox();
+        //HBox hboxBuildings = new HBox();
+        HBox hboxRailway = new HBox();
+        HBox hboxAirport = new HBox();
 
         BorderPane borderPane = new BorderPane();
         borderPane.setStyle("-fx-background-color: #FFFFFF;");
 
 
         borderPane.setBottom(closeButton);
-        borderPane.setCenter(hbox);
+        //borderPane.setCenter(hbox);
         //borderPane.setTop(messageLabel);
         //borderPane.setPrefSize(1024,150);
 
@@ -131,7 +135,7 @@ GameView {
         closeButton.setOnAction(event -> {
             topBar.getChildren().remove(borderPane);
             borderPane.getChildren().removeAll();
-            hbox.getChildren().removeAll();
+            hboxNatur.getChildren().removeAll();
         });
 
 
@@ -141,28 +145,117 @@ GameView {
         root.getChildren().add(this.topBar);
 
 
-        ArrayList<Button> buttonBaum = new ArrayList<>();
         for (NatureObject nature : this.model.getNatureObjects()) {
-            System.out.println("adjkladsjkl");
-            System.out.println(nature.getBuildmenu());
-            if (nature.getBuildmenu().equals("nature")) {
-                System.out.println("NAME: " + nature.getName());
-                System.out.println("PATH: " + "/buildings/" + nature.getName() + ".png");
-                Button b = new Button();
-                b.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + nature.getName() + ".png"))));
 
-                b.setOnAction(event -> {
+            if (nature.getBuildmenu().isPresent() && nature.getBuildmenu().get().equals("nature")) {
+                Button bNatur = new Button();
+                ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + nature.getName() + ".png")));
+                imageView.setPreserveRatio(true);
+                imageView.setFitHeight(100);
+
+                bNatur.setGraphic(imageView);
+
+                bNatur.setOnAction(event -> {
                     buildingLayer.placeBuilding(nature);
                 });
-                buttonBaum.add(b);
-                hbox.getChildren().add(b);
+                hboxNatur.getChildren().add(bNatur);
             }
         }
-        topBar.getChildren().add(borderPane);
 
-        ArrayList<Button> buttonRoad = new ArrayList<>();
-        buttonRoad.add(new Button ("/tilesets/strase_01.png"));
-        buttonRoad.add(new Button ("/tilesets/strase_02.png"));
+        bäumeItem.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                topBar.getChildren().remove(borderPane);
+                borderPane.setCenter(hboxNatur);
+                topBar.getChildren().add(borderPane);
+            }
+        });
+
+
+        for (Road road : this.model.getRoads()) {
+
+            if (road.getBuildmenu().isPresent() && road.getBuildmenu().get().equals("road")) {
+                Button bRoad = new Button();
+                ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + road.getName() + ".png")));
+                imageView.setPreserveRatio(true);
+                imageView.setFitHeight(100);
+                bRoad.setGraphic(imageView);
+
+                bRoad.setOnAction(event -> {
+                    buildingLayer.placeBuilding(road);
+                });
+                hboxRoad.getChildren().add(bRoad);
+            }
+        }
+
+
+        straßenItem.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                topBar.getChildren().remove(borderPane);
+                borderPane.setCenter(hboxRoad);
+                topBar.getChildren().add(borderPane);
+            }
+        });
+
+
+        for (Railway railway : this.model.getRailways()) {
+
+            if (railway.getBuildmenu().isPresent() && railway.getBuildmenu().get().equals("rail")) {
+                Button bRailway = new Button();
+                ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + railway.getName() + ".png")));
+                imageView.setPreserveRatio(true);
+                imageView.setFitHeight(50);
+                bRailway.setGraphic(imageView);
+
+                bRailway.setOnAction(event -> {
+                    buildingLayer.placeBuilding(railway);
+                });
+                hboxRailway.getChildren().add(bRailway);
+            }
+        }
+
+
+        gleiseItem.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                topBar.getChildren().remove(borderPane);
+                borderPane.setCenter(hboxRailway);
+                topBar.getChildren().add(borderPane);
+            }
+        });
+
+
+        for (AirportObject airport : this.model.getAirportObjects()) {
+
+            if (airport.getBuildmenu().isPresent() && airport.getBuildmenu().get().equals("airport")) {
+                Button bAirport = new Button();
+                ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + airport.getName() + ".png")));
+                imageView.setPreserveRatio(true);
+                imageView.setFitHeight(100);
+
+                bAirport.setGraphic(imageView);
+
+                bAirport.setOnAction(event -> {
+                    buildingLayer.placeBuilding(airport);
+                });
+                hboxAirport.getChildren().add(bAirport);
+            }
+        }
+
+        airportItem.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                topBar.getChildren().remove(borderPane);
+                borderPane.setCenter(hboxAirport);
+                topBar.getChildren().add(borderPane);
+            }
+        });
+
 
         // When user click on the bäume item.
         /*bäumeItem.setOnAction(new EventHandler<ActionEvent>() {
@@ -181,7 +274,7 @@ GameView {
         });*/
 
         // When user click on the road item.
-        straßenItem.setOnAction(event -> {
+       /* straßenItem.setOnAction(event -> {
                 for (Button b : buttonRoad) {
                     Button bRoad = new Button();
                     Image imageRoad = new Image(getClass().getResourceAsStream(b.getText()));
@@ -189,7 +282,7 @@ GameView {
                     hbox.getChildren().add(bRoad);
                 }
                 topBar.getChildren().add(borderPane);
-        });
+        });*/
 
 
 

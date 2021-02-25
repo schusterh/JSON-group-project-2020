@@ -4,14 +4,14 @@ import java.util.*;
 
 public class AirportObject extends Building {
     private String name;
-    private String buildmenu;
+    private Optional buildmenu;
     private String special;
     private HashMap<String, ArrayList<Double>> points;
     private Optional entry;
     private ArrayList<ArrayList<String>> planes;
     private int dz;
 
-    public AirportObject(int width, int depth, String name, String buildmenu, String special,
+    public AirportObject(int width, int depth, String name, Optional buildmenu, String special,
                          HashMap<String, ArrayList<Double>> points, Optional<ArrayList<String>> entry, ArrayList<ArrayList<String>> planes, int dz) {
         super(width, depth, name);
         this.name = name;
@@ -21,6 +21,7 @@ public class AirportObject extends Building {
         this.entry = entry;
         this.planes = planes;
         this.dz = dz;
-    }
 
+    }
+    public Optional getBuildmenu() { return this.buildmenu; }
 }
