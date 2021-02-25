@@ -58,13 +58,6 @@ public class LandscapeLayer implements RenderLayer {
         this.gameLoop = loop;
     }
 
-    public void toggleInteractivity() {
-        this.isInteractable = !this.isInteractable;
-        if (!this.isInteractable) {
-            this.selectedTiles.clear();
-        }
-    }
-
     public void setInteractive(boolean value) {
         this.isInteractable = value;
     }
