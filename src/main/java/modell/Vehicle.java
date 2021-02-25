@@ -15,8 +15,8 @@ public class Vehicle {
     private double speed;
     private HashMap<String,Integer> currentCargo;
     private Station currentStation;
-    private HashMap<TrafficRoute,Station> nextStation;
-    private HashMap<Station,Integer> path;
+    private Station nextStation;
+    private ArrayList<Station> path;
 
     // Konstruktor
     public Vehicle(String name,String kind, String graphic, double speed, Optional<ArrayList<HashMap<String,Integer>>> cargo){
@@ -43,7 +43,7 @@ public class Vehicle {
         return currentStation;
     }
 
-    public void setPath(HashMap<Station, Integer> path) {
+    public void setPath(ArrayList<Station> path) {
         this.path = path;
     }
 
@@ -68,7 +68,12 @@ public class Vehicle {
         currentCargo.remove(cargoType);
     }
 
+    public void drive(){
+        if (this.kind.equals("road vehicle")){
+            this.currentStation = this.path.get(0);
 
+        }
+    }
 
 }
 

@@ -142,19 +142,15 @@ public class Game {
         }
         return shortestPath;
     }
-    public HashMap<Station,Integer> findPath(Vehicle v, int startTick, Station target){
-        HashMap<Station,Integer> path = new HashMap<>();
+    public void findPath(Vehicle v, int startTick, Station target){
         if (v.getKind().equals("road vehicle")){
-            ArrayList <Station> stations = bfs(v.getCurrentStation(),target);
-            for (int i = 0; i < stations.size(); ++i){
-                path.put(stations.get(i),i);
-            }
+            v.setPath(bfs(v.getCurrentStation(), target));
         } else if (v.getKind().equals("plane")){
+
 
         } else if (v.getKind().equals("wagon")){
 
         }
-        return path;
     }
 
 
