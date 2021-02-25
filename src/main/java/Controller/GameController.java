@@ -1,16 +1,18 @@
 package Controller;
 
-
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-
 import javafx.util.Duration;
 import modell.Building;
 import modell.Game;
 import modell.MusicPlayer;
 import types.Coordinate;
+import types.GameMode;
+import types.OnMapBuilding;
+import types.Tile;
+import ui.GameLoop;
 import ui.GameView;
 import java.util.ArrayList;
 
@@ -22,9 +24,11 @@ public class GameController {
     Timeline timeline;
     EventHandler<ActionEvent> timelineTask;
     MusicPlayer music;
+    GameLoop gameLoop;
+
+    GameMode gameMode;
 
     public GameController(Game model, int tickLength) {
-
         this.model = model;
         music = new MusicPlayer(this.model.getBackgroundMusic(), this.model.getMenuMusic());
 
@@ -41,6 +45,12 @@ public class GameController {
         this.timeline.setCycleCount(Timeline.INDEFINITE);
     }
 
+    public void setGameLoop(GameLoop loop) {
+        this.gameLoop = loop;
+    }
+
+    public GameLoop getGameLoop() { return this.gameLoop; }
+
     public void increaseHeightOfSelectedTiles() {
         ArrayList<Coordinate> selectedTiles = this.view.getLandscapeLayer().getSelectedTiles();
         this.model.getMap().increaseHeightOfSelectedTiles(selectedTiles);
@@ -51,8 +61,8 @@ public class GameController {
         this.model.getMap().decreaseHeightOfSelectedTiles(selectedTiles);
     }
 
-    public void plainGround(int startX, int startY, int width, int depth, int height) {
-        this.model.getMap().plainGround(startX, startY, width, depth, height);
+    public void plainGround(int startX, int startY, int width, int depth, int height, boolean isConcrete) {
+        this.model.getMap().plainGround(startX, startY, width, depth, height, isConcrete);
     }
 
     public void addBuildingToMap(Building model, int startX, int startY, int height) {
@@ -65,7 +75,37 @@ public class GameController {
         this.startAnimation();
 
         music.playBackgroundMusic();
+    }
 
+    public void setCurrentMouseTileIndex(int[] pos) {
+        this.model.setCurrentMouseTileIndex(pos);
+    }
+
+    public GameMode getGameMode() { return gameMode; }
+
+    public void placePendingBuilding() {
+        OnMapBuilding newBuilding = this.view.getBuildingLayer().removeToBePlacedBuilding();
+        this.model.addBuildingToMap(newBuilding);
+        this.setGameMode(GameMode.NORMAL);
+    }
+
+    public void setGameMode(GameMode gameMode) {
+        this.gameMode = gameMode;
+
+        switch (this.gameMode) {
+            case NORMAL:
+                this.view.getLandscapeLayer().setInteractive(false);
+                this.view.getBuildingLayer().setInteractive(true);
+                break;
+            case TERRAIN:
+                this.view.getLandscapeLayer().setInteractive(true);
+                this.view.getBuildingLayer().setInteractive(false);
+                break;
+            case BUILDING:
+                this.view.getLandscapeLayer().setInteractive(false);
+                this.view.getBuildingLayer().setInteractive(false);
+                break;
+        }
     }
 
     public void startAnimation() {
@@ -81,7 +121,4 @@ public class GameController {
        // this.view.startview();
         this.startAnimation();
     }
-
-
-
 }

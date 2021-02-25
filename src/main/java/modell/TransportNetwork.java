@@ -10,8 +10,8 @@ class Station extends Building{
     String label;
     Factory nearFactory;
 
-    Station(int width, int depth){
-        super(width,depth);
+    Station(int width, int depth, String name){
+        super(width,depth, name);
         this.holdingArea = new HashMap<>();
     }
 

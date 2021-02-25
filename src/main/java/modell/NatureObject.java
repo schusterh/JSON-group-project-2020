@@ -9,7 +9,7 @@ public class NatureObject extends Building {
     private int dz;
 
     public NatureObject(String name,int width, int depth, Optional<String> buildmenu, String special, int dz) {
-        super(width,depth);
+        super(width,depth, name);
         this.name = name;
         this.buildmenu = buildmenu;
         this.special = special;
