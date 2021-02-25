@@ -21,6 +21,8 @@ public class Game {
     private ArrayList<String> music;
     private TransportNetwork transportNetwork;
 
+    int[] currentMouseTileIndex;
+
     public Game(ArrayList<String> commodities, ArrayList<Road> roads, ArrayList<Railway> railways, ArrayList<Tower> towers
     , ArrayList<AirportObject> airport_objects, ArrayList<NatureObject> nature_objects, ArrayList<Factory> factories,
                 ArrayList<Vehicle> vehicles, Map map, ArrayList<String> music) {
@@ -49,7 +51,7 @@ public class Game {
         return roads;
     }
 
-    public ArrayList<NatureObject> getNature_objects() {
+    public ArrayList<NatureObject> getNatureObjects() {
         return nature_objects;
     }
 
@@ -61,7 +63,7 @@ public class Game {
         return vehicles;
     }
 
-    public ArrayList<AirportObject> getAirport_objects() {
+    public ArrayList<AirportObject> getAirportObjects() {
         return airport_objects;
     }
 
@@ -156,20 +158,34 @@ public class Game {
 
 
     public void addBuildingToMap(Building model, int startX, int startY, int height) {
-        this.map.plainGround(startX, startY, model.getWidth(), model.getDepth(), height);
+        this.map.plainGround(startX, startY, model.getWidth(), model.getDepth(), height, model.getClass() != NatureObject.class);
         this.buildingsOnMap.add(new OnMapBuilding(model, startX, startY, height));
+        this.sortBuildings();
+    }
+
+    public void addBuildingToMap(OnMapBuilding pendingBuilding) {
+        this.map.plainGround(pendingBuilding.startX, pendingBuilding.startY, pendingBuilding.width, pendingBuilding.depth, pendingBuilding.height, pendingBuilding.model.getClass() != NatureObject.class);
+        this.buildingsOnMap.add(pendingBuilding);
+        this.sortBuildings();
+    }
+
+    private void sortBuildings() {
         this.buildingsOnMap = this.buildingsOnMap.stream()
                 .sorted(Comparator.comparingInt(OnMapBuilding::getStartY))
                 .sorted(Comparator.comparingInt(OnMapBuilding::getStartX))
                 .collect(Collectors.toList());
-        if (model instanceof Road || model instanceof Railway || model instanceof AirportObject){
-
-        }
     }
 
     public Map getMap() {
         return map;
     }
+
+
+    public void setCurrentMouseTileIndex(int[] pos) {
+        this.currentMouseTileIndex = pos;
+    }
+
+    public int[] getCurrentMouseTileIndex() { return currentMouseTileIndex; }
 
     public TransportNetwork getTransportNetwork() {
         return transportNetwork;

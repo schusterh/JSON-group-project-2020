@@ -6,9 +6,10 @@ public class Building {
     private int depth;
     private String name;
 
-    public Building(int width, int depth) {
+    public Building(int width, int depth, String name) {
         this.width = width;
         this.depth = depth;
+        this.name = name;
     }
 
     public int getWidth() {

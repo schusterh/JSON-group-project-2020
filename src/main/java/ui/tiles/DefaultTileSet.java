@@ -14,8 +14,6 @@ public class DefaultTileSet implements TileSet {
 
     List<Image> tileList;
 
-
-
     public final int TILE_WIDTH;
     public final int TILE_HEIGHT;
 

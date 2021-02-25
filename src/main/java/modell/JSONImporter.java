@@ -445,7 +445,7 @@ public class JSONImporter {
                         }
                     }
 
-                    AirportObject new_r = new AirportObject(width, depth, name, buildmenu, special, points, Optional.ofNullable(entry),
+                    AirportObject new_r = new AirportObject(width, depth, name, Optional.ofNullable(buildmenu), special, points, Optional.ofNullable(entry),
                             input_planes, dz);
                     r.add(new_r);
                 }

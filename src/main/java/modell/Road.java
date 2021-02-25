@@ -19,14 +19,14 @@ public class Road extends Building {
 
     public Road(String name, int width, int depth, HashMap<String,ArrayList<Double>> points, ArrayList<ArrayList<String>> roads, int dz,
                 Optional<String> buildmenu,Optional<HashMap<String,String>> combines, Optional<String> special) {
-        super(width,depth);
+        super(width,depth, name);
         this.name = name;
         this.points = points;
         this.roads = roads;
         this.dz = dz;
-        if (buildmenu.isPresent()) {this.buildmenu = buildmenu;}
-        if (combines.isPresent()) {this.combines = combines;}
-        if(special.isPresent()) {this.special = special;}
+        this.buildmenu = buildmenu;
+        this.combines = combines;
+        this.special = special;
 
     }
 

@@ -6,6 +6,7 @@ import javafx.scene.paint.Color;
 import modell.Game;
 import modell.Map;
 import types.Coordinate;
+import types.CoordinateConverter;
 import types.Tile;
 import ui.GameLoop;
 import ui.RenderLayer;
@@ -53,8 +54,19 @@ public class LandscapeLayer implements RenderLayer {
     }
 
     public void makeInteractable(GameLoop loop) {
-        this.isInteractable = true;
+        this.isInteractable = false;
         this.gameLoop = loop;
+    }
+
+    public void toggleInteractivity() {
+        this.isInteractable = !this.isInteractable;
+        if (!this.isInteractable) {
+            this.selectedTiles.clear();
+        }
+    }
+
+    public void setInteractive(boolean value) {
+        this.isInteractable = value;
     }
 
     private int isLeftOfVector(double xp, double yp, double x1, double y1, double x2, double y2) {
@@ -85,6 +97,8 @@ public class LandscapeLayer implements RenderLayer {
         return result == polyPoiNum;
     }
 
+
+
     public void setRadius(int radius) {
         this.selectionRadius = radius;
     }
@@ -95,20 +109,11 @@ public class LandscapeLayer implements RenderLayer {
         double posX = ((x + y) * (double) (tileResolution[0] / 2) + offsetX) * zoomFactor;
         double posY = ((x - y) * (double) (tileResolution[1] / 4) + offsetY - heightOffset) * zoomFactor + 10;
 
-        double[] polyPoiX = new double[]{
-                posX,
-                (posX + (double) tileResolution[0] / 2 * zoomFactor),
-                (posX + (double) tileResolution[0] * zoomFactor),
-                (posX + (double) tileResolution[0] / 2 * zoomFactor)};
-        double[] polyPoiY = new double[]{
-                posY + ((double) tileResolution[1] * (1f / 4f) + this.tileOffsetY) * zoomFactor,
-                posY + ((double) tileResolution[1] * (0f / 4f) + this.tileOffsetY) * zoomFactor,
-                posY + ((double) tileResolution[1] * (1f / 4f) + this.tileOffsetY) * zoomFactor,
-                posY + ((double) tileResolution[1] * (1f / 2f) + this.tileOffsetY) * zoomFactor};
+        double[][] polygons = CoordinateConverter.createPolygonFromPoint(posX, posY, tileResolution[0], this.tileOffsetY, zoomFactor);
 
         gc.setFill(new Color(0.41, 0.41, 0.41, 0.3));
-        gc.fillPolygon(polyPoiX, polyPoiY, 4);
-        gc.strokePolygon(polyPoiX, polyPoiY, 4);
+        gc.fillPolygon(polygons[0], polygons[1], 4);
+        gc.strokePolygon(polygons[0], polygons[1], 4);
         gc.setFill(new Color(1, 1, 1, 1));
         gc.fillText("[x: " + x + ", y: " + y + "]", posX + (double)tileResolution[0]/4, posY + (double) tileResolution[1]/2);
     }
@@ -118,36 +123,29 @@ public class LandscapeLayer implements RenderLayer {
         int[] tileResolution = this.tileSet.getTileResolution();
         int[] mousePosition = this.gameLoop.getMousePosition();
 
-        for (int y = this.mapHeight-1; y > 0; y--) {
+        for (int y = this.mapHeight - 1; y > 0; y--) {
             for (int x = 0; x < this.mapWidth; x++) {
                 double heightOffset = this.model.getMap().getTile(x, y).height * this.tileOffsetY;
-                double posX = ( (x + y) * (double) (tileResolution[0] / 2) + offsetX ) * zoomFactor;
-                double posY = ( (x - y) * (double) (tileResolution[1] / 4) + offsetY - heightOffset) * zoomFactor;
+                double posX = ((x + y) * (double) (tileResolution[0] / 2) + offsetX) * zoomFactor;
+                double posY = ((x - y) * (double) (tileResolution[1] / 4) + offsetY - heightOffset) * zoomFactor;
 
-                if (posX > -this.tileSet.TILE_WIDTH*2 && posX < gc.getCanvas().getWidth() && posY > -this.tileSet.TILE_HEIGHT*2 && posY < gc.getCanvas().getHeight()) {
+                if (posX > -this.tileSet.TILE_WIDTH * 2 && posX < gc.getCanvas().getWidth() && posY > -this.tileSet.TILE_HEIGHT * 2 && posY < gc.getCanvas().getHeight()) {
                     gc.drawImage(tileSet.getTile(this.model.getMap().getTile(x, y).tileIndex), posX, posY, tileResolution[0] * zoomFactor, tileResolution[1] * zoomFactor);
 
-                    if (isInteractable) {
-                        double[] polyPoiX = new double[]{
-                                posX,
-                                ( posX + (double) tileResolution[0] / 2 * zoomFactor) ,
-                                ( posX + (double) tileResolution[0] * zoomFactor) ,
-                                ( posX + (double) tileResolution[0] / 2 * zoomFactor) };
-                        double[] polyPoiY = new double[]{
-                                posY + ( (double) tileResolution[1] * (1f/4f) + this.tileOffsetY) * zoomFactor,
-                                posY + ( (double) tileResolution[1] * (0f/4f) + this.tileOffsetY) * zoomFactor,
-                                posY + ( (double) tileResolution[1] * (1f/4f) + this.tileOffsetY) * zoomFactor,
-                                posY + ( (double) tileResolution[1] * (1f/2f) + this.tileOffsetY) * zoomFactor};
-                        if (this.isInsidePolygon(mousePosition[0], mousePosition[1], 4, polyPoiX, polyPoiY)) {
+                    double[][] polygons = CoordinateConverter.createPolygonFromPoint(posX, posY, tileResolution[0], this.tileOffsetY, zoomFactor);
+
+                    if (this.isInsidePolygon(mousePosition[0], mousePosition[1], 4, polygons[0], polygons[1])) {
+                        this.controller.setCurrentMouseTileIndex(new int[]{x, y});
+                        if (isInteractable) {
                             this.selectedTiles = this.getTilesInCircle(x, y, this.selectionRadius);
                         }
                     }
                 }
             }
-        }
 
-        for (Coordinate tileCoord : this.selectedTiles) {
-            this.paintTileSelected(gc, tileCoord.x, tileCoord.y, offsetX, offsetY, tileResolution, zoomFactor);
+            for (Coordinate tileCoord : this.selectedTiles) {
+                this.paintTileSelected(gc, tileCoord.x, tileCoord.y, offsetX, offsetY, tileResolution, zoomFactor);
+            }
         }
     }
 

@@ -7,6 +7,8 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
+import modell.Game;
+import types.GameMode;
 import ui.tiles.TileRenderer;
 
 import java.time.ZonedDateTime;
@@ -148,7 +150,11 @@ public class GameLoop {
             this.input.remove("COMMA");
         }
         if (this.input.contains("CLICK_PRIMARY")) {
-            this.controller.increaseHeightOfSelectedTiles();
+            if (this.controller.getGameMode() == GameMode.TERRAIN) {
+                this.controller.increaseHeightOfSelectedTiles();
+            } else if (this.controller.getGameMode() == GameMode.BUILDING) {
+                this.controller.placePendingBuilding();
+            }
             this.input.remove("CLICK_PRIMARY");
         }
         if (this.input.contains("CLICK_SECONDARY")) {
