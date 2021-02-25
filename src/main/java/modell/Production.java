@@ -25,4 +25,8 @@ public class Production {
     public void setDuration(int duration) {
         this.duration = duration;
     }
+
+    public Optional<HashMap<String, Integer>> getConsume() {
+        return consume;
+    }
 }
