@@ -207,7 +207,7 @@ GameView {
                 Button bRailway = new Button();
                 ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + railway.getName() + ".png")));
                 imageView.setPreserveRatio(true);
-                imageView.setFitHeight(100);
+                imageView.setFitHeight(50);
                 bRailway.setGraphic(imageView);
 
                 bRailway.setOnAction(event -> {
