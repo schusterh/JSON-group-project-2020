@@ -105,7 +105,6 @@ class TrafficRoute {
         }
         vehicles.removeIf(v -> !v.getKind().equals(this.getVehicleType()));
     }
-
 }
 
 public class TransportNetwork {

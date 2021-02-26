@@ -14,7 +14,7 @@ public class Vehicle {
     private ArrayList<GoodsBundle> currentCargo;
     private Station currentStation;
     private Station nextStation;
-    private ArrayList<Station> path;
+    private ArrayList<Point> path;
     private HashMap<Station,String> cargoTarget;
     private Point currentPoint;
     private Point nextPoint;
@@ -44,7 +44,7 @@ public class Vehicle {
         return currentStation;
     }
 
-    public void setPath(ArrayList<Station> path) {
+    public void setPath(ArrayList<Point> path) {
         this.path = path;
     }
 
@@ -73,11 +73,11 @@ public class Vehicle {
         return Optional.ofNullable(remain);
     }
 
-    public void unloadCargo(String cargoType){
-        currentCargo.remove(cargoType);
+    public void unloadCargo(GoodsBundle gb){
+        currentCargo.remove(gb);
     }
 
-    public ArrayList<Station> getPath() {
+    public ArrayList<Point> getPath() {
         return path;
     }
 
@@ -88,12 +88,20 @@ public class Vehicle {
         this.nextPoint = nextPoint;
     }
 
+    public Point getNextPoint() {
+        return nextPoint;
+    }
+
     public void setCargoTarget(String cargoType, Station targetStation) {
         this.cargoTarget.put(targetStation,cargoType);
     }
 
     public String getCargoTarget(Station s) {
         return cargoTarget.get(s);
+    }
+
+    public ArrayList<GoodsBundle> getCurrentCargo() {
+        return currentCargo;
     }
 }
 

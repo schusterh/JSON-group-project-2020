@@ -74,14 +74,29 @@ public class Game {
 
     public List<OnMapBuilding> getBuildingsOnMap() { return buildingsOnMap; }
 
-    public void drive(Vehicle v,int tick){
+    public void drive (Vehicle v, int tick){
+        if (v.getKind().equals("road vehicle")){
+            if (v.getPath()!=null) {
+                v.setCurrentPoint(v.getNextPoint());
+                v.setNextPoint(v.getPath().get(0));
+            }
+            else {
+                v.unloadCargo(v.getCurrentCargo().get(0));
+                if (!v.getCurrentCargo().isEmpty())
+                    findPath(v, tick, v.getCurrentCargo().get(0));
+            }
+        } if (v.getKind().equals("engine")){
+
+        }
+    }
+    /*public void drive(Vehicle v,int tick){
         if (v.getKind().equals("road vehicle")){
             if (v.getPath()!=null){
                 //v.setCurrentPoint();
-                if (this.transportNetwork.stations.contains(v.getPath().get(1))){
+                //if (this.transportNetwork.stations.contains(v.getPath().get(1))){
                     //v.setNextPoint(v.getPath().get(1));
                 } else {
-                    findPath(v,tick,v.getPath().get(-1));
+                    //findPath(v,tick,v.getPath().get(-1));
                     drive(v,tick);
                 }
                 //v.setNextStation(v.getPath().get(1));
@@ -100,17 +115,20 @@ public class Game {
         }
     }
 
-    public void findTarget(GoodsBundle gb, Factory f, String commodity){
+     */
+
+    public void findTarget(GoodsBundle gb, Factory f){
         HashMap<Factory, Double> possibleTargets = new HashMap<>();
         ArrayList<Factory> possTargets = new ArrayList<>();
         for (Factory g : this.getFactories()) {
             g.getProductions().stream().filter(p -> p.getConsume()
                     .isPresent()).filter(p -> p.getConsume().get()
-                    .containsKey(commodity))
+                    .containsKey(gb.getGoodType()))
                     .forEach(p -> possibleTargets.put(g, null));
             Station nearF = transportNetwork.getNearStations(f);
             Station nearG = transportNetwork.getNearStations(g);
-            double weight = (double) (g.getStorage().get(commodity) - g.getCurrentStorage().get(commodity))
+            double weight = (double) (g.getStorage().get(gb.getGoodType())
+                    - g.getCurrentStorage().get(gb.getGoodType()))
                     / transportNetwork.getAdjStations(nearF).get(nearG).size();
             possibleTargets.put(g, weight);
             possTargets.add(g);
@@ -171,15 +189,27 @@ public class Game {
         }
         return shortestPath;
     }
-    public void findPath(Vehicle v, int startTick, Station target){
+    public ArrayList<Point> findPath(Vehicle v, int startTick, GoodsBundle goodsBundle){
+        ArrayList<Point> path = new ArrayList<>();
         if (v.getKind().equals("road vehicle")){
-            v.setPath(bfs(v.getCurrentStation(), target));
+            ArrayList<Station> stations = bfs(v.getCurrentStation(),goodsBundle.getTargetStation());
+            int i = 0;
+            while (stations.get(i+1) != null) {
+                for (TrafficRoute tr : transportNetwork.trafficRoutes){
+                    if (tr.getStations().contains(stations.get(i+1)) && tr.getVehicleType().equals(v.getKind())){
+                        path.addAll(transportNetwork.getAdjStations(stations.get(i)).get(stations.get(i + 1)));
+                        break;
+                    }
+                }
+                i++;
+            }
         } else if (v.getKind().equals("plane")){
 
 
         } else if (v.getKind().equals("wagon")){
 
         }
+        return path;
     }
 
 
@@ -300,10 +330,6 @@ class PrioPair implements Comparable<PrioPair>{
     }
 
     boolean containsStation(Station s){
-        if(this.getStation().equals(s)){
-            return true;
-        } else {
-            return false;
-        }
+        return this.getStation().equals(s);
     }
 }
