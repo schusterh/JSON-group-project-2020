@@ -2,6 +2,8 @@ package types;
 
 import javafx.scene.image.Image;
 import modell.Building;
+import modell.Factory;
+import ui.StandardImage;
 
 public class OnMapBuilding {
 
@@ -12,6 +14,8 @@ public class OnMapBuilding {
     public int depth;
     public int height;
     public Image graphic;
+    public StandardImage std = new StandardImage("/buildings/error_tile.png");
+    public StandardImage std_factory = new StandardImage("/buildings/error_factory.png");
 
     public OnMapBuilding(Building building, int startX, int startY, int height) {
         this.model = building;
@@ -21,7 +25,14 @@ public class OnMapBuilding {
         this.depth = building.getDepth();
         this.height = height;
         System.out.println("Building name: " + building.getName());
-        this.graphic = new Image(getClass().getResourceAsStream("/buildings/" + building.getName() + ".png"));
+
+        if (building.getClass() == Factory.class) {
+            this.graphic = std_factory.setImage("/buildings/" + building.getName() + ".png");
+        }
+        else {
+            this.graphic = std.setImage("/buildings/" + building.getName() + ".png");
+        }
+
     }
 
     public int getStartX() { return startX; }
