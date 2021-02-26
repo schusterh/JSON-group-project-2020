@@ -4,12 +4,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 class Station extends Building{
-    ArrayList<GoodsBundle> holdingArea;
-    String label;
-    Factory nearFactory;
+    private ArrayList<GoodsBundle> holdingArea;
+    private String label;
+    private Factory nearFactory;
 
     Station(int width, int depth, String name){
         super(width,depth, name);
+        this.holdingArea = new ArrayList<>();
     }
 
     public ArrayList<GoodsBundle> getHoldingArea() {
@@ -87,6 +88,14 @@ class TrafficRoute {
     public ArrayList<Vehicle> getVehicles() {
         return vehicles;
     }
+    public void removeVehicle(int amount){
+        if (amount > 0) {
+            this.vehicles.subList(0, amount).clear();
+        }
+    }
+    public void addVehicle(Vehicle v){
+        this.vehicles.add(v);
+    }
 
     public void addStation(Station station){
         this.stations.add(station);
@@ -96,15 +105,7 @@ class TrafficRoute {
         this.stations.remove(station);
     }
 
-    public void manageVehicles(){
-        if (this.vehicles.size() > vehicleAmount){
-            this.vehicles.remove(0);
-        }
-        if (this.vehicles.size() < vehicleAmount){
-            this.vehicles.add(this.vehicles.get(0));
-        }
-        vehicles.removeIf(v -> !v.getKind().equals(this.getVehicleType()));
-    }
+
 }
 
 public class TransportNetwork {
@@ -118,6 +119,8 @@ public class TransportNetwork {
     public HashMap<Factory, Station> nearStations;
     public ArrayList<String> signals;
     public ArrayList<ArrayList<String>> railSections;
+    public Tower tower;
+    public ArrayList<Vehicle> vehicles;
 
     public TransportNetwork() {
         this.adjStations = new HashMap<>();
@@ -129,6 +132,7 @@ public class TransportNetwork {
         this.nearStations = new HashMap<>();
         this.signals = new ArrayList<>();
         this.railSections = new ArrayList<>();
+        this.vehicles = new ArrayList<>();
     }
 
     public void addSignal(Double xPos, Double yPos, String signal) {
@@ -187,13 +191,54 @@ public class TransportNetwork {
         adjStations.remove(s);
     }
 
-    public void addConnection(Station s1, Station s2, ArrayList <Point> distance) {
+
+    public void addConnection(Station s1, Station s2, ArrayList <Point> distance,Building connectionType) throws Exception {
+        ArrayList<TrafficRoute> routeCombine = new ArrayList<>();
         for (TrafficRoute trafficRoute : trafficRoutes){
-            ArrayList<TrafficRoute> routeCombine = new ArrayList<>();
+
             if (trafficRoute.getStations().contains(s1) || trafficRoute.getStations().contains(s2)){
                 routeCombine.add(trafficRoute);
             }
         }
+        if (!routeCombine.isEmpty()) {
+            String vehicleType = routeCombine.get(0).getVehicleType();
+            ArrayList<Station> stationsCombine = new ArrayList<>();
+            ArrayList<Vehicle> vehiclesCombine = new ArrayList<>();
+            int vehicleAmount = 0;
+
+            for (TrafficRoute route : routeCombine) {
+                if (!route.getVehicleType().equals(vehicleType)) {
+                    throw new Exception("this route does not have a consistent vehicle type");
+                }
+                stationsCombine.addAll(route.getStations());
+                vehiclesCombine.addAll(route.getVehicles());
+                vehicleAmount =+ route.getVehicleAmount();
+                trafficRoutes.remove(route);
+            }
+
+            TrafficRoute combined = new TrafficRoute(stationsCombine, vehicleType, vehicleAmount, vehiclesCombine);
+            trafficRoutes.add(combined);
+        } else {
+            ArrayList<Station> newStations = new ArrayList<>();
+            newStations.add(s1);
+            newStations.add(s2);
+            String vehicleType = "";
+            int vehicleAmount = 0;
+            Class c = connectionType.getClass();
+            if (c.getName().equals("Road")){
+                vehicleType = "road vehicle";
+                vehicleAmount = distance.size()/10;
+            } if (c.getName().equals("Railway")){
+                vehicleType = "engine";
+                vehicleAmount = distance.size()/20;
+            } if (c.getName().equals("AirportObject")){
+                vehicleType = "plane";
+                vehicleAmount = this.tower.getMaxplanes();
+            }
+            TrafficRoute newRoute = new TrafficRoute(newStations,vehicleType,vehicleAmount,new ArrayList<>());
+
+        }
+
         adjStations.get(s1).put(s2, distance);
         adjStations.get(s2).put(s1, distance);
     }

@@ -191,8 +191,29 @@ public class Game {
         }
         return path;
     }
-
-
+    public void manageVehicles(TrafficRoute route){
+        int diff = route.getVehicles().size()-route.getVehicleAmount();
+        if (diff > 0){
+            route.removeVehicle(diff);
+        } if (diff < 0){
+            ArrayList<Vehicle> possVehicles = new ArrayList<>();
+            for (Vehicle v : this.vehicles) {
+                if (v.getKind().equals(route.getVehicleType())) {
+                    possVehicles.add(v);
+                }
+            }
+            Random rand = new Random();
+            for (int i = 0; i < Math.abs(diff);i++){
+                route.addVehicle(possVehicles.get(rand.nextInt(possVehicles.size())));
+            }
+        }
+        for (Vehicle v : route.getVehicles()){
+            if (!v.getKind().equals(route.getVehicleType())){
+                route.vehicles.remove(v);
+                manageVehicles(route);
+            }
+        }
+    }
 
     public void addBuildingToMap(Building model, int startX, int startY, int height) {
         System.out.println(model.getClass());
