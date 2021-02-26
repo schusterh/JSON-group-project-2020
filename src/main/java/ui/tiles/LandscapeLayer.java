@@ -58,13 +58,6 @@ public class LandscapeLayer implements RenderLayer {
         this.gameLoop = loop;
     }
 
-    public void toggleInteractivity() {
-        this.isInteractable = !this.isInteractable;
-        if (!this.isInteractable) {
-            this.selectedTiles.clear();
-        }
-    }
-
     public void setInteractive(boolean value) {
         this.isInteractable = value;
     }
@@ -97,8 +90,6 @@ public class LandscapeLayer implements RenderLayer {
         return result == polyPoiNum;
     }
 
-
-
     public void setRadius(int radius) {
         this.selectionRadius = radius;
     }
@@ -109,9 +100,9 @@ public class LandscapeLayer implements RenderLayer {
         double posX = ((x + y) * (double) (tileResolution[0] / 2) + offsetX) * zoomFactor;
         double posY = ((x - y) * (double) (tileResolution[1] / 4) + offsetY - heightOffset) * zoomFactor + 10;
 
-        double[][] polygons = CoordinateConverter.createPolygonFromPoint(posX, posY, tileResolution[0], this.tileOffsetY, zoomFactor);
+        double[][] polygons = CoordinateConverter.createPolygonFromPoint(posX, posY, tileResolution[0], tileOffsetY, zoomFactor);
 
-        gc.setFill(new Color(0.41, 0.41, 0.41, 0.3));
+        gc.setFill(new Color(0.41, 0.41, 0.41, 0.1));
         gc.fillPolygon(polygons[0], polygons[1], 4);
         gc.strokePolygon(polygons[0], polygons[1], 4);
         gc.setFill(new Color(1, 1, 1, 1));
@@ -132,7 +123,7 @@ public class LandscapeLayer implements RenderLayer {
                 if (posX > -this.tileSet.TILE_WIDTH * 2 && posX < gc.getCanvas().getWidth() && posY > -this.tileSet.TILE_HEIGHT * 2 && posY < gc.getCanvas().getHeight()) {
                     gc.drawImage(tileSet.getTile(this.model.getMap().getTile(x, y).tileIndex), posX, posY, tileResolution[0] * zoomFactor, tileResolution[1] * zoomFactor);
 
-                    double[][] polygons = CoordinateConverter.createPolygonFromPoint(posX, posY, tileResolution[0], this.tileOffsetY, zoomFactor);
+                    double[][] polygons = CoordinateConverter.createPolygonFromPoint(posX, posY, tileResolution[0], tileOffsetY, zoomFactor);
 
                     if (this.isInsidePolygon(mousePosition[0], mousePosition[1], 4, polygons[0], polygons[1])) {
                         this.controller.setCurrentMouseTileIndex(new int[]{x, y});
@@ -142,7 +133,6 @@ public class LandscapeLayer implements RenderLayer {
                     }
                 }
             }
-
             for (Coordinate tileCoord : this.selectedTiles) {
                 this.paintTileSelected(gc, tileCoord.x, tileCoord.y, offsetX, offsetY, tileResolution, zoomFactor);
             }
@@ -151,5 +141,9 @@ public class LandscapeLayer implements RenderLayer {
 
     public ArrayList<Coordinate> getSelectedTiles() {
         return selectedTiles;
+    }
+
+    public void clearSelectedTiles() {
+        this.selectedTiles.clear();
     }
 }

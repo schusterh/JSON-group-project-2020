@@ -139,6 +139,10 @@ public class GameLoop {
             this.renderer.decreaseZoomFactor();
             this.input.remove("SUBTRACT");
         }
+        if (this.input.contains("ESCAPE")) {
+            this.controller.setGameMode(GameMode.NORMAL);
+
+        }
         if (this.input.contains("PERIOD")) {
             this.selectionRadius = this.selectionRadius < 6 ? this.selectionRadius + 1 : 6;
             this.renderer.getLandscapeLayer().setRadius(this.selectionRadius);

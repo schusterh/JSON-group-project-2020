@@ -3,10 +3,7 @@ package modell;
 import types.OnMapBuilding;
 import ui.tiles.BuildingLayer;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Game {
@@ -40,6 +37,7 @@ public class Game {
         this.buildingsOnMap = new ArrayList<>();
         this.map = map;
         this.music = music;
+        this.addFactoriesToMap();
     }
 
     public ArrayList<Railway> getRailways() {
@@ -104,13 +102,16 @@ public class Game {
     }
 
     public void addBuildingToMap(Building model, int startX, int startY, int height) {
-        this.map.plainGround(startX, startY, model.getWidth(), model.getDepth(), height, model.getClass() != NatureObject.class);
+        System.out.println(model.getClass());
+        this.map.plainGround(startX, startY, model.getWidth(), model.getDepth(), height, model.getClass() != Road.class);
         this.buildingsOnMap.add(new OnMapBuilding(model, startX, startY, height));
         this.sortBuildings();
     }
 
     public void addBuildingToMap(OnMapBuilding pendingBuilding) {
-        this.map.plainGround(pendingBuilding.startX, pendingBuilding.startY, pendingBuilding.width, pendingBuilding.depth, pendingBuilding.height, pendingBuilding.model.getClass() != NatureObject.class);
+        System.out.println(pendingBuilding.model.getClass());
+        boolean isConcrete = pendingBuilding.model.getClass() != NatureObject.class && pendingBuilding.model.getClass() != Road.class;
+        this.map.plainGround(pendingBuilding.startX, pendingBuilding.startY, pendingBuilding.width, pendingBuilding.depth, pendingBuilding.height, isConcrete);
         this.buildingsOnMap.add(pendingBuilding);
         this.sortBuildings();
     }
@@ -126,6 +127,49 @@ public class Game {
         return map;
     }
 
+    public void addFactoriesToMap() {
+        Random r = new Random();
+        for (Factory factory : this.factories) {
+            int posX = r.nextInt(this.map.getWidth()-4);
+            int posY = r.nextInt(this.map.getDepth()-4);
+
+            while (this.isInMap(posX, posY, factory.getWidth(), factory.getDepth()) && this.isOccupied(posX, posY) && this.isInWater(posX, posY, factory.getWidth(), factory.getDepth())) {
+                posX = r.nextInt(this.map.getWidth()-1);
+                posY = r.nextInt(this.map.getDepth()-1);
+            }
+            this.addBuildingToMap(new OnMapBuilding(factory, posX, posY, this.map.getTile(posX, posY).height));
+        }
+    }
+
+    public boolean isOccupied(int x, int y) {
+        for (OnMapBuilding building : this.buildingsOnMap) {
+            if (x >= building.startX &&
+                x <= building.startX + building.width &&
+                y >= building.startY &&
+                y <= building.startY + building.depth
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isInWater(int x, int y, int width, int depth) {
+        int waterCount = 0;
+        for (int xCount = 0; xCount < width; xCount++) {
+            for (int yCount = 0; yCount < depth; yCount++) {
+                if (this.map.getTile(xCount, yCount).height == -1) {
+                    waterCount++;
+                }
+            }
+        }
+        return waterCount >= 2;
+    }
+
+    public boolean isInMap(int x, int y, int width, int depth) {
+        return x >= 0 && x + width < this.map.getWidth() - 1 &&
+                y >= 0 && y + depth < this.map.getDepth() - 1;
+    }
 
     public void setCurrentMouseTileIndex(int[] pos) {
         this.currentMouseTileIndex = pos;
@@ -143,5 +187,11 @@ public class Game {
 
     public String getMenuMusic() {
         return this.music.get(1);
+    }
+
+    public void handleUpdate() {
+        for (Factory factory : factories) {
+            factory.produce();
+        }
     }
 }

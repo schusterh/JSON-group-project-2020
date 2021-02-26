@@ -3,7 +3,11 @@ package ui.tiles;
 import Controller.GameController;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
 import modell.Building;
+import modell.Factory;
 import modell.Game;
 import types.GameMode;
 import types.OnMapBuilding;
@@ -39,7 +43,6 @@ public class BuildingLayer implements RenderLayer {
         this.model = model;
         this.controller = controller;
         this.tileHeightOffset = tileHeightOffset;
-        this.controller.addBuildingToMap(this.model.getFactories().get(6), 3, 3, 2);
     }
 
     public void placeBuilding(Building model) {
@@ -47,15 +50,19 @@ public class BuildingLayer implements RenderLayer {
         this.toBePlacedBuilding = new OnMapBuilding(model, 0, 0, 2);
     }
 
-    public OnMapBuilding removeToBePlacedBuilding() {
-        OnMapBuilding returnValue = this.toBePlacedBuilding;
+    public OnMapBuilding getToBePlacedBuilding() {
+        return this.toBePlacedBuilding;
+    }
+
+    public void removeToBePlacedBuilding() {
         this.toBePlacedBuilding = null;
-        return returnValue;
     }
 
     public void setInteractive(boolean value) {
         this.isInteractive = value;
     }
+
+
 
     @Override
     public void draw(GraphicsContext gc, int offsetX, int offsetY, double zoomFactor) {
@@ -68,15 +75,24 @@ public class BuildingLayer implements RenderLayer {
 
             double[] startPos = calculateDrawingPosition(toBePlacedBuilding, offsetX, offsetY, zoomFactor);
 
-            gc.setGlobalAlpha(0.5);
+            //gc.setGlobalAlpha(0.5);
             gc.drawImage(toBePlacedBuilding.graphic, startPos[0], startPos[1], toBePlacedBuilding.graphic.getWidth() * zoomFactor, toBePlacedBuilding.graphic.getHeight() * zoomFactor);
-            gc.setGlobalAlpha(1);
+            //gc.setGlobalAlpha(1);
         }
 
         for (OnMapBuilding building : this.model.getBuildingsOnMap()) {
 
             double[] startPos = calculateDrawingPosition(building, offsetX, offsetY, zoomFactor);
+            System.out.println("Building " + building.model.getClass() + " - at: " + building.startX + "; " + building.startY);
             gc.drawImage(building.graphic, startPos[0], startPos[1], building.graphic.getWidth() * zoomFactor, building.graphic.getHeight() * zoomFactor);
+            if (building.model.getClass() == Factory.class) {
+                Factory model = (Factory) building.model;
+                Font temp = gc.getFont();
+                gc.setFont(new Font("Arial", 24));
+                gc.setFill(Color.WHITE);
+                gc.fillText(model.getProdMessage(), startPos[0] + (building.graphic.getWidth() / 3), startPos[1] + 100);
+                gc.setFont(temp);
+            }
         }
     }
 

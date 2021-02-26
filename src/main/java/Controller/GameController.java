@@ -33,8 +33,7 @@ public class GameController {
         music = new MusicPlayer(this.model.getBackgroundMusic(), this.model.getMenuMusic());
 
         this.timelineTask = event -> {
-            //model.handleUpdate();
-            //view.handleModelUpdate();
+            model.handleUpdate();
             System.out.println("UPDATING EVERYTHING!");
         };
 
@@ -84,9 +83,9 @@ public class GameController {
     public GameMode getGameMode() { return gameMode; }
 
     public void placePendingBuilding() {
-        OnMapBuilding newBuilding = this.view.getBuildingLayer().removeToBePlacedBuilding();
-        this.model.addBuildingToMap(newBuilding);
-        this.setGameMode(GameMode.NORMAL);
+        OnMapBuilding newBuilding = this.view.getBuildingLayer().getToBePlacedBuilding();
+        this.model.addBuildingToMap(new OnMapBuilding(newBuilding.model, newBuilding.startX, newBuilding.startY, newBuilding.height));
+        //this.setGameMode(GameMode.NORMAL);
     }
 
     public void setGameMode(GameMode gameMode) {
@@ -95,6 +94,8 @@ public class GameController {
         switch (this.gameMode) {
             case NORMAL:
                 this.view.getLandscapeLayer().setInteractive(false);
+                this.view.getLandscapeLayer().clearSelectedTiles();
+                this.view.getBuildingLayer().removeToBePlacedBuilding();
                 this.view.getBuildingLayer().setInteractive(true);
                 break;
             case TERRAIN:
