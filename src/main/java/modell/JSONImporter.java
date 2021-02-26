@@ -23,9 +23,14 @@ public class JSONImporter {
         String ERROR_MESSAGE = "Not enogh objects in the scenario!";
         final String STANDARD_BG_MUSIC = "happy_tune.mp3";
         final String STANDARD_MN_MUSIC = "";
-
+        JSONObject json = new JSONObject();
         String content = Files.readString(Paths.get(this.file.getAbsolutePath()), StandardCharsets.UTF_8);
-        JSONObject json = new JSONObject(content);
+        try {
+            json = new JSONObject(content);
+        }
+        catch (Exception ex) {
+            throw new Exception("This is not a correct JSON file!");
+        }
         if (!json.has("buildings")) {
             throw new Exception("No buildings found!");
         }
