@@ -14,6 +14,8 @@ import types.OnMapBuilding;
 import types.Tile;
 import ui.GameLoop;
 import ui.GameView;
+
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 
@@ -72,8 +74,8 @@ public class GameController {
         this.view.displayGameScreen();
         System.out.println("WELL2?");
         this.startAnimation();
-
         music.playBackgroundMusic();
+
     }
 
     public void setCurrentMouseTileIndex(int[] pos) {
