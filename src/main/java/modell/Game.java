@@ -102,13 +102,16 @@ public class Game {
     }
 
     public void addBuildingToMap(Building model, int startX, int startY, int height) {
-        this.map.plainGround(startX, startY, model.getWidth(), model.getDepth(), height, model.getClass() != NatureObject.class || model.getClass() != Road.class);
+        System.out.println(model.getClass());
+        this.map.plainGround(startX, startY, model.getWidth(), model.getDepth(), height, model.getClass() != Road.class);
         this.buildingsOnMap.add(new OnMapBuilding(model, startX, startY, height));
         this.sortBuildings();
     }
 
     public void addBuildingToMap(OnMapBuilding pendingBuilding) {
-        this.map.plainGround(pendingBuilding.startX, pendingBuilding.startY, pendingBuilding.width, pendingBuilding.depth, pendingBuilding.height, pendingBuilding.model.getClass() != NatureObject.class);
+        System.out.println(pendingBuilding.model.getClass());
+        boolean isConcrete = pendingBuilding.model.getClass() != NatureObject.class && pendingBuilding.model.getClass() != Road.class;
+        this.map.plainGround(pendingBuilding.startX, pendingBuilding.startY, pendingBuilding.width, pendingBuilding.depth, pendingBuilding.height, isConcrete);
         this.buildingsOnMap.add(pendingBuilding);
         this.sortBuildings();
     }
@@ -127,8 +130,8 @@ public class Game {
     public void addFactoriesToMap() {
         Random r = new Random();
         for (Factory factory : this.factories) {
-            int posX = r.nextInt(this.map.getWidth()-1);
-            int posY = r.nextInt(this.map.getDepth()-1);
+            int posX = r.nextInt(this.map.getWidth()-4);
+            int posY = r.nextInt(this.map.getDepth()-4);
 
             while (this.isInMap(posX, posY, factory.getWidth(), factory.getDepth()) && this.isOccupied(posX, posY) && this.isInWater(posX, posY, factory.getWidth(), factory.getDepth())) {
                 posX = r.nextInt(this.map.getWidth()-1);
@@ -164,11 +167,8 @@ public class Game {
     }
 
     public boolean isInMap(int x, int y, int width, int depth) {
-        if (x >= 0 && x + width < this.map.getWidth()-1 &&
-            y >= 0 && y + depth < this.map.getDepth()-1) {
-            return true;
-        }
-        return false;
+        return x >= 0 && x + width < this.map.getWidth() - 1 &&
+                y >= 0 && y + depth < this.map.getDepth() - 1;
     }
 
     public void setCurrentMouseTileIndex(int[] pos) {

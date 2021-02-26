@@ -83,6 +83,7 @@ public class BuildingLayer implements RenderLayer {
         for (OnMapBuilding building : this.model.getBuildingsOnMap()) {
 
             double[] startPos = calculateDrawingPosition(building, offsetX, offsetY, zoomFactor);
+            System.out.println("Building " + building.model.getClass() + " - at: " + building.startX + "; " + building.startY);
             gc.drawImage(building.graphic, startPos[0], startPos[1], building.graphic.getWidth() * zoomFactor, building.graphic.getHeight() * zoomFactor);
             if (building.model.getClass() == Factory.class) {
                 Factory model = (Factory) building.model;

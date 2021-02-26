@@ -84,7 +84,7 @@ public class GameController {
 
     public void placePendingBuilding() {
         OnMapBuilding newBuilding = this.view.getBuildingLayer().getToBePlacedBuilding();
-        this.model.addBuildingToMap(newBuilding);
+        this.model.addBuildingToMap(new OnMapBuilding(newBuilding.model, newBuilding.startX, newBuilding.startY, newBuilding.height));
         //this.setGameMode(GameMode.NORMAL);
     }
 
