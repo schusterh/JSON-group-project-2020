@@ -1,10 +1,7 @@
 package modell;
 
-import java.lang.reflect.Array;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Stream;
 
 class Station extends Building{
     ArrayList<GoodsBundle> holdingArea;
@@ -113,8 +110,9 @@ class TrafficRoute {
 
 public class TransportNetwork {
     ArrayList<String> station_names = new ArrayList<>();
-    public HashMap<Station, HashMap<Station, Integer>> adjStations;
-    public HashMap<Point, ArrayList<Point>> connections;
+    public HashMap<Station, HashMap<Station, ArrayList<Point>>> adjStations;
+    public HashMap<Point, ArrayList<Point>> pointConnections;
+    public HashMap<ArrayList<Station>,ArrayList<Point>> stationConnections;
     public ArrayList<Point> points;
     public ArrayList<Station> stations;
     public ArrayList<TrafficRoute> trafficRoutes;
@@ -122,7 +120,7 @@ public class TransportNetwork {
     public ArrayList<String> signals;
     public ArrayList<ArrayList<String>> railSections;
 
-    public TransportNetwork(HashMap<Station, HashMap<Station, Integer>> adjStations) {
+    public TransportNetwork(HashMap<Station, HashMap<Station, ArrayList<Point>>> adjStations) {
         this.adjStations = adjStations;
     }
 
@@ -140,7 +138,7 @@ public class TransportNetwork {
             Point p = new Point(newPoints.get(name).get(0) + xPos, newPoints.get(name).get(1) + yPos);
             if (points.stream().noneMatch(z -> Math.abs(z.getX()) - Math.abs((p.getX())) <= diff && Math.abs(z.getY()) - Math.abs(p.getY()) <= diff)) {
                 points.add(p);
-                connections.put(p, new ArrayList<>());
+                pointConnections.put(p, new ArrayList<>());
             } else {
                 Point similarPoint = points.stream()
                         .findAny()
@@ -154,10 +152,10 @@ public class TransportNetwork {
                     Point connectPoint = new Point(newPoints.get(connection).get(0) + xPos, newPoints.get(connection).get(1) + yPos);
                     if (points.stream().noneMatch(z -> Math.abs(z.getX()) - Math.abs(connectPoint.getX()) <= diff && Math.abs(z.getY()) - Math.abs(connectPoint.getY()) <= diff)) {
                         points.add(connectPoint);
-                        connections.put(connectPoint, new ArrayList<>());
-                        if (!connections.get(p).contains(connectPoint)) {
-                            connections.get(p).add(connectPoint);
-                            connections.get(connectPoint).add(p);
+                        pointConnections.put(connectPoint, new ArrayList<>());
+                        if (!pointConnections.get(p).contains(connectPoint)) {
+                            pointConnections.get(p).add(connectPoint);
+                            pointConnections.get(connectPoint).add(p);
                         }
                     }
                 }
@@ -175,14 +173,14 @@ public class TransportNetwork {
         adjStations.remove(s);
     }
 
-    public void addConnection(Station s1, Station s2, Integer distance) {
+    public void addConnection(Station s1, Station s2, ArrayList <Point> distance) {
         adjStations.get(s1).put(s2, distance);
         adjStations.get(s2).put(s1, distance);
     }
 
     public void removeConnection(Station s1, Station s2) {
-        HashMap<Station, Integer> connectS1 = adjStations.get(s1);
-        HashMap<Station, Integer> connectS2 = adjStations.get(s2);
+        HashMap<Station, ArrayList<Point>> connectS1 = adjStations.get(s1);
+        HashMap<Station, ArrayList<Point>> connectS2 = adjStations.get(s2);
         if (connectS1 != null) {
             connectS1.remove(s2);
         }
@@ -195,7 +193,7 @@ public class TransportNetwork {
         return nearStations.get(f);
     }
 
-    HashMap<Station, Integer> getAdjStations(Station s) {
+    HashMap<Station, ArrayList<Point>> getAdjStations(Station s) {
         return adjStations.get(s);
     }
 

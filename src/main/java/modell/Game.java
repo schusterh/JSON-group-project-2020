@@ -77,14 +77,14 @@ public class Game {
     public void drive(Vehicle v,int tick){
         if (v.getKind().equals("road vehicle")){
             if (v.getPath()!=null){
-                v.setCurrentStation(v.getPath().get(0));
+                //v.setCurrentPoint();
                 if (this.transportNetwork.stations.contains(v.getPath().get(1))){
-                    v.setNextStation(v.getPath().get(1));
+                    //v.setNextPoint(v.getPath().get(1));
                 } else {
                     findPath(v,tick,v.getPath().get(-1));
                     drive(v,tick);
                 }
-                v.setNextStation(v.getPath().get(1));
+                //v.setNextStation(v.getPath().get(1));
 
             } else {
                 // Wenn es keinen Weg mehr gibt
@@ -111,7 +111,7 @@ public class Game {
             Station nearF = transportNetwork.getNearStations(f);
             Station nearG = transportNetwork.getNearStations(g);
             double weight = (double) (g.getStorage().get(commodity) - g.getCurrentStorage().get(commodity))
-                    / transportNetwork.getAdjStations(nearF).get(nearG);
+                    / transportNetwork.getAdjStations(nearF).get(nearG).size();
             possibleTargets.put(g, weight);
             possTargets.add(g);
         }
@@ -137,9 +137,9 @@ public class Game {
             if (pq.peek() != null) {
                 PrioPair currentPair = pq.peek();
                 Station currentStation = currentPair.getStation();
-                HashMap<Station, Integer> nextStations = getTransportNetwork().getAdjStations(currentStation);
+                HashMap<Station, ArrayList<Point>> nextStations = getTransportNetwork().getAdjStations(currentStation);
                 for (Station s : nextStations.keySet()) {
-                    int dist = nextStations.get(s) + currentPair.getDistance();
+                    int dist = nextStations.get(s).size() + currentPair.getDistance();
                     if (origins.containsKey(s)){
                         int previousDist = pq.stream().filter(x -> x.getStation()
                                 .equals(s))

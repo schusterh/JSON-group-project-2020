@@ -16,6 +16,8 @@ public class Vehicle {
     private Station nextStation;
     private ArrayList<Station> path;
     private HashMap<Station,String> cargoTarget;
+    private Point currentPoint;
+    private Point nextPoint;
 
     // Konstruktor
     public Vehicle(String name,String kind, String graphic, double speed, Optional<ArrayList<HashMap<String,Integer>>> cargo){
@@ -79,11 +81,11 @@ public class Vehicle {
         return path;
     }
 
-    public void setCurrentStation(Station currentStation) {
-        this.currentStation = currentStation;
+    public void setCurrentPoint(Point currentPoint) {
+        this.currentPoint = currentPoint;
     }
-    public void setNextStation(Station nextStation) {
-        this.nextStation = nextStation;
+    public void setNextPoint(Point nextPoint) {
+        this.nextPoint = nextPoint;
     }
 
     public void setCargoTarget(String cargoType, Station targetStation) {
