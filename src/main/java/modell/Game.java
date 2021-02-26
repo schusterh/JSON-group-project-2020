@@ -52,7 +52,7 @@ public class Game {
         this.buildingsOnMap = new ArrayList<>();
         this.map = map;
         this.music = music;
-        this.transportNetwork = new TransportNetwork(new HashMap<Station, HashMap<Station, Integer>>());
+        this.transportNetwork = new TransportNetwork(new HashMap<>());
         this.addFactoriesToMap();
         this.roadExtensions = new HashMap<>();
         this.roadExtensions.put("road-sw", "road-ne-sw");
