@@ -77,45 +77,25 @@ public class Game {
     public void drive (Vehicle v, int tick){
         if (v.getKind().equals("road vehicle")){
             if (v.getPath()!=null) {
-                v.setCurrentPoint(v.getNextPoint());
-                v.setNextPoint(v.getPath().get(0));
-            }
-            else {
+                if (transportNetwork.points.contains(v.getNextPoint())){
+                    v.setCurrentPoint(v.getNextPoint());
+                    v.setNextPoint(v.getPath().get(0));
+                } else {
+                    findPath(v, tick, v.getCurrentCargo().get(0));
+                    drive(v,tick);
+                }
+            } else {
                 v.unloadCargo(v.getCurrentCargo().get(0));
                 if (!v.getCurrentCargo().isEmpty())
                     findPath(v, tick, v.getCurrentCargo().get(0));
             }
         } if (v.getKind().equals("engine")){
-
-        }
-    }
-    /*public void drive(Vehicle v,int tick){
-        if (v.getKind().equals("road vehicle")){
-            if (v.getPath()!=null){
-                //v.setCurrentPoint();
-                //if (this.transportNetwork.stations.contains(v.getPath().get(1))){
-                    //v.setNextPoint(v.getPath().get(1));
-                } else {
-                    //findPath(v,tick,v.getPath().get(-1));
-                    drive(v,tick);
-                }
-                //v.setNextStation(v.getPath().get(1));
-
-            } else {
-                // Wenn es keinen Weg mehr gibt
-                v.unloadCargo(v.getCargoTarget(v.getCurrentStation()));
-            }
-        } if (v.getKind().equals("engine")){
             if (v.getPath()!=null){
 
-
             }
-        } if (v.getKind().equals("plane")){
-
         }
     }
 
-     */
 
     public void findTarget(GoodsBundle gb, Factory f){
         HashMap<Factory, Double> possibleTargets = new HashMap<>();

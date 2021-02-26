@@ -128,36 +128,41 @@ public class TransportNetwork {
         this.signals.add(signal);
     }
 
-    public void addTrafficObject(Double xPos, Double yPos, HashMap<String, ArrayList<Double>> newPoints, ArrayList<ArrayList<String>> newConnect) {
+    public void addTrafficSection(Double xPos, Double yPos, HashMap<String, ArrayList<Double>> newPoints, ArrayList<ArrayList<String>> newConnect) {
         //nur für objekte, die punkte und punktverbindungen auf der karte hinzufügen
 
-        double diff = 0.2;
-
+        HashMap<Point,ArrayList<String>> connections = new HashMap<>();
         for (String name : newPoints.keySet()) {
             Point p = new Point(newPoints.get(name).get(0) + xPos, newPoints.get(name).get(1) + yPos);
-            if (points.stream().noneMatch(z -> Math.abs(z.getX()) - Math.abs((p.getX())) <= diff && Math.abs(z.getY()) - Math.abs(p.getY()) <= diff)) {
-                points.add(p);
-                pointConnections.put(p, new ArrayList<>());
-            } else {
-                Point similarPoint = points.stream()
-                        .findAny()
-                        .filter(z -> ((Math.abs(z.getX()) - Math.abs((p.getX()))) <= diff) && ((Math.abs(z.getY()) - Math.abs(p.getY())) <= diff))
-                        .orElse(p); // müsste es nicht orElse(z) sein?
 
-            }
-            for (ArrayList<String> c : newConnect) {
+            connections.put(p,new ArrayList<>());
+
+            for (ArrayList<String> c : newConnect){
                 if (c.contains(name)) {
-                    String connection = String.valueOf(c.stream().filter(x -> !(x.equals(name))));
-                    Point connectPoint = new Point(newPoints.get(connection).get(0) + xPos, newPoints.get(connection).get(1) + yPos);
-                    if (points.stream().noneMatch(z -> Math.abs(z.getX()) - Math.abs(connectPoint.getX()) <= diff && Math.abs(z.getY()) - Math.abs(connectPoint.getY()) <= diff)) {
-                        points.add(connectPoint);
-                        pointConnections.put(connectPoint, new ArrayList<>());
-                        if (!pointConnections.get(p).contains(connectPoint)) {
-                            pointConnections.get(p).add(connectPoint);
-                            pointConnections.get(connectPoint).add(p);
+                    for (String s : c){
+                        if (!s.equals(name)) {
+                            connections.get(p).add(s);
                         }
                     }
                 }
+            }
+        }
+        for (Point point : connections.keySet()){
+            ArrayList<Point> connectingPoints = new ArrayList<>();
+            for (String s : connections.get(point)) {
+                connectingPoints.add(new Point(newPoints.get(s).get(0),newPoints.get(s).get(1)));
+            }
+            boolean duplicate = false;
+            for (Point p : pointConnections.keySet()){
+                if (equalPoints(point,p)){
+                    duplicate = true;
+                    for (Point c:connectingPoints) {
+                        pointConnections.get(p).add(c);
+                    }
+                }
+            }
+            if (!duplicate){
+                pointConnections.put(point,connectingPoints);
             }
         }
     }
@@ -173,6 +178,12 @@ public class TransportNetwork {
     }
 
     public void addConnection(Station s1, Station s2, ArrayList <Point> distance) {
+        for (TrafficRoute trafficRoute : trafficRoutes){
+            ArrayList<TrafficRoute> routeCombine = new ArrayList<>();
+            if (trafficRoute.getStations().contains(s1) || trafficRoute.getStations().contains(s2)){
+                routeCombine.add(trafficRoute);
+            }
+        }
         adjStations.get(s1).put(s2, distance);
         adjStations.get(s2).put(s1, distance);
     }
@@ -186,6 +197,27 @@ public class TransportNetwork {
         if (connectS2 != null) {
             connectS2.remove(s1);
         }
+    }
+    public void connectPoints(Point point, Point addPoint){
+        ArrayList<Point> connections = new ArrayList<>();
+        if (pointConnections.containsKey(point)) {
+            if (pointConnections.containsKey(addPoint))
+                connections.add(addPoint);
+                connections.remove(addPoint);
+        }
+        for (Point conn: connections) {
+            pointConnections.get(point).add(conn);
+        }
+    }
+
+    public boolean equalPoints(Point p1, Point p2){
+        double diff = 0.2;
+        return Math.abs(p1.getX() - p2.getX()) <= diff && Math.abs(p1.getY() - p2.getY()) <= diff;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(points);
     }
 
     public Station getNearStations(Factory f) {
