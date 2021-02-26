@@ -77,7 +77,7 @@ public class Game {
     public void drive (Vehicle v, int tick){
         if (v.getKind().equals("road vehicle")){
             if (v.getPath()!=null) {
-                if (transportNetwork.points.contains(v.getNextPoint())){
+                if (transportNetwork.getPoints().contains(v.getNextPoint())){
                     v.setCurrentPoint(v.getNextPoint());
                     v.setNextPoint(v.getPath().get(0));
                 } else {
@@ -123,7 +123,7 @@ public class Game {
             if (r <= 0.0) break;
         }
         Factory targetFactory = possTargets.get(randomIndex);
-        gb.setTargetStation(this.transportNetwork.nearStations.get(targetFactory));
+        gb.setTargetStation(this.transportNetwork.getNearStations(targetFactory));
     }
     public ArrayList<Station> bfs (Station startStation, Station targetStation){
         ArrayList<Station> shortestPath = new ArrayList<>();
@@ -175,7 +175,7 @@ public class Game {
             ArrayList<Station> stations = bfs(v.getCurrentStation(),goodsBundle.getTargetStation());
             int i = 0;
             while (stations.get(i+1) != null) {
-                for (TrafficRoute tr : transportNetwork.trafficRoutes){
+                for (TrafficRoute tr : transportNetwork.getTrafficRoutes().keySet()){
                     if (tr.getStations().contains(stations.get(i+1)) && tr.getVehicleType().equals(v.getKind())){
                         path.addAll(transportNetwork.getAdjStations(stations.get(i)).get(stations.get(i + 1)));
                         break;
@@ -194,7 +194,7 @@ public class Game {
     public void manageVehicles(TrafficRoute route){
         int diff = route.getVehicles().size()-route.getVehicleAmount();
         if (diff > 0){
-            route.removeVehicle(diff);
+            route.removeVehicleAmount(diff);
         } if (diff < 0){
             ArrayList<Vehicle> possVehicles = new ArrayList<>();
             for (Vehicle v : this.vehicles) {
@@ -209,7 +209,7 @@ public class Game {
         }
         for (Vehicle v : route.getVehicles()){
             if (!v.getKind().equals(route.getVehicleType())){
-                route.vehicles.remove(v);
+                route.getVehicles().remove(v);
                 manageVehicles(route);
             }
         }
