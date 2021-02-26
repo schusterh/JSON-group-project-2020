@@ -1,7 +1,5 @@
 package modell;
 
-import javafx.util.Pair;
-
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -13,10 +11,11 @@ public class Vehicle {
     private String graphic;
     private Optional<ArrayList<HashMap<String,Integer>>> cargo;
     private double speed;
-    private HashMap<String,Integer> currentCargo;
+    private ArrayList<GoodsBundle> currentCargo;
     private Station currentStation;
     private Station nextStation;
     private ArrayList<Station> path;
+    private HashMap<Station,String> cargoTarget;
 
     // Konstruktor
     public Vehicle(String name,String kind, String graphic, double speed, Optional<ArrayList<HashMap<String,Integer>>> cargo){
@@ -47,33 +46,52 @@ public class Vehicle {
         this.path = path;
     }
 
-    public int loadCargo(String cargoType, Integer cargoAmount){
+    public Optional<GoodsBundle> loadCargo(GoodsBundle gb){
 
-        if (cargoAmount<0) {throw new IllegalArgumentException("Cargo Amount should be positive");}
         Stream<HashMap> cargoStream = cargo.stream().flatMap(ArrayList::stream);
         HashMap<String,Integer> allowedCargo = new HashMap<>();
-        cargoStream.filter(x -> x.containsKey(cargoType)).forEach(allowedCargo::putAll);
-        int cargoSpace = allowedCargo.get(cargoType)-this.currentCargo.get(cargoType);
+        cargoStream.filter(x -> x.containsKey(gb.getGoodType())).forEach(allowedCargo::putAll);
+        int alreadyLoaded = 0;
+        for (GoodsBundle goodsBundle:currentCargo)
+            if (goodsBundle.getGoodType().equals(gb.getGoodType()))
+                alreadyLoaded = +goodsBundle.getGoodAmount();
+        int cargoSpace = allowedCargo.get(gb.getGoodType())-alreadyLoaded;
         int loaded = 0;
-        if (cargoSpace<cargoAmount){
-            loaded = cargoSpace;
-        } else if (cargoSpace > cargoAmount){
-            loaded = cargoAmount;
+        GoodsBundle remain=new GoodsBundle(gb.getGoodType(),0,gb.getTargetStation());
+        if (cargoSpace<gb.getGoodAmount()){
+            GoodsBundle newGb = new GoodsBundle(gb.getGoodType(), cargoSpace, gb.getTargetStation());
+            remain.setGoodAmount(gb.getGoodAmount()-cargoSpace);
+            this.currentCargo.add(newGb);
+        } else {
+            this.currentCargo.add(gb);
         }
-        this.currentCargo.put(cargoType,this.currentCargo.get(cargoType)+loaded);
-        return loaded;
+        if (remain.getGoodAmount()==0){
+            remain = null;
+        }
+        return Optional.ofNullable(remain);
     }
 
     public void unloadCargo(String cargoType){
         currentCargo.remove(cargoType);
     }
 
-    public void drive(){
-        if (this.kind.equals("road vehicle")){
-            this.currentStation = this.path.get(0);
-
-        }
+    public ArrayList<Station> getPath() {
+        return path;
     }
 
+    public void setCurrentStation(Station currentStation) {
+        this.currentStation = currentStation;
+    }
+    public void setNextStation(Station nextStation) {
+        this.nextStation = nextStation;
+    }
+
+    public void setCargoTarget(String cargoType, Station targetStation) {
+        this.cargoTarget.put(targetStation,cargoType);
+    }
+
+    public String getCargoTarget(Station s) {
+        return cargoTarget.get(s);
+    }
 }
 

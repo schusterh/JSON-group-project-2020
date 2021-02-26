@@ -6,16 +6,15 @@ import java.util.*;
 import java.util.stream.Stream;
 
 class Station extends Building{
-    HashMap<String,Integer> holdingArea;
+    ArrayList<GoodsBundle> holdingArea;
     String label;
     Factory nearFactory;
 
     Station(int width, int depth, String name){
         super(width,depth, name);
-        this.holdingArea = new HashMap<>();
     }
 
-    public HashMap<String, Integer> getHoldingArea() {
+    public ArrayList<GoodsBundle> getHoldingArea() {
         return holdingArea;
     }
 
@@ -23,8 +22,8 @@ class Station extends Building{
         return label;
     }
 
-    public void setHoldingArea(HashMap<String, Integer> holdingArea) {
-        this.holdingArea = holdingArea;
+    public void addGoods(GoodsBundle gb){
+        this.holdingArea.add(gb);
     }
 
     public void setLabel(String label) {
@@ -119,17 +118,19 @@ public class TransportNetwork {
     public ArrayList<TrafficRoute> trafficRoutes;
     public HashMap<Factory, Station> nearStations;
     public ArrayList<String> signals;
+    public ArrayList<ArrayList<String>> railSections;
 
     public TransportNetwork(HashMap<Station, HashMap<Station, Integer>> adjStations) {
         this.adjStations = adjStations;
     }
 
     public void addSignal(Double xPos, Double yPos, String signal) {
+        //railSections.add()
         this.signals.add(signal);
     }
 
-    public void addTrafficSection(Double xPos, Double yPos, HashMap<String, ArrayList<Double>> newPoints, ArrayList<ArrayList<String>> newConnect) {
-        //nur für road, rail und airportObject
+    public void addTrafficObject(Double xPos, Double yPos, HashMap<String, ArrayList<Double>> newPoints, ArrayList<ArrayList<String>> newConnect) {
+        //nur für objekte, die punkte und punktverbindungen auf der karte hinzufügen
 
         double diff = 0.2;
 
@@ -138,6 +139,12 @@ public class TransportNetwork {
             if (points.stream().noneMatch(z -> Math.abs(z.getX()) - Math.abs((p.getX())) <= diff && Math.abs(z.getY()) - Math.abs(p.getY()) <= diff)) {
                 points.add(p);
                 connections.put(p, new ArrayList<>());
+            } else {
+                Point similarPoint = points.stream()
+                        .findAny()
+                        .filter(z -> ((Math.abs(z.getX()) - Math.abs((p.getX()))) <= diff) && ((Math.abs(z.getY()) - Math.abs(p.getY())) <= diff))
+                        .orElse(p); // müsste es nicht orElse(z) sein?
+
             }
             for (ArrayList<String> c : newConnect) {
                 if (c.contains(name)) {

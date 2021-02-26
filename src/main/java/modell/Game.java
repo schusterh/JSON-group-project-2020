@@ -73,8 +73,33 @@ public class Game {
 
     public List<OnMapBuilding> getBuildingsOnMap() { return buildingsOnMap; }
 
+    public void drive(Vehicle v,int tick){
+        if (v.getKind().equals("road vehicle")){
+            if (v.getPath()!=null){
+                v.setCurrentStation(v.getPath().get(0));
+                if (this.transportNetwork.stations.contains(v.getPath().get(1))){
+                    v.setNextStation(v.getPath().get(1));
+                } else {
+                    findPath(v,tick,v.getPath().get(-1));
+                    drive(v,tick);
+                }
+                v.setNextStation(v.getPath().get(1));
 
-    public Factory findTarget(Factory f, String commodity){
+            } else {
+                // Wenn es keinen Weg mehr gibt
+                v.unloadCargo(v.getCargoTarget(v.getCurrentStation()));
+            }
+        } if (v.getKind().equals("engine")){
+            if (v.getPath()!=null){
+
+
+            }
+        } if (v.getKind().equals("plane")){
+
+        }
+    }
+
+    public void findTarget(GoodsBundle gb, Factory f, String commodity){
         HashMap<Factory, Double> possibleTargets = new HashMap<>();
         ArrayList<Factory> possTargets = new ArrayList<>();
         for (Factory g : this.getFactories()) {
@@ -98,7 +123,8 @@ public class Game {
             r -= possibleTargets.get(possTargets.get(randomIndex));
             if (r <= 0.0) break;
         }
-        return possTargets.get(randomIndex);
+        Factory targetFactory = possTargets.get(randomIndex);
+        gb.setTargetStation(this.transportNetwork.nearStations.get(targetFactory));
     }
     public ArrayList<Station> bfs (Station startStation, Station targetStation){
         ArrayList<Station> shortestPath = new ArrayList<>();
