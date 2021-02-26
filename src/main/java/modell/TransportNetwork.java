@@ -153,11 +153,13 @@ public class TransportNetwork {
                 connectingPoints.add(new Point(newPoints.get(s).get(0),newPoints.get(s).get(1)));
             }
             boolean duplicate = false;
-            for (Point p : pointConnections.keySet()){
-                if (equalPoints(point,p)){
-                    duplicate = true;
-                    for (Point c:connectingPoints) {
-                        pointConnections.get(p).add(c);
+            if (!pointConnections.isEmpty()) {
+                for (Point p : pointConnections.keySet()) {
+                    if (equalPoints(point, p)) {
+                        duplicate = true;
+                        for (Point c : connectingPoints) {
+                            pointConnections.get(p).add(c);
+                        }
                     }
                 }
             }
