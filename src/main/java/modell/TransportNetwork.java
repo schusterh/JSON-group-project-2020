@@ -119,8 +119,16 @@ public class TransportNetwork {
     public ArrayList<String> signals;
     public ArrayList<ArrayList<String>> railSections;
 
-    public TransportNetwork(HashMap<Station, HashMap<Station, ArrayList<Point>>> adjStations) {
-        this.adjStations = adjStations;
+    public TransportNetwork() {
+        this.adjStations = new HashMap<>();
+        this.pointConnections = new HashMap<>();
+        this.stationConnections = new HashMap<>();
+        this.points = new ArrayList<>();
+        this.stations = new ArrayList<>();
+        this.trafficRoutes = new ArrayList<>();
+        this.nearStations = new HashMap<>();
+        this.signals = new ArrayList<>();
+        this.railSections = new ArrayList<>();
     }
 
     public void addSignal(Double xPos, Double yPos, String signal) {
