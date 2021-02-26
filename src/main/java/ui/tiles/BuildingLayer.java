@@ -2,6 +2,7 @@ package ui.tiles;
 
 import Controller.GameController;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -28,6 +29,8 @@ public class BuildingLayer implements RenderLayer {
 
     OnMapBuilding toBePlacedBuilding;
 
+    ColorAdjust buildingNotPossibleEffect;
+
     boolean isInteractive;
 
     public double[] calculateDrawingPosition(OnMapBuilding building, int offsetX, int offsetY, double zoomFactor) {
@@ -43,6 +46,10 @@ public class BuildingLayer implements RenderLayer {
         this.model = model;
         this.controller = controller;
         this.tileHeightOffset = tileHeightOffset;
+
+        this.buildingNotPossibleEffect = new ColorAdjust();
+        this.buildingNotPossibleEffect.setSaturation(1);
+        this.buildingNotPossibleEffect.setHue(Color.RED.getHue());
     }
 
     public void placeBuilding(Building model) {
@@ -75,15 +82,18 @@ public class BuildingLayer implements RenderLayer {
 
             double[] startPos = calculateDrawingPosition(toBePlacedBuilding, offsetX, offsetY, zoomFactor);
 
-            //gc.setGlobalAlpha(0.5);
+            gc.setGlobalAlpha(0.5);
+            if (!controller.isBuildingPossible()) {
+                gc.setEffect(this.buildingNotPossibleEffect);
+            }
             gc.drawImage(toBePlacedBuilding.graphic, startPos[0], startPos[1], toBePlacedBuilding.graphic.getWidth() * zoomFactor, toBePlacedBuilding.graphic.getHeight() * zoomFactor);
-            //gc.setGlobalAlpha(1);
+            gc.setGlobalAlpha(1f);
+            gc.setEffect(null);
         }
 
         for (OnMapBuilding building : this.model.getBuildingsOnMap()) {
 
             double[] startPos = calculateDrawingPosition(building, offsetX, offsetY, zoomFactor);
-            System.out.println("Building " + building.model.getClass() + " - at: " + building.startX + "; " + building.startY);
             gc.drawImage(building.graphic, startPos[0], startPos[1], building.graphic.getWidth() * zoomFactor, building.graphic.getHeight() * zoomFactor);
             if (building.model.getClass() == Factory.class) {
                 Factory model = (Factory) building.model;

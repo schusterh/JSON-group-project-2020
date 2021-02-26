@@ -8,6 +8,7 @@ import javafx.util.Duration;
 import modell.Building;
 import modell.Game;
 import modell.MusicPlayer;
+import modell.Road;
 import types.Coordinate;
 import types.GameMode;
 import types.OnMapBuilding;
@@ -82,10 +83,29 @@ public class GameController {
 
     public GameMode getGameMode() { return gameMode; }
 
+    public boolean isBuildingPossible() {
+        OnMapBuilding pendingBuilding = this.view.getBuildingLayer().getToBePlacedBuilding();
+
+        if (model.isInWater(pendingBuilding.startX, pendingBuilding.startY, pendingBuilding.width, pendingBuilding.depth)) return false;
+        if (!model.isInMap(pendingBuilding.startX, pendingBuilding.startY, pendingBuilding.width, pendingBuilding.depth)) return false;
+
+        if (pendingBuilding.model.getClass() == Road.class) {
+            Road pendingRoad = (Road) pendingBuilding.model;
+            if (!pendingRoad.getSpecial().isPresent()) {
+                ArrayList<OnMapBuilding> adjRoads = this.model.getAdjRoads(pendingBuilding);
+                return !adjRoads.isEmpty();
+            }
+        }
+
+        return true;
+    }
+
     public void placePendingBuilding() {
-        OnMapBuilding newBuilding = this.view.getBuildingLayer().getToBePlacedBuilding();
-        this.model.addBuildingToMap(new OnMapBuilding(newBuilding.model, newBuilding.startX, newBuilding.startY, newBuilding.height));
-        //this.setGameMode(GameMode.NORMAL);
+        if (isBuildingPossible()) {
+            OnMapBuilding newBuilding = this.view.getBuildingLayer().getToBePlacedBuilding();
+            this.model.addBuildingToMap(new OnMapBuilding(newBuilding.model, newBuilding.startX, newBuilding.startY, newBuilding.height));
+            //this.setGameMode(GameMode.NORMAL);
+        }
     }
 
     public void setGameMode(GameMode gameMode) {

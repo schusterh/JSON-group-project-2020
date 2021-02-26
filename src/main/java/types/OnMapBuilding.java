@@ -27,4 +27,9 @@ public class OnMapBuilding {
     public int getStartX() { return startX; }
 
     public int getStartY() { return startY; }
+
+    public void replaceModel(Building newModel) {
+        this.model = newModel;
+        this.graphic = new Image(getClass().getResourceAsStream("/buildings/" + newModel.getName() + ".png"));
+    }
 }
