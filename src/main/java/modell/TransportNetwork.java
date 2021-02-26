@@ -2,6 +2,7 @@ package modell;
 
 import java.lang.reflect.Array;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -38,6 +39,7 @@ class Station extends Building{
         this.nearFactory = nearFactory;
     }
 }
+
 class Point {
     Double x;
     Double y;
@@ -203,7 +205,7 @@ public class TransportNetwork {
         while (notGenerated) {
             byte[] array = new byte[3];
             new Random().nextBytes(array);
-            generatedString = new String(array, Charset.forName("UTF-8"));
+            generatedString = new String(array, StandardCharsets.UTF_8);
             if (!station_names.contains(generatedString)) {
                 station_names.add(generatedString);
                 notGenerated = false;
