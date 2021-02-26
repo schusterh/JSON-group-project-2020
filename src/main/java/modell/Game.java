@@ -52,7 +52,7 @@ public class Game {
         this.buildingsOnMap = new ArrayList<>();
         this.map = map;
         this.music = music;
-        this.transportNetwork = new TransportNetwork(new HashMap<>());
+        this.transportNetwork = new TransportNetwork();
         this.addFactoriesToMap();
         this.roadExtensions = new HashMap<>();
         this.roadExtensions.put("road-sw", "road-ne-sw");
@@ -251,7 +251,7 @@ public class Game {
                 }
             });
 
-            //this.transportNetwork.addTrafficSection((double) pendingBuilding.startX, (double) pendingBuilding.startY, roadModel.getPoints(), roadModel.getRoads());
+            this.transportNetwork.addTrafficSection((double) pendingBuilding.startX, (double) pendingBuilding.startY, roadModel.getPoints(), roadModel.getRoads());
             System.out.println("Added road to transport network!");
         }
 
