@@ -198,17 +198,6 @@ public class TransportNetwork {
             connectS2.remove(s1);
         }
     }
-    public void connectPoints(Point point, Point addPoint){
-        ArrayList<Point> connections = new ArrayList<>();
-        if (pointConnections.containsKey(point)) {
-            if (pointConnections.containsKey(addPoint))
-                connections.add(addPoint);
-                connections.remove(addPoint);
-        }
-        for (Point conn: connections) {
-            pointConnections.get(point).add(conn);
-        }
-    }
 
     public boolean equalPoints(Point p1, Point p2){
         double diff = 0.2;
