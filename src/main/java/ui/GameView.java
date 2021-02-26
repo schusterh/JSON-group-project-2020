@@ -149,7 +149,12 @@ GameView {
 
             if (nature.getBuildmenu().isPresent() && nature.getBuildmenu().get().equals("nature")) {
                 Button bNatur = new Button();
-                ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + nature.getName() + ".png")));
+
+
+                //ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + nature.getName() + ".png")));
+
+                StandardImage std_nature = new StandardImage("/buildings/tree.png");
+                ImageView imageView = new ImageView(std_nature.setImage("/buildings/" + nature.getName() + ".png"));
                 imageView.setPreserveRatio(true);
                 imageView.setFitHeight(100);
 
@@ -177,7 +182,9 @@ GameView {
 
             if (road.getBuildmenu().isPresent() && road.getBuildmenu().get().equals("road")) {
                 Button bRoad = new Button();
-                ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + road.getName() + ".png")));
+                StandardImage std_road = new StandardImage("/buildings/error_tile.png");
+                ImageView imageView = new ImageView(std_road.setImage("/buildings/" + road.getName() + ".png"));
+                //ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + road.getName() + ".png")));
                 imageView.setPreserveRatio(true);
                 imageView.setFitHeight(100);
                 bRoad.setGraphic(imageView);
@@ -205,7 +212,12 @@ GameView {
 
             if (railway.getBuildmenu().isPresent() && railway.getBuildmenu().get().equals("rail")) {
                 Button bRailway = new Button();
-                ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + railway.getName() + ".png")));
+
+                StandardImage std_rail = new StandardImage("/buildings/error_tile.png");
+                ImageView imageView = new ImageView(std_rail.setImage("/buildings/" + railway.getName() + ".png"));
+
+
+                //ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + railway.getName() + ".png")));
                 imageView.setPreserveRatio(true);
                 imageView.setFitHeight(50);
                 bRailway.setGraphic(imageView);
@@ -233,7 +245,10 @@ GameView {
 
             if (airport.getBuildmenu().isPresent() && airport.getBuildmenu().get().equals("airport")) {
                 Button bAirport = new Button();
-                ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + airport.getName() + ".png")));
+
+                StandardImage std_airport = new StandardImage("/buildings/error_tile.png");
+                ImageView imageView = new ImageView(std_airport.setImage("/buildings/" + airport.getName() + ".png"));
+                //ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + airport.getName() + ".png")));
                 imageView.setPreserveRatio(true);
                 imageView.setFitHeight(100);
 
