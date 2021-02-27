@@ -32,7 +32,7 @@ public class GameController {
 
     public GameController(Game model, int tickLength) {
         this.model = model;
-        music = new MusicPlayer(this.model.getBackgroundMusic(), this.model.getMenuMusic());
+        music = new MusicPlayer(this.model.getBackgroundMusic());
 
         this.timelineTask = event -> {
             model.handleUpdate();

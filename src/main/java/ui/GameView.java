@@ -39,6 +39,7 @@ GameView {
     BuildingLayer buildingLayer;
 
     Canvas canvas;
+    MusicPlayer music;
 
 
     final int TILE_DIMENSION = 138;
@@ -52,6 +53,8 @@ GameView {
        this.gameLoop = new GameLoop(controller);
        this.controller.setGameLoop(this.gameLoop);
        this.renderer = new TileRenderer();
+
+
     }
 
     public void displayGameScreen() {
