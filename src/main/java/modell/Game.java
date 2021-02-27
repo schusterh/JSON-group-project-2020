@@ -355,6 +355,7 @@ public class Game {
             } else if (roadModel.getSpecial().isPresent()) {
                 if (roadModel.getSpecial().get().equals("busstop")) {
                     System.out.println("Busstop added!");
+                    this.transportNetwork.addStation();
                 }
             }
         }
