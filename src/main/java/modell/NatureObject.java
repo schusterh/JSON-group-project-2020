@@ -23,4 +23,5 @@ public class NatureObject extends Building {
     public int getDz() {
         return dz;
     }
+
 }
