@@ -13,11 +13,11 @@ public class TileRenderer {
     double zoomFactor = 1;
 
     public void increaseZoomFactor() {
-        this.zoomFactor += (this.zoomFactor + 0.5 < 3.5) ? 0.5 : 0.0;
+        this.zoomFactor += (this.zoomFactor + 0.25 < 3.5) ? 0.25 : 0.0;
     }
 
     public void decreaseZoomFactor() {
-        this.zoomFactor -= (this.zoomFactor - 0.5 > 0) ? 0.5 : 0.0;
+        this.zoomFactor -= (this.zoomFactor - 0.25 > 0) ? 0.25 : 0.0;
     }
 
     public LandscapeLayer getLandscapeLayer() {
