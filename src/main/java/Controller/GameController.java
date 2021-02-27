@@ -16,6 +16,8 @@ import types.Tile;
 import ui.GameLoop;
 import ui.GameView;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Optional;
 
 
 public class GameController {
@@ -98,6 +100,32 @@ public class GameController {
         }
 
         return true;
+    }
+
+    public Optional<OnMapBuilding> getCombinationTile(OnMapBuilding pendingBuilding) {
+        Optional<OnMapBuilding> underlyingRoadOptional = this.model.getBuildingAtTile(pendingBuilding.getStartX(), pendingBuilding.getStartY());
+
+        if (pendingBuilding.model.getClass() == Road.class) {
+            Road roadModel = (Road) pendingBuilding.model;
+            if (underlyingRoadOptional.isPresent()) {
+                OnMapBuilding underlyingRoad = underlyingRoadOptional.get();
+
+                if (underlyingRoad.model.getClass() == Road.class) {
+                    if (roadModel.getCombines().isPresent()) {
+                        HashMap<String, String> combines = roadModel.getCombines().get();
+                        if (combines.containsKey(underlyingRoad.model.getName())) {
+                            Road replacementModel = this.model.getRoads().stream().filter(roadFilter -> roadFilter.getName().equals(combines.get(underlyingRoad.model.getName()))).findFirst().orElse(null);
+                            if (replacementModel != null) {
+                                return Optional.of(new OnMapBuilding(replacementModel, pendingBuilding.startX, pendingBuilding.startY, pendingBuilding.height));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        return Optional.empty();
     }
 
     public void placePendingBuilding() {
