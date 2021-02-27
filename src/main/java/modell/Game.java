@@ -1,10 +1,10 @@
 package modell;
 
 import types.OnMapBuilding;
-import ui.tiles.BuildingLayer;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
 
 public class Game {
 
@@ -20,6 +20,7 @@ public class Game {
     private Map map;
     private ArrayList<String> music;
     private TransportNetwork transportNetwork;
+    private HashMap<String, int[]> directions;
 
     int[] currentMouseTileIndex;
 
@@ -37,7 +38,14 @@ public class Game {
         this.buildingsOnMap = new ArrayList<>();
         this.map = map;
         this.music = music;
+        this.transportNetwork = new TransportNetwork();
         this.addFactoriesToMap();
+
+        this.directions = new HashMap<>();
+        this.directions.put("ne", new int[]{0,1});
+        this.directions.put("se", new int[]{1,0});
+        this.directions.put("sw", new int[]{0,-1});
+        this.directions.put("nw", new int[]{-1,0});
 
         for(int i = 0; i < 100; i++) {
             this.addStonesToMap();
@@ -278,7 +286,184 @@ public class Game {
         boolean isConcrete = pendingBuilding.model.getClass() != NatureObject.class && pendingBuilding.model.getClass() != Road.class;
         this.map.plainGround(pendingBuilding.startX, pendingBuilding.startY, pendingBuilding.width, pendingBuilding.depth, pendingBuilding.height, isConcrete);
         this.buildingsOnMap.add(pendingBuilding);
+
+        if (pendingBuilding.model.getClass() == Road.class) {
+            Road roadModel = (Road) pendingBuilding.model;
+
+            Optional<OnMapBuilding> previousRoadOptional;
+            Optional<OnMapBuilding> nextRoadOptional;
+            switch (roadModel.getName()) {
+                case "road-ne":
+                    previousRoadOptional = this.getBuildingAtTile(pendingBuilding.getStartX(), pendingBuilding.getStartY()+1);
+                    nextRoadOptional = this.getBuildingAtTile(pendingBuilding.getStartX(), pendingBuilding.getStartY()-1);
+                    if (previousRoadOptional.isPresent()) {
+                        OnMapBuilding previousRoad = previousRoadOptional.get();
+                        if (previousRoad.model.getName().equals("road-ne") || previousRoad.model.getName().equals("road-sw")) {
+                            this.roads.stream().filter(roadFilter -> roadFilter.getName().equals("road-ne-sw")).findFirst().ifPresent(previousRoad::replaceModel);
+                        }
+                    }
+                    if (nextRoadOptional.isPresent()) {
+                        OnMapBuilding nextRoad = nextRoadOptional.get();
+                        if (nextRoad.model.getClass() == Road.class) {
+                            Road nextRoadModel = (Road) nextRoad.model;
+                            if (nextRoadModel.getPoints().containsKey("ne")) {
+                                this.roads.stream().filter(roadFilter -> roadFilter.getName().equals("road-ne-sw")).findFirst().ifPresent(pendingBuilding::replaceModel);
+                            }
+                        }
+                    }
+                    break;
+                case "road-sw":
+                    previousRoadOptional = this.getBuildingAtTile(pendingBuilding.getStartX(), pendingBuilding.getStartY()-1);
+                    nextRoadOptional = this.getBuildingAtTile(pendingBuilding.getStartX(), pendingBuilding.getStartY()+1);
+
+                    if (previousRoadOptional.isPresent()) {
+                        OnMapBuilding previousRoad = previousRoadOptional.get();
+                        if (previousRoad.model.getName().equals("road-sw") || previousRoad.model.getName().equals("road-ne")) {
+                            this.roads.stream().filter(roadFilter -> roadFilter.getName().equals("road-ne-sw")).findFirst().ifPresent(previousRoad::replaceModel);
+                        }
+                    }
+                    if (nextRoadOptional.isPresent()) {
+                        OnMapBuilding nextRoad = nextRoadOptional.get();
+                        if (nextRoad.model.getClass() == Road.class) {
+                            Road nextRoadModel = (Road) nextRoad.model;
+                            if (nextRoadModel.getPoints().containsKey("ne")) {
+                                this.roads.stream().filter(roadFilter -> roadFilter.getName().equals("road-ne-sw")).findFirst().ifPresent(pendingBuilding::replaceModel);
+                            }
+                        }
+                    }
+                    break;
+                case "road-se":
+                    previousRoadOptional = this.getBuildingAtTile(pendingBuilding.getStartX()+1, pendingBuilding.getStartY());
+                    nextRoadOptional = this.getBuildingAtTile(pendingBuilding.getStartX()-1, pendingBuilding.getStartY());
+
+                    if (previousRoadOptional.isPresent()) {
+                        OnMapBuilding previousRoad = previousRoadOptional.get();
+                        if (previousRoad.model.getName().equals("road-se") | previousRoad.model.getName().equals("road-nw")) {
+                            this.roads.stream().filter(roadFilter -> roadFilter.getName().equals("road-nw-se")).findFirst().ifPresent(previousRoad::replaceModel);
+                        }
+                    }
+                    if (nextRoadOptional.isPresent()) {
+                        OnMapBuilding nextRoad = nextRoadOptional.get();
+                        if (nextRoad.model.getClass() == Road.class) {
+                            Road nextRoadModel = (Road) nextRoad.model;
+                            if (nextRoadModel.getPoints().containsKey("ne")) {
+                                this.roads.stream().filter(roadFilter -> roadFilter.getName().equals("road-ne-sw")).findFirst().ifPresent(pendingBuilding::replaceModel);
+                            }
+                        }
+                    }
+                    break;
+                case "road-nw":
+                    previousRoadOptional = this.getBuildingAtTile(pendingBuilding.getStartX()-1, pendingBuilding.getStartY());
+                    nextRoadOptional = this.getBuildingAtTile(pendingBuilding.getStartX()+1, pendingBuilding.getStartY());
+                    if (previousRoadOptional.isPresent()) {
+                        OnMapBuilding previousRoad = previousRoadOptional.get();
+                        if (previousRoad.model.getName().equals("road-nw") | previousRoad.model.getName().equals("road-se")) {
+                            this.roads.stream().filter(roadFilter -> roadFilter.getName().equals("road-nw-se")).findFirst().ifPresent(previousRoad::replaceModel);
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+            /*roadModel.getCombines().ifPresent(combines -> {
+                ArrayList<OnMapBuilding> adjBuildings = this.getAdjRoads(pendingBuilding);
+                if (!adjBuildings.isEmpty()) {
+                    for (OnMapBuilding adjBuilding : adjBuildings) {
+                        if (combines.containsKey(adjBuilding.model.getName())) {
+                            Road replacementModel = this.roads.stream().filter(roadFilter -> roadFilter.getName().equals(combines.get(adjBuilding.model.getName()))).findFirst().orElse(null);
+                            if (replacementModel != null) {
+                                adjBuilding.replaceModel(replacementModel);
+                            }
+                        }
+                        else if (adjBuilding.model.getName().equals(roadModel.getName())) {
+                            Road replacementModel = this.roads.stream().filter(roadFilter -> roadFilter.getName().equals(this.roadExtensions.get(roadModel.getName()))).findFirst().orElse(null);
+                            if (replacementModel != null) {
+                                adjBuilding.replaceModel(replacementModel);
+                            }
+                        }
+                    }
+                }
+            });*/
+
+            if (roadModel.getSpecial().isEmpty()) {
+                this.transportNetwork.addTrafficSection((double) pendingBuilding.startX, (double) pendingBuilding.startY, roadModel.getPoints(), roadModel.getRoads());
+                System.out.println("Added road to transport network!");
+            } else if (roadModel.getSpecial().isPresent()) {
+                if (roadModel.getSpecial().get().equals("busstop")) {
+                    System.out.println("Busstop added!");
+                    Station newStation = new Station(pendingBuilding.width, pendingBuilding.depth, this.transportNetwork.stationnameGenerator());
+                    ArrayList<OnMapBuilding> adjBuildings = this.getAdjBuildings(pendingBuilding);
+                    if (!adjBuildings.isEmpty()) {
+                        for (OnMapBuilding adjBuilding : adjBuildings) {
+                            if (adjBuilding.model.getClass() == Factory.class) {
+                                newStation.setNearFactory((Factory) adjBuilding.model);
+                                System.out.println("Station " + newStation.getName() + " mit Fabrik " + adjBuilding.model.getName() + " verbunden!");
+                                break;
+                            }
+                        }
+                    }
+                    this.transportNetwork.addStation(newStation, pendingBuilding.getStartX(), pendingBuilding.getStartY());
+                    System.out.println("Neue Station hinzugefügt: " + newStation.getName());
+                }
+            }
+        }
+
         this.sortBuildings();
+    }
+
+    public Optional<OnMapBuilding> getBuildingAtTile(int xPos, int yPos) {
+        for (OnMapBuilding building : this.buildingsOnMap) {
+            if (building.startX == xPos && building.startY == yPos) {
+                return Optional.of(building);
+            }
+        }
+        return Optional.empty();
+    }
+
+    public void possiblyConnectStation(OnMapBuilding newRoad) {
+        if (newRoad.model.getClass() == Road.class) {
+            Road roadModel = (Road) newRoad.model;
+        }
+    }
+
+    public void updateRoadNetwork(OnMapBuilding newRoad) {
+        ArrayList<OnMapBuilding> adjBuildings = this.getAdjBuildings(newRoad);
+    }
+
+    public ArrayList<OnMapBuilding> getAdjRoads(OnMapBuilding newRoad) {
+        ArrayList<OnMapBuilding> returnList = new ArrayList<>();
+
+        for (OnMapBuilding adjRoad : this.buildingsOnMap) {
+            if (adjRoad.model.getClass() == Road.class) {
+                if ((adjRoad.startX == newRoad.startX-1 && adjRoad.startY == newRoad.startY) ||
+                        (adjRoad.startX == newRoad.startX+1 && adjRoad.startY == newRoad.startY) ||
+                        (adjRoad.startY == newRoad.startY-1 && adjRoad.startX == newRoad.startX) ||
+                        (adjRoad.startY == newRoad.startY+1 && adjRoad.startX == newRoad.startX)) {
+                    returnList.add(adjRoad);
+                }
+            }
+        }
+
+        return returnList;
+    }
+
+    public ArrayList<OnMapBuilding> getAdjBuildings(OnMapBuilding newBuilding) {
+        ArrayList<OnMapBuilding> returnList = new ArrayList<>();
+
+        for (int xPos = newBuilding.startX-1; xPos <= newBuilding.startX + newBuilding.width; xPos++) {
+            Optional<OnMapBuilding> result = this.tileHasBuilding(xPos, newBuilding.startY-1);
+            result.ifPresent(returnList::add);
+            result = this.tileHasBuilding(xPos, newBuilding.startY + newBuilding.depth + 1);
+            result.ifPresent(returnList::add);
+        }
+        for (int yPos = newBuilding.startY-1; yPos <= newBuilding.startY + newBuilding.depth; yPos++) {
+            Optional<OnMapBuilding> result = this.tileHasBuilding(newBuilding.startX-1, yPos);
+            result.ifPresent(returnList::add);
+            result = this.tileHasBuilding( newBuilding.startX + newBuilding.width + 1, yPos);
+            result.ifPresent(returnList::add);
+        }
+
+        return returnList;
     }
 
     private void sortBuildings() {
@@ -286,6 +471,16 @@ public class Game {
                 .sorted(Comparator.comparingInt(OnMapBuilding::getStartY))
                 .sorted(Comparator.comparingInt(OnMapBuilding::getStartX))
                 .collect(Collectors.toList());
+    }
+
+    public Optional<OnMapBuilding> tileHasBuilding(int xPos, int yPos) {
+        for (OnMapBuilding building : this.buildingsOnMap) {
+            if (building.startX <= xPos && xPos <= building.startX + building.width
+                && building.startY <= yPos && yPos <= building.startY + building.depth) {
+                return Optional.of(building);
+            }
+        }
+        return Optional.empty();
     }
 
     public Map getMap() {

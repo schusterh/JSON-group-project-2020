@@ -10,9 +10,9 @@ public class Road extends Building {
     private HashMap<String,ArrayList<Double>> points;
     private ArrayList<ArrayList<String>> roads;
     private int dz;
-    private Optional buildmenu;
-    private Optional combines;
-    private Optional special;
+    private Optional<String> buildmenu;
+    private Optional<HashMap<String, String>> combines;
+    private Optional<String> special;
 
 
 
@@ -41,16 +41,18 @@ public class Road extends Building {
         return roads;
     }
 
-    public Optional getBuildmenu() {
+    public Optional<String> getBuildmenu() {
         return buildmenu;
     }
 
-    public Optional getCombines() {
+    public Optional<HashMap<String, String>> getCombines() {
         return combines;
     }
 
     public int getDz() {
         return dz;
     }
+
+    public Optional<String> getSpecial() { return special; }
 
 }

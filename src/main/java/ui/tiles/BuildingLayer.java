@@ -2,6 +2,7 @@ package ui.tiles;
 
 import Controller.GameController;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -16,6 +17,7 @@ import ui.RenderLayer;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class BuildingLayer implements RenderLayer {
@@ -27,6 +29,9 @@ public class BuildingLayer implements RenderLayer {
     GameController controller;
 
     OnMapBuilding toBePlacedBuilding;
+    OnMapBuilding combinationOverlay;
+
+    ColorAdjust buildingNotPossibleEffect;
 
     boolean isInteractive;
 
@@ -43,6 +48,10 @@ public class BuildingLayer implements RenderLayer {
         this.model = model;
         this.controller = controller;
         this.tileHeightOffset = tileHeightOffset;
+
+        this.buildingNotPossibleEffect = new ColorAdjust();
+        this.buildingNotPossibleEffect.setSaturation(1);
+        this.buildingNotPossibleEffect.setHue(Color.RED.getHue());
     }
 
     public void placeBuilding(Building model) {
@@ -51,7 +60,7 @@ public class BuildingLayer implements RenderLayer {
     }
 
     public OnMapBuilding getToBePlacedBuilding() {
-        return this.toBePlacedBuilding;
+        return this.combinationOverlay != null ? this.combinationOverlay : this.toBePlacedBuilding;
     }
 
     public void removeToBePlacedBuilding() {
@@ -66,19 +75,6 @@ public class BuildingLayer implements RenderLayer {
 
     @Override
     public void draw(GraphicsContext gc, int offsetX, int offsetY, double zoomFactor) {
-        if (this.toBePlacedBuilding != null) {
-            int[] mousePos = this.model.getCurrentMouseTileIndex();
-
-            toBePlacedBuilding.startX = mousePos[0];
-            toBePlacedBuilding.startY = mousePos[1];
-            toBePlacedBuilding.height = this.model.getMap().getTile(mousePos[0], mousePos[1]).height;
-
-            double[] startPos = calculateDrawingPosition(toBePlacedBuilding, offsetX, offsetY, zoomFactor);
-
-            //gc.setGlobalAlpha(0.5);
-            gc.drawImage(toBePlacedBuilding.graphic, startPos[0], startPos[1], toBePlacedBuilding.graphic.getWidth() * zoomFactor, toBePlacedBuilding.graphic.getHeight() * zoomFactor);
-            //gc.setGlobalAlpha(1);
-        }
 
         for (OnMapBuilding building : this.model.getBuildingsOnMap()) {
 
@@ -92,6 +88,33 @@ public class BuildingLayer implements RenderLayer {
                 gc.fillText(model.getProdMessage(), startPos[0] + (building.graphic.getWidth() / 3), startPos[1] + 100);
                 gc.setFont(temp);
             }
+        }
+
+        if (this.toBePlacedBuilding != null) {
+            int[] mousePos = this.model.getCurrentMouseTileIndex();
+
+            toBePlacedBuilding.startX = mousePos[0];
+            toBePlacedBuilding.startY = mousePos[1];
+            toBePlacedBuilding.height = this.model.getMap().getTile(mousePos[0], mousePos[1]).height;
+
+            double[] startPos = calculateDrawingPosition(toBePlacedBuilding, offsetX, offsetY, zoomFactor);
+
+            Optional<OnMapBuilding> combinationOverlayOptional = this.controller.getCombinationTile(toBePlacedBuilding);
+
+            gc.setGlobalAlpha(0.5);
+            if (!controller.isBuildingPossible()) {
+                gc.setEffect(this.buildingNotPossibleEffect);
+            }
+            if (combinationOverlayOptional.isPresent()) {
+                this.combinationOverlay = combinationOverlayOptional.get();
+                gc.drawImage(combinationOverlay.graphic, startPos[0], startPos[1], combinationOverlay.graphic.getWidth() * zoomFactor, combinationOverlay.graphic.getHeight() * zoomFactor);
+            } else {
+                this.combinationOverlay = null;
+                gc.drawImage(toBePlacedBuilding.graphic, startPos[0], startPos[1], toBePlacedBuilding.graphic.getWidth() * zoomFactor, toBePlacedBuilding.graphic.getHeight() * zoomFactor);
+
+            }
+            gc.setGlobalAlpha(1f);
+            gc.setEffect(null);
         }
     }
 

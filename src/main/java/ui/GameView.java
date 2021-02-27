@@ -191,7 +191,9 @@ GameView {
 
 
         for (Road road : this.model.getRoads()) {
-
+            if (this.model.getRoads().indexOf(road) == 8) {
+                controller.addBuildingToMap(road, 1, 1, this.model.getMap().getTile(1, 1).height);
+            }
             if (road.getBuildmenu().isPresent() && road.getBuildmenu().get().equals("road")) {
                 Button bRoad = new Button();
                 StandardImage std_road = new StandardImage("/buildings/error_tile.png");
