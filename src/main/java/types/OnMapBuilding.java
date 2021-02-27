@@ -24,7 +24,6 @@ public class OnMapBuilding {
         this.width = building.getWidth();
         this.depth = building.getDepth();
         this.height = height;
-        System.out.println("Building name: " + building.getName());
 
         if (building.getClass() == Factory.class) {
             this.graphic = std_factory.setImage("/buildings/" + building.getName() + ".png");

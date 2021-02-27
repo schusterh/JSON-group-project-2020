@@ -33,7 +33,7 @@ public class MenuView {
 
     public void displayWelcomeScreen() {
 
-        final String TITLE = "Wirtschaftssimulator";
+        final String TITLE = "GGG";
         final String BUTTON_LABEL = "Choose a scene";
         this.stage.setTitle(TITLE);
 
@@ -85,7 +85,7 @@ public class MenuView {
         });
 
 
-        Image Hintergundimage = new Image("/Hintergrund.jpg");
+        Image Hintergundimage = new Image("/GGG-Hintergund.png");
 
         ImageView imageView = new ImageView();
         imageView.setImage(Hintergundimage);

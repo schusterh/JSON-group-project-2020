@@ -40,11 +40,26 @@ public class Game {
         this.music = music;
         this.transportNetwork = new TransportNetwork();
         this.addFactoriesToMap();
+
         this.directions = new HashMap<>();
         this.directions.put("ne", new int[]{0,1});
         this.directions.put("se", new int[]{1,0});
         this.directions.put("sw", new int[]{0,-1});
         this.directions.put("nw", new int[]{-1,0});
+
+        for(int i = 0; i < 100; i++) {
+            this.addStonesToMap();
+        }
+
+        for(int i = 0; i < 100; i++) {
+            this.addTreesToMap();
+        }
+
+        for (int i = 0; i < 10; i++) {
+            this.addRuinsToMap();
+        }
+
+
     }
 
     public ArrayList<Railway> getRailways() {
@@ -84,7 +99,7 @@ public class Game {
     public void drive (Vehicle v, int tick){
         if (v.getKind().equals("road vehicle")){
             if (v.getPath()!=null) {
-                if (transportNetwork.points.contains(v.getNextPoint())){
+                if (transportNetwork.getPoints().contains(v.getNextPoint())){
                     v.setCurrentPoint(v.getNextPoint());
                     v.setNextPoint(v.getPath().get(0));
                 } else {
@@ -130,7 +145,7 @@ public class Game {
             if (r <= 0.0) break;
         }
         Factory targetFactory = possTargets.get(randomIndex);
-        gb.setTargetStation(this.transportNetwork.nearStations.get(targetFactory));
+        gb.setTargetStation(this.transportNetwork.getNearStations(targetFactory));
     }
     public ArrayList<Station> bfs (Station startStation, Station targetStation){
         ArrayList<Station> shortestPath = new ArrayList<>();
@@ -182,7 +197,7 @@ public class Game {
             ArrayList<Station> stations = bfs(v.getCurrentStation(),goodsBundle.getTargetStation());
             int i = 0;
             while (stations.get(i+1) != null) {
-                for (TrafficRoute tr : transportNetwork.trafficRoutes){
+                for (TrafficRoute tr : transportNetwork.getTrafficRoutes().keySet()){
                     if (tr.getStations().contains(stations.get(i+1)) && tr.getVehicleType().equals(v.getKind())){
                         path.addAll(transportNetwork.getAdjStations(stations.get(i)).get(stations.get(i + 1)));
                         break;
@@ -198,18 +213,39 @@ public class Game {
         }
         return path;
     }
-
-
+    public void manageVehicles(TrafficRoute route){
+        int diff = route.getVehicles().size()-route.getVehicleAmount();
+        if (diff > 0){
+            route.removeVehicleAmount(diff);
+        } if (diff < 0){
+            ArrayList<Vehicle> possVehicles = new ArrayList<>();
+            for (Vehicle v : this.vehicles) {
+                if (v.getKind().equals(route.getVehicleType())) {
+                    possVehicles.add(v);
+                }
+            }
+            Random rand = new Random();
+            for (int i = 0; i < Math.abs(diff);i++){
+                route.addVehicle(possVehicles.get(rand.nextInt(possVehicles.size())));
+            }
+        }
+        for (Vehicle v : route.getVehicles()){
+            if (!v.getKind().equals(route.getVehicleType())){
+                route.getVehicles().remove(v);
+                manageVehicles(route);
+            }
+        }
+    }
 
     public void addBuildingToMap(Building model, int startX, int startY, int height) {
-        System.out.println(model.getClass());
+
         this.map.plainGround(startX, startY, model.getWidth(), model.getDepth(), height, model.getClass() != Road.class);
         this.buildingsOnMap.add(new OnMapBuilding(model, startX, startY, height));
         this.sortBuildings();
     }
 
     public void addBuildingToMap(OnMapBuilding pendingBuilding) {
-        System.out.println(pendingBuilding.model.getClass());
+
         boolean isConcrete = pendingBuilding.model.getClass() != NatureObject.class && pendingBuilding.model.getClass() != Road.class;
         this.map.plainGround(pendingBuilding.startX, pendingBuilding.startY, pendingBuilding.width, pendingBuilding.depth, pendingBuilding.height, isConcrete);
         this.buildingsOnMap.add(pendingBuilding);
@@ -404,6 +440,7 @@ public class Game {
 
     public void addFactoriesToMap() {
         Random r = new Random();
+
         for (Factory factory : this.factories) {
             int posX = r.nextInt(this.map.getWidth()-4);
             int posY = r.nextInt(this.map.getDepth()-4);
@@ -412,9 +449,63 @@ public class Game {
                 posX = r.nextInt(this.map.getWidth()-1);
                 posY = r.nextInt(this.map.getDepth()-1);
             }
+
             this.addBuildingToMap(new OnMapBuilding(factory, posX, posY, this.map.getTile(posX, posY).height));
         }
     }
+
+    public void addTreesToMap() {
+        Random r = new Random();
+        for (NatureObject natob : this.nature_objects) {
+            if (natob.getBuildmenu().isPresent()) {
+                int posX = r.nextInt(this.map.getWidth() - 4);
+                int posY = r.nextInt(this.map.getDepth() - 4);
+
+                while (this.isInMap(posX, posY, natob.getWidth(), natob.getDepth()) && this.isOccupied(posX, posY) && this.isInWater(posX, posY, natob.getWidth(), natob.getDepth())) {
+                    posX = r.nextInt(this.map.getWidth() - 1);
+                    posY = r.nextInt(this.map.getDepth() - 1);
+                }
+                this.addBuildingToMap(new OnMapBuilding(natob, posX, posY, this.map.getTile(posX, posY).height));
+            }
+        }
+    }
+
+    public void addStonesToMap() {
+        Random r = new Random();
+        for (NatureObject natob : this.nature_objects) {
+            if (natob.getName().equals("stone")) {
+                System.out.println(natob.getName());
+                int posX = r.nextInt(this.map.getWidth() - 4);
+                int posY = r.nextInt(this.map.getDepth() - 4);
+
+                while (this.isInMap(posX, posY, natob.getWidth(), natob.getDepth()) && this.isOccupied(posX, posY) && this.isInWater(posX, posY, natob.getWidth(), natob.getDepth())) {
+                    posX = r.nextInt(this.map.getWidth() - 1);
+                    posY = r.nextInt(this.map.getDepth() - 1);
+                }
+                this.addBuildingToMap(new OnMapBuilding(natob, posX, posY, this.map.getTile(posX, posY).height));
+            }
+        }
+    }
+
+
+    public void addRuinsToMap() {
+        Random r = new Random();
+        for (NatureObject natob : this.nature_objects) {
+            if (natob.getName().equals("ruine") || natob.getName().equals("road-ruine") || natob.getName().equals("wohnhaus-ruine")) {
+                System.out.println(natob.getName());
+                int posX = r.nextInt(this.map.getWidth() - 4);
+                int posY = r.nextInt(this.map.getDepth() - 4);
+
+                while (this.isInMap(posX, posY, natob.getWidth(), natob.getDepth()) && this.isOccupied(posX, posY) && !this.isInWater(posX, posY, natob.getWidth(), natob.getDepth())) {
+                    posX = r.nextInt(this.map.getWidth() - 1);
+                    posY = r.nextInt(this.map.getDepth() - 1);
+                }
+                this.addBuildingToMap(new OnMapBuilding(natob, posX, posY, this.map.getTile(posX, posY).height));
+            }
+        }
+    }
+
+
 
     public boolean isOccupied(int x, int y) {
         for (OnMapBuilding building : this.buildingsOnMap) {

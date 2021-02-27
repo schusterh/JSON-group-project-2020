@@ -39,6 +39,7 @@ GameView {
     BuildingLayer buildingLayer;
 
     Canvas canvas;
+    MusicPlayer music;
 
 
     final int TILE_DIMENSION = 138;
@@ -52,6 +53,8 @@ GameView {
        this.gameLoop = new GameLoop(controller);
        this.controller.setGameLoop(this.gameLoop);
        this.renderer = new TileRenderer();
+
+
     }
 
     public void displayGameScreen() {
@@ -64,6 +67,7 @@ GameView {
         Menu bauenMenu = new Menu("Building");
         Menu lebenMenu = new Menu("Live");
         Menu landscapeMenu = new Menu("Terrain");
+        Menu speedMenu = new Menu("Speed");
         Menu exitMenu = new Menu("Exit");
 
         //Creat MenuItems
@@ -75,6 +79,13 @@ GameView {
         MenuItem exitItem = new MenuItem("Exit");
 
         MenuItem landscapeItem = new MenuItem("Shape");
+
+        MenuItem speedItem0 = new MenuItem("0");
+        speedItem0.setOnAction(event -> controller.stopAnimation());
+        MenuItem speedItem1 = new MenuItem("1x");
+        speedItem1.setOnAction(event -> controller.setTickLenght(1));
+        MenuItem speedItem2 = new MenuItem("2x");
+        speedItem2.setOnAction(event -> controller.setTickLenght(0.5));
 
         // Set Accelerator for Exit MenuItem.
         exitItem.setAccelerator(KeyCombination.keyCombination("Ctrl+E"));
@@ -89,9 +100,10 @@ GameView {
         bauenMenu.getItems().addAll(straßenItem, gleiseItem, airportItem, bäumeItem);
         homeMenu.getItems().addAll(speichernItem, exitItem);
         landscapeMenu.getItems().add(landscapeItem);
+        speedMenu.getItems().addAll(speedItem0, speedItem1, speedItem2);
 
         // Add Menus to the MenuBar
-        menuBar.getMenus().addAll(homeMenu, bauenMenu, lebenMenu, landscapeMenu, exitMenu);
+        menuBar.getMenus().addAll(homeMenu, bauenMenu, lebenMenu, landscapeMenu,speedMenu, exitMenu);
         menuLeiste.setTop(menuBar);
 
 

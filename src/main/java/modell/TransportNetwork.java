@@ -1,15 +1,17 @@
 package modell;
 
 import java.nio.charset.StandardCharsets;
+import java.security.Signature;
 import java.util.*;
 
 class Station extends Building{
-    ArrayList<GoodsBundle> holdingArea;
-    String label;
-    Factory nearFactory;
+    private ArrayList<GoodsBundle> holdingArea;
+    private String label;
+    private Factory nearFactory;
 
     Station(int width, int depth, String name){
         super(width,depth, name);
+        this.holdingArea = new ArrayList<>();
     }
 
     public ArrayList<GoodsBundle> getHoldingArea() {
@@ -60,10 +62,12 @@ festgelegte Verkehrsmittel. Sie müssen nicht zwangsweise Fabriken verbinden.
 Wenn die Anzahl oder der Typ von Fahrzeugen nicht stimmt, werden diese gelöscht.
  */
 class TrafficRoute {
-    ArrayList<Station> stations;
-    String vehicleType;
-    int vehicleAmount;
-    ArrayList<Vehicle> vehicles;
+    private ArrayList<Station> stations;
+    private String vehicleType;
+    private int vehicleAmount;
+    private ArrayList<Vehicle> vehicles;
+    private ArrayList<Point> points;
+
 
     public TrafficRoute(ArrayList<Station> stations, String vehicleType, int vehicleAmount, ArrayList<Vehicle> vehicles){
         this.stations = stations;
@@ -84,8 +88,23 @@ class TrafficRoute {
         return vehicleAmount;
     }
 
+    public ArrayList<Point> getPoints() {
+        return points;
+    }
+
     public ArrayList<Vehicle> getVehicles() {
         return vehicles;
+    }
+    public void removeVehicle(Vehicle v){
+        this.vehicles.remove(v);
+    }
+    public void removeVehicleAmount(int amount){
+        if (amount > 0) {
+            this.vehicles.subList(0, amount).clear();
+        }
+    }
+    public void addVehicle(Vehicle v){
+        this.vehicles.add(v);
     }
 
     public void addStation(Station station){
@@ -96,28 +115,45 @@ class TrafficRoute {
         this.stations.remove(station);
     }
 
-    public void manageVehicles(){
-        if (this.vehicles.size() > vehicleAmount){
-            this.vehicles.remove(0);
-        }
-        if (this.vehicles.size() < vehicleAmount){
-            this.vehicles.add(this.vehicles.get(0));
-        }
-        vehicles.removeIf(v -> !v.getKind().equals(this.getVehicleType()));
+
+}
+class RailSection {
+    private String signal1;
+    private String signal2;
+    private ArrayList<Point> between;
+    public RailSection(String signal1, String signal2,ArrayList<Point> between){
+        this.signal1 = signal1;
+        this.signal2 = signal2;
+        this.between = between;
+    }
+
+    public ArrayList<Point> getBetween() {
+        return between;
+    }
+    
+
+    public String getSignal1() {
+        return signal1;
+    }
+
+    public String getSignal2() {
+        return signal2;
     }
 }
 
 public class TransportNetwork {
     ArrayList<String> station_names = new ArrayList<>();
-    public HashMap<Station, HashMap<Station, ArrayList<Point>>> adjStations;
-    public HashMap<Point, ArrayList<Point>> pointConnections;
-    public HashMap<ArrayList<Station>,ArrayList<Point>> stationConnections;
-    public ArrayList<Point> points;
-    public ArrayList<Station> stations;
-    public ArrayList<TrafficRoute> trafficRoutes;
-    public HashMap<Factory, Station> nearStations;
-    public ArrayList<String> signals;
-    public ArrayList<ArrayList<String>> railSections;
+    private HashMap<Station, HashMap<Station, ArrayList<Point>>> adjStations;
+    private HashMap<Point, ArrayList<Point>> pointConnections;
+    private HashMap<ArrayList<Station>,ArrayList<Point>> stationConnections;
+    private ArrayList<Point> points;
+    private ArrayList<Station> stations;
+    private HashMap<TrafficRoute,ArrayList<Point>> trafficRoutes;
+    private HashMap<Factory, Station> nearStations;
+    private ArrayList<String> signals;
+    private HashMap<TrafficRoute,ArrayList<RailSection>> railSections;
+    private Tower tower;
+    private ArrayList<Vehicle> vehicles;
 
     public TransportNetwork() {
         this.adjStations = new HashMap<>();
@@ -125,15 +161,61 @@ public class TransportNetwork {
         this.stationConnections = new HashMap<>();
         this.points = new ArrayList<>();
         this.stations = new ArrayList<>();
-        this.trafficRoutes = new ArrayList<>();
+        this.trafficRoutes = new HashMap<>();
         this.nearStations = new HashMap<>();
         this.signals = new ArrayList<>();
-        this.railSections = new ArrayList<>();
+        this.railSections = new HashMap<>();
+        this.vehicles = new ArrayList<>();
     }
 
-    public void addSignal(Double xPos, Double yPos, String signal) {
-        //railSections.add()
-        this.signals.add(signal);
+    public void addSignal(Point point, String signal) {
+        signals.add(signal);
+        for (TrafficRoute tr : trafficRoutes.keySet()){
+            if (tr.getPoints().contains(point)){
+                int signalPos = tr.getPoints().indexOf(point);
+                if (railSections.containsKey(tr)) {
+                    for (RailSection rs : railSections.get(tr)){
+                        if (rs.getBetween().contains(point)) {
+                            RailSection rs1 = new RailSection(rs.getSignal1(), signal,
+                                    new ArrayList<>(rs.getBetween().subList(0, signalPos)));
+                            RailSection rs2 = new RailSection(signal, rs.getSignal2(),
+                                    new ArrayList<>(rs.getBetween().subList(signalPos, rs.getBetween().size() - 1)));
+                            railSections.get(tr).add(rs1);
+                            railSections.get(tr).add(rs2);
+                            railSections.get(tr).remove(rs);
+                        }
+                    }   
+                }
+            }
+        }
+    }
+    public void removeSignal (Point point, String signal) {
+        ArrayList<RailSection> connecting = new ArrayList<>();
+        TrafficRoute tr = null;
+        RailSection newSection;
+        for (TrafficRoute trafficRoute : railSections.keySet()) {
+            for (RailSection rs : railSections.get(trafficRoute)) {
+                if (rs.getBetween().contains(point)) {
+                    connecting.add(rs);
+                    tr = trafficRoute;
+                }
+            }
+        }
+        if (connecting.size() == 2) {
+            for (RailSection connect : connecting){
+                if (connect.getBetween().get(0).equals(point)){
+                    ArrayList <Point> points = new ArrayList<>();
+                    points.addAll(connecting.get(1).getBetween());
+                    points.addAll(connecting.get(0).getBetween());
+                    newSection = new RailSection(connecting.get(1).getSignal1(),
+                            connecting.get(0).getSignal2(),points);
+                }
+
+            }
+            railSections.remove(tr,connecting.get(0));
+            
+            
+        }
     }
 
     public void addTrafficSection(Double xPos, Double yPos, HashMap<String, ArrayList<Double>> newPoints, ArrayList<ArrayList<String>> newConnect) {
@@ -187,13 +269,56 @@ public class TransportNetwork {
         adjStations.remove(s);
     }
 
-    public void addConnection(Station s1, Station s2, ArrayList <Point> distance) {
-        for (TrafficRoute trafficRoute : trafficRoutes){
-            ArrayList<TrafficRoute> routeCombine = new ArrayList<>();
+
+    public void addConnection(Station s1, Station s2, ArrayList <Point> distance,Building connectionType) throws Exception {
+        ArrayList<TrafficRoute> routeCombine = new ArrayList<>();
+        for (TrafficRoute trafficRoute : trafficRoutes.keySet()){
+
             if (trafficRoute.getStations().contains(s1) || trafficRoute.getStations().contains(s2)){
                 routeCombine.add(trafficRoute);
             }
         }
+        if (!routeCombine.isEmpty()) {
+            String vehicleType = routeCombine.get(0).getVehicleType();
+            ArrayList<Station> stationsCombine = new ArrayList<>();
+            ArrayList<Vehicle> vehiclesCombine = new ArrayList<>();
+            int vehicleAmount = 0;
+            ArrayList<Point> pointsCombine = new ArrayList<>();
+
+            for (TrafficRoute route : routeCombine) {
+                if (!route.getVehicleType().equals(vehicleType)) {
+                    throw new Exception("this route does not have a consistent vehicle type");
+                }
+                stationsCombine.addAll(route.getStations());
+                vehiclesCombine.addAll(route.getVehicles());
+                pointsCombine.addAll(trafficRoutes.get(route));
+                vehicleAmount =+ route.getVehicleAmount();
+                trafficRoutes.remove(route);
+            }
+
+            TrafficRoute combined = new TrafficRoute(stationsCombine, vehicleType, vehicleAmount, vehiclesCombine);
+            trafficRoutes.put(combined,pointsCombine);
+        } else {
+            ArrayList<Station> newStations = new ArrayList<>();
+            newStations.add(s1);
+            newStations.add(s2);
+            String vehicleType = "";
+            int vehicleAmount = 0;
+            Class c = connectionType.getClass();
+            if (c.getName().equals("Road")){
+                vehicleType = "road vehicle";
+                vehicleAmount = distance.size()/10;
+            } if (c.getName().equals("Railway")){
+                vehicleType = "engine";
+                vehicleAmount = distance.size()/20;
+            } if (c.getName().equals("AirportObject")){
+                vehicleType = "plane";
+                vehicleAmount = this.tower.getMaxplanes();
+            }
+            TrafficRoute newRoute = new TrafficRoute(newStations,vehicleType,vehicleAmount,new ArrayList<>());
+
+        }
+
         adjStations.get(s1).put(s2, distance);
         adjStations.get(s2).put(s1, distance);
     }
@@ -225,6 +350,14 @@ public class TransportNetwork {
 
     HashMap<Station, ArrayList<Point>> getAdjStations(Station s) {
         return adjStations.get(s);
+    }
+
+    public ArrayList<Point> getPoints() {
+        return points;
+    }
+
+    public HashMap<TrafficRoute, ArrayList<Point>> getTrafficRoutes() {
+        return trafficRoutes;
     }
 
     public String stationnameGenerator() {

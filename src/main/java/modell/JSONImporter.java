@@ -22,8 +22,7 @@ public class JSONImporter {
     public Game LoadMap() throws Exception {
         String ERROR_MESSAGE = "Not enogh objects in the scenario!";
         final String STANDARD_BG_MUSIC = "happy_tune.mp3";
-        final String STANDARD_MN_MUSIC = "";
-        JSONObject json = new JSONObject();
+        JSONObject json;
         String content = Files.readString(Paths.get(this.file.getAbsolutePath()), StandardCharsets.UTF_8);
         try {
             json = new JSONObject(content);
@@ -31,6 +30,7 @@ public class JSONImporter {
         catch (Exception ex) {
             throw new Exception("This is not a correct JSON file!");
         }
+
         if (!json.has("buildings")) {
             throw new Exception("No buildings found!");
         }
@@ -66,7 +66,6 @@ public class JSONImporter {
             else {
                 music = new ArrayList<>();
                 music.add(STANDARD_BG_MUSIC);
-                music.add(STANDARD_MN_MUSIC);
             }
 
             if(commodities == null || roads == null || railways == null || towers == null || airport_objects == null || nature_objects == null || factories == null || vehicles == null) {
@@ -79,36 +78,67 @@ public class JSONImporter {
     }
 
     public ArrayList<Vehicle> getVehicles(JSONObject vehicles) throws Exception{
+
         String ERROR_MESSAGE = "Error! The vehicle is not in a supported format!";
         ArrayList<Vehicle> v = new ArrayList<>();
+
         for (String key : vehicles.keySet()) {
             JSONObject vehicle = vehicles.getJSONObject(key);
 
             if (!vehicle.has("kind") || !vehicle.has("graphic") || !vehicle.has("speed")) {
                 throw new Exception(ERROR_MESSAGE);
-            } else {
+            }
+            else {
 
                 String name = key;
-                String kind = vehicle.getString("kind");
-                String graphic = vehicle.getString("graphic");
-                Double speed = vehicle.getDouble("speed");
+                String kind;
+                try {
+                    kind = vehicle.getString("kind");
+                }
+                catch (Exception error1) {
+                    throw new Exception("Kind in a vehicle is not in a correct format!");
+                }
+
+                String graphic;
+                try {
+                    graphic = vehicle.getString("graphic");
+                }
+                catch (Exception error2) {
+                    throw new Exception("Graphic in a vehicle is not in a correct format!");
+                }
+
+
+                Double speed;
+                try {
+                    speed = vehicle.getDouble("speed");
+                }
+                catch (Exception error3) {
+                    throw new Exception("Speed in a vehicle is not in a correct format!");
+                }
+
                 ArrayList<HashMap<String, Integer>> cargo = null;
                 if (vehicle.has("cargo")) {
-                    cargo = new ArrayList<>();
-                    JSONArray cargo_data = new JSONArray();
-                    if (vehicle.get("cargo") instanceof JSONObject) {
-                        cargo_data.put(vehicle.getJSONObject("cargo"));
-                    } else if (vehicle.get("cargo") instanceof JSONArray) {
-                        cargo_data = vehicle.getJSONArray("cargo");
-                    }
-                    for (int i = 0; i < cargo_data.length(); i++) {
-                        JSONObject obj = cargo_data.getJSONObject(i);
-                        for (String item : obj.keySet()) {
-                            HashMap<String, Integer> m = new HashMap<>();
-                            m.put(item, obj.getInt(item));
-                            cargo.add(m);
+                    try {
 
+                        cargo = new ArrayList<>();
+                        JSONArray cargo_data = new JSONArray();
+                        if (vehicle.get("cargo") instanceof JSONObject) {
+                            cargo_data.put(vehicle.getJSONObject("cargo"));
+                        } else if (vehicle.get("cargo") instanceof JSONArray) {
+                            cargo_data = vehicle.getJSONArray("cargo");
                         }
+                        for (int i = 0; i < cargo_data.length(); i++) {
+                            JSONObject obj = cargo_data.getJSONObject(i);
+                            for (String item : obj.keySet()) {
+                                HashMap<String, Integer> m = new HashMap<>();
+                                m.put(item, obj.getInt(item));
+                                cargo.add(m);
+
+                            }
+                        }
+                    }
+                    catch (Exception error4) {
+                        throw new Exception("Cargo in a vehicle is not in a correct format!");
                     }
                 }
                 Vehicle r = new Vehicle(name, kind, graphic, speed, Optional.ofNullable(cargo));
@@ -129,44 +159,96 @@ public class JSONImporter {
                 if (!road.has("width") || !road.has("depth") || !road.has("roads") || !road.has("dz")) {
                     throw new Exception(ERROR_MESSAGE);
                 } else {
-                    int width = road.getInt("width");
-                    int depth = road.getInt("depth");
-                    HashMap<String, ArrayList<Double>> points = new HashMap<>();
-                    JSONObject points_map_obj = road.getJSONObject("points");
-                    for (String item : points_map_obj.keySet()) {
-                        JSONArray item_array = points_map_obj.getJSONArray(item);
-                        ArrayList<Double> d = new ArrayList<>();
-                        for (int i = 0; i < item_array.length(); i++) {
-                            d.add(item_array.getDouble(i));
-                        }
-                        points.put(item, d);
+
+                    int width;
+                    int depth;
+                    try {
+                         width = road.getInt("width");
+                         depth = road.getInt("depth");
                     }
-                    ArrayList<ArrayList<String>> input_roads = new ArrayList<>(); // am ende zu dem hinzufügem
-                    JSONArray json_input_roads = road.getJSONArray("roads");
-                    for (int i = 0; i < json_input_roads.length(); i++) {
-                        ArrayList<String> s = new ArrayList<>();
-                        JSONArray inner_list = json_input_roads.getJSONArray(i);
-                        for (int j = 0; j < inner_list.length(); j++) {
-                            s.add(inner_list.getString(j));
-                        }
-                        input_roads.add(s);
+                    catch (Exception error1) {
+                        throw new Exception("Width and/or depth attributes in a road are not in a correct format!");
                     }
-                    int dz = road.getInt("dz");
+
+
+                    HashMap<String, ArrayList<Double>> points;
+                    try {
+                        points = new HashMap<>();
+                        JSONObject points_map_obj = road.getJSONObject("points");
+                        for (String item : points_map_obj.keySet()) {
+                            JSONArray item_array = points_map_obj.getJSONArray(item);
+                            ArrayList<Double> d = new ArrayList<>();
+                            for (int i = 0; i < item_array.length(); i++) {
+                                d.add(item_array.getDouble(i));
+                            }
+                            points.put(item, d);
+                        }
+                    }
+                    catch (Exception error2) {
+                        throw new Exception("Points in a road are not in a correct format!");
+                    }
+
+
+                    ArrayList<ArrayList<String>> input_roads;
+                    try {
+                        input_roads = new ArrayList<>();
+                        JSONArray json_input_roads = road.getJSONArray("roads");
+                        for (int i = 0; i < json_input_roads.length(); i++) {
+                            ArrayList<String> s = new ArrayList<>();
+                            JSONArray inner_list = json_input_roads.getJSONArray(i);
+                            for (int j = 0; j < inner_list.length(); j++) {
+                                s.add(inner_list.getString(j));
+                            }
+                            input_roads.add(s);
+                        }
+                    }
+                    catch (Exception error3) {
+                        throw new Exception("Roads in a road are not in a correct format!");
+                    }
+
+                    int dz;
+                    try {
+                        dz = road.getInt("dz");
+                    }
+                    catch (Exception error4) {
+                        throw new Exception("Dz in a road is not in a correct format!");
+                    }
+
+
                     String buildmenu = null;
                     if (road.has("buildmenu")) {
-                        buildmenu = road.getString("buildmenu");
-                    }
-                    HashMap<String, String> combines = null;
-                    if (road.has("combines")) {
-                        combines = new HashMap<>();
-                        JSONObject combines_map_obj = road.getJSONObject("combines");
-                        for (String combine : combines_map_obj.keySet()) {
-                            combines.put(combine, combines_map_obj.getString(combine));
+                        try {
+                            buildmenu = road.getString("buildmenu");
+                        }
+                        catch (Exception error5) {
+                            throw new Exception("Buildmenu in a road is not in a correct format!");
                         }
                     }
+
+
+                    HashMap<String, String> combines = null;
+                    if (road.has("combines")) {
+                        try {
+                            combines = new HashMap<>();
+                            JSONObject combines_map_obj = road.getJSONObject("combines");
+                            for (String combine : combines_map_obj.keySet()) {
+                                combines.put(combine, combines_map_obj.getString(combine));
+                            }
+                        }
+                        catch (Exception error6) {
+                            throw new Exception("Combines in a road are not in a correct format!");
+                        }
+                    }
+
+
                     String special = null;
                     if (road.has("special")) {
-                        special = road.getString("special");
+                        try {
+                            special = road.getString("special");
+                        }
+                        catch (Exception error6) {
+                            throw new Exception("Special  in a road is not in a correct format!");
+                        }
                     }
                     Road new_r = new Road(name, width, depth, points, input_roads, dz, Optional.ofNullable(buildmenu), Optional.ofNullable(combines), Optional.ofNullable(special));
                     r.add(new_r);
@@ -176,7 +258,7 @@ public class JSONImporter {
         return r;
     }
 
-    public ArrayList<Railway> getRailways(JSONObject rails){
+    public ArrayList<Railway> getRailways(JSONObject rails) throws Exception{
         ArrayList<Railway> r = new ArrayList<>();
 
         for (String key : rails.keySet()) {
@@ -185,66 +267,122 @@ public class JSONImporter {
                 String name = key;
                 int width = 0;
                 int depth = 0;
+
                 if (rail.has("width")) {
-                     width = rail.getInt("width");
+                    try {
+                        width = rail.getInt("width");
+                    }
+                    catch (Exception error1) {
+                        throw new Exception("Width in a rail is not in a correct format!");
+                    }
                 }
+
                 if (rail.has("depth")) {
-                     depth = rail.getInt("depth");
+                    try {
+                        depth = rail.getInt("depth");
+                    }
+                    catch (Exception error2) {
+                        throw new Exception("Depth in a rail is not in a correct format!");
+                    }
                 }
+
                 HashMap<String, ArrayList<Double>> points = null;
                 if (rail.has("points")) {
-                    points = new HashMap<>();
-                    JSONObject points_map_obj = rail.getJSONObject("points");
-                    for (String item : points_map_obj.keySet()) {
-                        JSONArray item_array = points_map_obj.getJSONArray(item);
-                        ArrayList<Double> d = new ArrayList<>();
-                        for (int i = 0; i < item_array.length(); i++) {
-                            d.add(item_array.getDouble(i));
+                    try {
+                        points = new HashMap<>();
+                        JSONObject points_map_obj = rail.getJSONObject("points");
+                        for (String item : points_map_obj.keySet()) {
+                            JSONArray item_array = points_map_obj.getJSONArray(item);
+                            ArrayList<Double> d = new ArrayList<>();
+                            for (int i = 0; i < item_array.length(); i++) {
+                                d.add(item_array.getDouble(i));
+                            }
+                            points.put(item, d);
                         }
-                        points.put(item, d);
+                    }
+                    catch (Exception error3) {
+                        throw new Exception("Points in a rail are not in a correct format");
                     }
                 }
 
                 String buildmenu = null;
                 if (rail.has("buildmenu")) {
-                    buildmenu = rail.getString("buildmenu");
+                    try {
+                        buildmenu = rail.getString("buildmenu");
+                    }
+                    catch (Exception error4) {
+                        throw new Exception("Buildmenu in a rail is not in a correct format!");
+                    }
                 }
 
                 ArrayList<ArrayList<String>> input_rails = null;
                 if (rail.has("rails")) {
-                    input_rails = new ArrayList<>();
-                    JSONArray json_input_rails = rail.getJSONArray("rails");
-                    for(int i = 0; i < json_input_rails.length(); i++) {
-                        ArrayList<String> s = new ArrayList<>();
-                        JSONArray inner_list = json_input_rails.getJSONArray(i);
-                        for(int j = 0; j < inner_list.length(); j++) {
-                            s.add(inner_list.getString(j));
+                    try {
+                        input_rails = new ArrayList<>();
+                        JSONArray json_input_rails = rail.getJSONArray("rails");
+                        for (int i = 0; i < json_input_rails.length(); i++) {
+                            ArrayList<String> s = new ArrayList<>();
+                            JSONArray inner_list = json_input_rails.getJSONArray(i);
+                            for (int j = 0; j < inner_list.length(); j++) {
+                                s.add(inner_list.getString(j));
+                            }
+                            input_rails.add(s);
                         }
-                        input_rails.add(s);
+                    }
+                    catch (Exception error5) {
+                        throw new Exception("Rails in a rail are not in a correct format!");
                     }
                 }
+
+
                 Integer dz = null;
                 if (rail.has("dz")) {
-                    dz = rail.getInt("dz");
-                }
-                ArrayList<String> signals = null;
-                if(rail.has("signals")) {
-                    signals = new ArrayList<>();
-                    JSONArray obj_arr = rail.getJSONArray("signals");
-                    for (int z = 0; z < obj_arr.length(); z++) {
-                        signals.add(obj_arr.getString(z));
+                    try {
+                        dz = rail.getInt("dz");
+                    }
+                    catch (Exception error6) {
+                        throw new Exception("Dz in a rail is not in a correct format!");
                     }
                 }
+
+
+                ArrayList<String> signals = null;
+                if(rail.has("signals")) {
+                    try {
+                        signals = new ArrayList<>();
+                        JSONArray obj_arr = rail.getJSONArray("signals");
+                        for (int z = 0; z < obj_arr.length(); z++) {
+                            signals.add(obj_arr.getString(z));
+                        }
+                    }
+                    catch (Exception error7) {
+                        throw new Exception("Signals in a rail are not in a corect format!");
+                    }
+                }
+
+
                 String special = null;
                 if (rail.has("special")) {
-                    special = rail.getString("special");
+                    try {
+                        special = rail.getString("special");
+                    }
+                    catch (Exception error8) {
+                        throw new Exception("Special in a rail is not in a correct format!");
+                    }
                 }
+
+
                 HashMap<String, String> combines = null;
                 if (rail.has("combines")) {
-                    combines = new HashMap<>();
-                    JSONObject combines_map_obj = rail.getJSONObject("combines");
-                    for (String combine : combines_map_obj.keySet()) {
-                        combines.put(combine,combines_map_obj.getString(combine));
+                    try {
+                        combines = new HashMap<>();
+                        JSONObject combines_map_obj = rail.getJSONObject("combines");
+                        for (String combine : combines_map_obj.keySet()) {
+                            combines.put(combine, combines_map_obj.getString(combine));
+                        }
+                    }
+                    catch (Exception error9) {
+                        throw new Exception("Combines in a rail are not in a correct format!");
                     }
                 }
                 Railway new_railway = new Railway(name,width,depth,Optional.ofNullable(buildmenu),Optional.ofNullable(points),Optional.ofNullable(input_rails),Optional.ofNullable(dz),Optional.ofNullable(signals),Optional.ofNullable(special),Optional.ofNullable(combines));
@@ -263,51 +401,97 @@ public class JSONImporter {
                 JSONObject factory = factories.getJSONObject(key);
                 if (!factory.has("width") || !factory.has("depth") || !factory.has("special") || !factory.has("productions") || !factory.has("dz")) {
                     throw new Exception(ERROR_MESSAGE);
+
                 } else {
+
                     String name = key;
-                    int width = factory.getInt("width");
-                    int depth = factory.getInt("depth");
-                    String special = factory.getString("special");
-                    ArrayList<Production> productions = new ArrayList<>(); // hier productions arrray
-                    JSONArray production_data = new JSONArray();
-                    if (factory.get("productions") instanceof JSONObject) {
-                        production_data.put(factory.getJSONObject("productions"));
-                    } else {
-                        if (factory.get("productions") instanceof JSONArray) {
-                            production_data = factory.getJSONArray("productions");
-                        }
+
+                    int width;
+                    try {
+                        width = factory.getInt("width");
                     }
-                    for (int i = 0; i < production_data.length(); i++) {
-                        JSONObject obj = production_data.getJSONObject(i);
-                        HashMap<String, Integer> produce = null; // hier produce attribut
-                        if (obj.has("produce")) {
-                            produce = new HashMap<>();
-                            JSONObject produce_map = obj.getJSONObject("produce");
-                            for (String k : produce_map.keySet()) {
-                                produce.put(k, produce_map.getInt(k));
+                    catch (Exception error1) {
+                        throw new Exception("Width of factory not in a correct format!");
+                    }
+
+                    int depth;
+                    try {
+                        depth = factory.getInt("depth");
+                    }
+                    catch (Exception error2) {
+                        throw new Exception("Depth of a factory not in a correct format!");
+                    }
+
+                    String special;
+                    try {
+                        special = factory.getString("special");
+                    }
+                    catch (Exception error3) {
+                        throw new Exception("Special of a factory not in a correct format!");
+                    }
+
+                    ArrayList<Production> productions;
+                    try {
+                        productions = new ArrayList<>(); // hier productions arrray
+                        JSONArray production_data = new JSONArray();
+                        if (factory.get("productions") instanceof JSONObject) {
+                            production_data.put(factory.getJSONObject("productions"));
+                        } else {
+                            if (factory.get("productions") instanceof JSONArray) {
+                                production_data = factory.getJSONArray("productions");
                             }
                         }
-                        HashMap<String, Integer> consume = null;
-                        if (obj.has("consume")) {
-                            consume = new HashMap<>();
-                            JSONObject consume_map = obj.getJSONObject("consume");
-                            for (String g : consume_map.keySet()) {
-                                consume.put(g, consume_map.getInt(g));
+                        for (int i = 0; i < production_data.length(); i++) {
+                            JSONObject obj = production_data.getJSONObject(i);
+                            HashMap<String, Integer> produce = null; // hier produce attribut
+                            if (obj.has("produce")) {
+                                produce = new HashMap<>();
+                                JSONObject produce_map = obj.getJSONObject("produce");
+                                for (String k : produce_map.keySet()) {
+                                    produce.put(k, produce_map.getInt(k));
+                                }
                             }
+                            HashMap<String, Integer> consume = null;
+                            if (obj.has("consume")) {
+                                consume = new HashMap<>();
+                                JSONObject consume_map = obj.getJSONObject("consume");
+                                for (String g : consume_map.keySet()) {
+                                    consume.put(g, consume_map.getInt(g));
+                                }
+                            }
+                            int duration = obj.getInt("duration");
+                            Production p = new Production(Optional.ofNullable(produce), Optional.ofNullable(consume), duration);
+                            productions.add(p);
                         }
-                        int duration = obj.getInt("duration");
-                        Production p = new Production(Optional.ofNullable(produce), Optional.ofNullable(consume), duration);
-                        productions.add(p);
                     }
+                    catch (Exception error4) {
+                        throw new Exception("Productions of a factory are not in a correct format!");
+                    }
+
+
                     HashMap<String, Integer> storage = null;
                     if (factory.has("storage")) {
-                        storage = new HashMap<>();
-                        JSONObject storage_map = factory.getJSONObject("storage");
-                        for (String t : storage_map.keySet()) {
-                            storage.put(t, storage_map.getInt(t));
+                        try {
+                            storage = new HashMap<>();
+                            JSONObject storage_map = factory.getJSONObject("storage");
+                            for (String t : storage_map.keySet()) {
+                                storage.put(t, storage_map.getInt(t));
+                            }
+                        }
+                        catch (Exception error5) {
+                            throw new Exception("Storage of a factory not in a correct format!");
                         }
                     }
-                    int dz = factory.getInt("dz");
+
+
+                    int dz;
+                    try {
+                        dz = factory.getInt("dz");
+                    }
+                    catch (Exception error6) {
+                        throw new Exception("Dz of a factory not in a correct format!");
+                    }
+
                     Factory new_factory = new Factory(name, width, depth, special, productions, Optional.ofNullable(storage), dz);
                     f.add(new_factory);
                 }
@@ -317,15 +501,20 @@ public class JSONImporter {
     }
 
     public ArrayList<String> getCommodities(JSONArray comodities) throws Exception{
-        String ERROR_MESSAGE = "Error! The commodity is not in a supported format!";
+        String ERROR_MESSAGE = "Error! The commodity-list is empty!";
         ArrayList<String> c = new ArrayList<>();
         if (comodities.length() == 0) {
             throw new Exception(ERROR_MESSAGE);
         }
         else {
-            for (int i = 0; i < comodities.length(); i++) {
-                String item = comodities.getString(i);
-                c.add(item);
+            try {
+                for (int i = 0; i < comodities.length(); i++) {
+                    String item = comodities.getString(i);
+                    c.add(item);
+                }
+            }
+            catch (Exception error1) {
+                throw new Exception("Commodity not in a correct format!");
             }
         }
         return c;
@@ -337,10 +526,38 @@ public class JSONImporter {
             throw new Exception(ERROR_MESSAGE);
         }
         else {
-            String gamemode = map.getString("gamemode");
-            String mapgen = map.getString("mapgen");
-            int width = map.getInt("width");
-            int depth = map.getInt("depth");
+            String gamemode;
+            try {
+                gamemode = map.getString("gamemode");
+            }
+            catch (Exception error1) {
+                throw new Exception("Gamemode of the map not in a correct format!");
+            }
+
+            String mapgen;
+            try {
+                mapgen = map.getString("mapgen");
+            }
+            catch (Exception error2) {
+                throw new Exception("Mapgen of the map not in a correct format!");
+            }
+
+            int width;
+            try {
+                width = map.getInt("width");
+            }
+            catch (Exception error3) {
+                throw new Exception("Width of the map not in a correct format!");
+            }
+
+            int depth;
+            try {
+                depth = map.getInt("depth");
+            }
+            catch (Exception error4) {
+                throw new Exception("Depth of the map not in a supported format!");
+            }
+
             Map m = new Map(mapgen, gamemode, width, depth);
             return m;
         }
@@ -356,15 +573,52 @@ public class JSONImporter {
                     throw new Exception(ERROR_MESSAGE);
                 }
                 else {
+
                 String name = key;
-                int width = natob.getInt("width");
-                int depth = natob.getInt("depth");
+
+                int width;
+                try {
+                    width = natob.getInt("width");
+                }
+                catch (Exception error1) {
+                    throw new Exception("Width of a nature object not in a correct format!");
+                }
+
+                int depth;
+                try {
+                   depth = natob.getInt("depth");
+                }
+                catch (Exception error2) {
+                    throw new Exception("Depth of a nature object not in a correct format!");
+                }
+
                 String buildmenu = null;
                 if (natob.has("buildmenu")) {
-                    buildmenu = natob.getString("buildmenu");
+                    try {
+                        buildmenu = natob.getString("buildmenu");
+                    }
+                    catch (Exception error3) {
+                        throw new Exception("Buildmenu of a nature object not in a correct format!");
+                    }
                 }
-                String special = natob.getString("special");
-                int dz = natob.getInt("dz");
+
+
+                String special;
+                try {
+                  special = natob.getString("special");
+                }
+                catch (Exception error4) {
+                    throw new Exception("Special of a nature object not in a correct format!");
+                }
+
+                int dz;
+                try {
+                  dz = natob.getInt("dz");
+                }
+                catch (Exception error5) {
+                    throw new Exception("Dz of a nature object not in a correct format!");
+                }
+
                 NatureObject new_natob = new NatureObject(name,width,depth,Optional.ofNullable(buildmenu),special,dz);
                 no.add(new_natob);
                 }
@@ -409,44 +663,94 @@ public class JSONImporter {
                 }
                 else {
                     String name = key;
-                    int width = airob.getInt("width");
-                    int depth = airob.getInt("depth");
 
-                    HashMap<String, ArrayList<Double>> points = new HashMap<>();
-                    JSONObject points_map_obj = airob.getJSONObject("points");
-                    for (String item : points_map_obj.keySet()) {
-                        JSONArray item_array = points_map_obj.getJSONArray(item);
-                        ArrayList<Double> d = new ArrayList<>();
-                        for (int i = 0; i < item_array.length(); i++) {
-                            d.add(item_array.getDouble(i));
-                        }
-                        points.put(item, d);
+                    int width;
+                    try {
+                        width = airob.getInt("width");
+                    }
+                    catch (Exception error1) {
+                        throw new Exception("Width of an airport object not in a correct format!");
                     }
 
-                    ArrayList<ArrayList<String>> input_planes = new ArrayList<>(); // am ende zu dem hinzufügem
-                    JSONArray json_input_planes = airob.getJSONArray("planes");
-                    for (int i = 0; i < json_input_planes.length(); i++) {
-                        ArrayList<String> s = new ArrayList<>();
-                        JSONArray inner_list = json_input_planes.getJSONArray(i);
-                        for (int j = 0; j < inner_list.length(); j++) {
-                            s.add(inner_list.getString(j));
-                        }
-                        input_planes.add(s);
+                    int depth;
+                    try {
+                        depth  = airob.getInt("depth");
+                    }
+                    catch (Exception error2) {
+                        throw new Exception("Depth of a airport object not in a correct format!");
                     }
 
-                    int dz = airob.getInt("dz");
+                    HashMap<String, ArrayList<Double>> points;
+                    try {
+                    points = new HashMap<>();
+                        JSONObject points_map_obj = airob.getJSONObject("points");
+                        for (String item : points_map_obj.keySet()) {
+                            JSONArray item_array = points_map_obj.getJSONArray(item);
+                            ArrayList<Double> d = new ArrayList<>();
+                            for (int i = 0; i < item_array.length(); i++) {
+                                d.add(item_array.getDouble(i));
+                            }
+                            points.put(item, d);
+                        }
+                    }
+                    catch (Exception error3) {
+                        throw new Exception("Points of an airport object are not in a correct format!");
+                    }
+
+                    ArrayList<ArrayList<String>> input_planes;
+                    try {
+                    input_planes = new ArrayList<>(); // am ende zu dem hinzufügem
+                        JSONArray json_input_planes = airob.getJSONArray("planes");
+                        for (int i = 0; i < json_input_planes.length(); i++) {
+                            ArrayList<String> s = new ArrayList<>();
+                            JSONArray inner_list = json_input_planes.getJSONArray(i);
+                            for (int j = 0; j < inner_list.length(); j++) {
+                                s.add(inner_list.getString(j));
+                            }
+                            input_planes.add(s);
+                        }
+                    }
+                    catch (Exception error4) {
+                        throw new Exception("Planes of an airport object are not in a correct format!");
+                    }
+
+                    int dz;
+                    try {
+                        dz =airob.getInt("dz");
+                    }
+                    catch (Exception error5) {
+                        throw new Exception("Dz of an airport object not in a correct format!");
+                    }
+
                     String buildmenu = null;
                     if (airob.has("buildmenu")) {
-                        buildmenu = airob.getString("buildmenu");
+                        try {
+                            buildmenu = airob.getString("buildmenu");
+                        }
+                        catch (Exception error6) {
+                            throw new Exception("Buildmenu of an airport object not in a correct format!");
+                        }
                     }
 
-                    String special = airob.getString("special");
+                    String special;
+                    try {
+                        special = airob.getString("special");
+                    }
+                    catch (Exception error7) {
+                        throw new Exception("Special of an airport object not in a correct format!");
+                    }
+
                     ArrayList<String> entry = null;
                     if (airob.has("entry")) {
-                        entry = new ArrayList<>();
-                        JSONArray obj_array = airob.getJSONArray("entry");
-                        for (int i = 0; i < obj_array.length(); i++) {
-                            entry.add(obj_array.getString(i));
+                        try {
+                            entry = new ArrayList<>();
+                            JSONArray obj_array = airob.getJSONArray("entry");
+                            for (int i = 0; i < obj_array.length(); i++) {
+                                entry.add(obj_array.getString(i));
+                            }
+                        }
+                        catch (Exception error8) {
+                            throw new Exception("Entry of an airport object not in a correct format!");
                         }
                     }
 
@@ -459,12 +763,20 @@ public class JSONImporter {
         return r;
     }
 
-    public ArrayList<String> getMusic(JSONObject music) {
-        ArrayList<String> m = new ArrayList<>(2);
-        String path_to_backgroundmusic = music.getString("background_music_path");
-        m.add(path_to_backgroundmusic);
-        String path_to_menumusic = music.getString("menu_music_path");
-        m.add(path_to_menumusic);
+    public ArrayList<String> getMusic(JSONObject music) throws Exception{
+        ArrayList<String> m = new ArrayList<>(1);
+        if (!music.has("background_music_path")) {
+            throw new Exception("Music not in a correct format!");
+        }
+        String path_to_backgroundmusic;
+        try {
+            path_to_backgroundmusic = music.getString("background_music_path");
+            m.add(path_to_backgroundmusic);
+        }
+        catch (Exception error1) {
+            throw new Exception("Path to background music in music not in a correct format!");
+        }
+
         return m;
     }
 }

@@ -15,4 +15,8 @@ public class Tower extends Building{
         this.maxplanes = maxplanes;
         this.dz = dz;
     }
+
+    public int getMaxplanes() {
+        return maxplanes;
+    }
 }
