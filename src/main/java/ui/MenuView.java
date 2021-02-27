@@ -85,7 +85,7 @@ public class MenuView {
         });
 
 
-        Image Hintergundimage = new Image("/Hintergrund.jpg");
+        Image Hintergundimage = new Image("/GGG-Hintergund.png");
 
         ImageView imageView = new ImageView();
         imageView.setImage(Hintergundimage);
