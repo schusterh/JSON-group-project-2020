@@ -81,6 +81,10 @@ public class Vehicle {
         return path;
     }
 
+    public Point getCurrentPoint() {
+        return currentPoint;
+    }
+
     public void setCurrentPoint(Point currentPoint) {
         this.currentPoint = currentPoint;
     }
