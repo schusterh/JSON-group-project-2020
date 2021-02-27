@@ -147,7 +147,7 @@ public class Game {
         Factory targetFactory = possTargets.get(randomIndex);
         gb.setTargetStation(this.transportNetwork.getNearStations(targetFactory));
     }
-    public ArrayList<Point> bfs (Point startPoint, Station targetStation, HashMap<Point, HashMap<Integer, Vehicle>> obstacles ){
+    public ArrayList<Point> bfs (Point startPoint, Station targetStation, String vehicleType, int startTime ){
 
         ArrayList<Point> shortestPath = new ArrayList<>();
         Deque<Point> deq = new ArrayDeque<>();
@@ -163,19 +163,50 @@ public class Game {
 
                 ArrayList<Point> nextPoints = transportNetwork.getPointConnections().get(currentPoint);
 
+                int depth=0;
+                Point point = deq.peekFirst();
+                while (origins.containsKey(point)){
+                    point = origins.get(point);
+                    depth++;
+                }
                 for (Point p : nextPoints) {
-
-                    origins.put(p,currentPoint);
-                    deq.add(p);
-                    if (transportNetwork.getStationPoints().get(targetStation).contains(p)){
-                        targetFound = true;
-                        shortestPath.add(p);
-                        Point backtrack = origins.get(p);
-                        while (backtrack != null){
-                            shortestPath.add(0,backtrack);
-                            backtrack = origins.get(backtrack);
+                    if (vehicleType.equals("plane")){
+                        if (!transportNetwork.getReservations().get(p).containsKey(depth+startTime)){
+                            origins.put(p,currentPoint);
+                            deq.add(p);
+                            if (transportNetwork.getStationPoints().get(targetStation).contains(p)){
+                                targetFound = true;
+                                shortestPath.add(p);
+                                Point backtrack = origins.get(p);
+                            }
                         }
-                        return shortestPath;
+                    }
+                    if (vehicleType.equals("engine")){
+                        for (TrafficRoute tf : transportNetwork.getRailSections().keySet()){
+                            for (RailSection rs : transportNetwork.getRailSections().get(tf)) {
+                                if (rs.getBetween().contains(p)){
+                                    for (Point b : rs.getBetween()) {
+                                        if (!transportNetwork.getReservations().get(b).containsKey(depth+startTime)){
+                                            origins.put(p,currentPoint);
+                                            deq.add(p);
+                                            if (transportNetwork.getStationPoints().get(targetStation).contains(p)){
+                                                targetFound = true;
+                                                shortestPath.add(p);
+                                                Point backtrack = origins.get(p);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        origins.put(p, currentPoint);
+                        deq.add(p);
+                        if (transportNetwork.getStationPoints().get(targetStation).contains(p)) {
+                            targetFound = true;
+                            shortestPath.add(p);
+                            Point backtrack = origins.get(p);
+                        }
                     }
 
                 }
@@ -185,37 +216,34 @@ public class Game {
                 throw new IllegalArgumentException("No connecting path can be found.");
             }
         }
+        Point backtrack = shortestPath.get(0);
+        while (backtrack != null) {
+            shortestPath.add(0, backtrack);
+            backtrack = origins.get(backtrack);
+        }
         return shortestPath;
     }
 
     public ArrayList<Point> findPath(Vehicle v, int startTick){
         GoodsBundle goodsBundle = v.getCurrentCargo().get(0);
         ArrayList <Point> path = new ArrayList<>();
-        if (v.getKind().equals("road vehicle"))
-            path.addAll(bfs(v.getCurrentPoint(), goodsBundle.getTargetStation(), new HashMap<>()));
 
-        if (v.getKind().equals("plane"))
-            path.addAll(bfs (v.getCurrentPoint(), goodsBundle.getTargetStation(),transportNetwork.getReservations()));
+        if (v.getKind().equals("road vehicle")) {
+            path.addAll(bfs(v.getCurrentPoint(), goodsBundle.getTargetStation(), v.getKind(),startTick));
+        }
 
-        if (v.getKind().equals("engine"))
+        if (v.getKind().equals("plane")){
+            path.addAll(bfs (v.getCurrentPoint(), goodsBundle.getTargetStation(),v.getKind(),startTick));
 
-        if (!path.isEmpty()){
-            if (v.getKind().equals("plane")){
-                HashMap <Point, Integer> reservations = new HashMap<>();
-                for (int i = 0; i < path.size(); i++){
-                    reservations.put(path.get(i+startTick),i);
+            for (int i = 0; i < path.size(); i++){
+                transportNetwork.addReservations(path.get(i),startTick+i,v);
+            }
+        }
+        if (v.getKind().equals("engine")){
+            path.addAll(bfs (v.getCurrentPoint(), goodsBundle.getTargetStation(), v.getKind(),startTick));
 
-                }
-                for (Point p : reservations.keySet()){
-                    for (Integer i : transportNetwork.getReservations().get(p).keySet()){
-                        if (reservations.get(p).equals(i)){
-
-                        }
-                    }
-                }
-
-            } else if (v.getKind().equals("wagon")){
-
+            for (int i = 0; i < path.size(); i++){
+                transportNetwork.addReservations(path.get(i),startTick+i,v);
             }
         }
 
