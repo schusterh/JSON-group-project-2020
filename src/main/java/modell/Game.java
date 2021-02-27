@@ -139,6 +139,7 @@ public class Game {
         Factory targetFactory = possTargets.get(randomIndex);
         gb.setTargetStation(this.transportNetwork.getNearStations(targetFactory));
     }
+
     public ArrayList<Point> bfs (Point startPoint, Station targetStation, String vehicleType, int startTime ){
 
         ArrayList<Point> shortestPath = new ArrayList<>();
@@ -411,6 +412,9 @@ public class Game {
     public void handleUpdate() {
         for (Factory factory : factories) {
             factory.produce();
+        }
+        for (TrafficRoute trafficRoute : transportNetwork.getTrafficRoutes().keySet()){
+            manageVehicles(trafficRoute);;
         }
     }
 }
