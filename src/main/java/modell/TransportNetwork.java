@@ -375,6 +375,10 @@ public class TransportNetwork {
         this.reservations.get(point).put(tick,vehicle);
     }
 
+    public HashMap<TrafficRoute, ArrayList<RailSection>> getRailSections() {
+        return railSections;
+    }
+
     public HashMap<Point, HashMap<Integer, Vehicle>> getReservations() {
         return reservations;
     }
