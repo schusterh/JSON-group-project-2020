@@ -368,8 +368,11 @@ public class TransportNetwork {
         return pointConnections;
     }
 
-    public void setReservations(HashMap<Point, HashMap<Integer, Vehicle>> reservations) {
-        this.reservations = reservations;
+    public void addReservations(Point point, Integer tick, Vehicle vehicle) {
+        if (!this.reservations.containsKey(point)) {
+            this.reservations.put(point, new HashMap<>());
+        }
+        this.reservations.get(point).put(tick,vehicle);
     }
 
     public HashMap<Point, HashMap<Integer, Vehicle>> getReservations() {

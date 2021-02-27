@@ -125,7 +125,7 @@ public class Game {
         Factory targetFactory = possTargets.get(randomIndex);
         gb.setTargetStation(this.transportNetwork.getNearStations(targetFactory));
     }
-    public ArrayList<Point> bfs (Point startPoint, Station targetStation, HashMap<Point, HashMap<Integer, Vehicle>> obstacles ){
+    public ArrayList<Point> bfs (Point startPoint, Station targetStation, String vehicleType ){
 
         ArrayList<Point> shortestPath = new ArrayList<>();
         Deque<Point> deq = new ArrayDeque<>();
@@ -169,31 +169,22 @@ public class Game {
     public ArrayList<Point> findPath(Vehicle v, int startTick){
         GoodsBundle goodsBundle = v.getCurrentCargo().get(0);
         ArrayList <Point> path = new ArrayList<>();
+
         if (v.getKind().equals("road vehicle"))
-            path.addAll(bfs(v.getCurrentPoint(), goodsBundle.getTargetStation(), new HashMap<>()));
+            path.addAll(bfs(v.getCurrentPoint(), goodsBundle.getTargetStation(), v.getKind()));
 
-        if (v.getKind().equals("plane"))
-            path.addAll(bfs (v.getCurrentPoint(), goodsBundle.getTargetStation(),transportNetwork.getReservations()));
+        if (v.getKind().equals("plane")){
+            path.addAll(bfs (v.getCurrentPoint(), goodsBundle.getTargetStation(),v.getKind()));
 
-        if (v.getKind().equals("engine"))
+            for (int i = 0; i < path.size(); i++){
+                transportNetwork.addReservations(path.get(i),startTick+i,v);
+            }
+        }
+        if (v.getKind().equals("engine")){
+            path.addAll(bfs (v.getCurrentPoint(), goodsBundle.getTargetStation(), v.getKind()));
 
-        if (!path.isEmpty()){
-            if (v.getKind().equals("plane")){
-                HashMap <Point, Integer> reservations = new HashMap<>();
-                for (int i = 0; i < path.size(); i++){
-                    reservations.put(path.get(i+startTick),i);
-
-                }
-                for (Point p : reservations.keySet()){
-                    for (Integer i : transportNetwork.getReservations().get(p).keySet()){
-                        if (reservations.get(p).equals(i)){
-
-                        }
-                    }
-                }
-
-            } else if (v.getKind().equals("wagon")){
-
+            for (int i = 0; i < path.size(); i++){
+                transportNetwork.addReservations(path.get(i),startTick+i,v);
             }
         }
 
