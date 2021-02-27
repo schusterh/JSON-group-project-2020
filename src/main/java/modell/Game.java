@@ -74,18 +74,42 @@ public class Game {
 
     public List<OnMapBuilding> getBuildingsOnMap() { return buildingsOnMap; }
 
-    public Factory findTarget(Factory f, String commodity){
+    public void drive (Vehicle v, int tick){
+        if (v.getKind().equals("road vehicle")){
+            if (v.getPath()!=null) {
+                if (transportNetwork.getPoints().contains(v.getNextPoint())){
+                    v.setCurrentPoint(v.getNextPoint());
+                    v.setNextPoint(v.getPath().get(0));
+                } else {
+                    findPath(v, tick, v.getCurrentCargo().get(0));
+                    drive(v,tick);
+                }
+            } else {
+                v.unloadCargo(v.getCurrentCargo().get(0));
+                if (!v.getCurrentCargo().isEmpty())
+                    findPath(v, tick, v.getCurrentCargo().get(0));
+            }
+        } if (v.getKind().equals("engine")){
+            if (v.getPath()!=null){
+
+            }
+        }
+    }
+
+
+    public void findTarget(GoodsBundle gb, Factory f){
         HashMap<Factory, Double> possibleTargets = new HashMap<>();
         ArrayList<Factory> possTargets = new ArrayList<>();
         for (Factory g : this.getFactories()) {
             g.getProductions().stream().filter(p -> p.getConsume()
                     .isPresent()).filter(p -> p.getConsume().get()
-                    .containsKey(commodity))
+                    .containsKey(gb.getGoodType()))
                     .forEach(p -> possibleTargets.put(g, null));
             Station nearF = transportNetwork.getNearStations(f);
             Station nearG = transportNetwork.getNearStations(g);
-            double weight = (double) (g.getStorage().get(commodity) - g.getCurrentStorage().get(commodity))
-                    / transportNetwork.getAdjStations(nearF).get(nearG);
+            double weight = (double) (g.getStorage().get(gb.getGoodType())
+                    - g.getCurrentStorage().get(gb.getGoodType()))
+                    / transportNetwork.getAdjStations(nearF).get(nearG).size();
             possibleTargets.put(g, weight);
             possTargets.add(g);
         }
@@ -98,7 +122,97 @@ public class Game {
             r -= possibleTargets.get(possTargets.get(randomIndex));
             if (r <= 0.0) break;
         }
-        return possTargets.get(randomIndex);
+        Factory targetFactory = possTargets.get(randomIndex);
+        gb.setTargetStation(this.transportNetwork.getNearStations(targetFactory));
+    }
+    public ArrayList<Station> bfs (Station startStation, Station targetStation){
+        ArrayList<Station> shortestPath = new ArrayList<>();
+        PriorityQueue<PrioPair> pq = new PriorityQueue<>();
+        HashMap<Station, Station> origins = new HashMap<>();
+        pq.add(new PrioPair(startStation,0));
+        boolean targetFound = false;
+        while (!targetFound){
+            if (pq.peek() != null) {
+                PrioPair currentPair = pq.peek();
+                Station currentStation = currentPair.getStation();
+                HashMap<Station, ArrayList<Point>> nextStations = getTransportNetwork().getAdjStations(currentStation);
+                for (Station s : nextStations.keySet()) {
+                    int dist = nextStations.get(s).size() + currentPair.getDistance();
+                    if (origins.containsKey(s)){
+                        int previousDist = pq.stream().filter(x -> x.getStation()
+                                .equals(s))
+                                .findFirst()
+                                .orElseThrow()
+                                .getDistance();
+                        if (previousDist<dist){
+                            pq.remove(s);
+                            origins.remove(s);
+                            origins.put(s,currentStation);
+                        }
+                    } else { origins.put(s,currentStation); }
+
+                    pq.add(new PrioPair(s, dist));
+                    if (s == targetStation) {
+                        targetFound = true;
+                    }
+                }
+                pq.remove(currentPair);
+            } else {
+                throw new IllegalArgumentException("No connecting path can be found.");
+            }
+        }
+        shortestPath.add(targetStation);
+        Station backtrack = origins.get(targetStation);
+        while (backtrack != null){
+            shortestPath.add(0,backtrack);
+            backtrack = origins.get(backtrack);
+        }
+        return shortestPath;
+    }
+    public ArrayList<Point> findPath(Vehicle v, int startTick, GoodsBundle goodsBundle){
+        ArrayList<Point> path = new ArrayList<>();
+        if (v.getKind().equals("road vehicle")){
+            ArrayList<Station> stations = bfs(v.getCurrentStation(),goodsBundle.getTargetStation());
+            int i = 0;
+            while (stations.get(i+1) != null) {
+                for (TrafficRoute tr : transportNetwork.getTrafficRoutes().keySet()){
+                    if (tr.getStations().contains(stations.get(i+1)) && tr.getVehicleType().equals(v.getKind())){
+                        path.addAll(transportNetwork.getAdjStations(stations.get(i)).get(stations.get(i + 1)));
+                        break;
+                    }
+                }
+                i++;
+            }
+        } else if (v.getKind().equals("plane")){
+
+
+        } else if (v.getKind().equals("wagon")){
+
+        }
+        return path;
+    }
+    public void manageVehicles(TrafficRoute route){
+        int diff = route.getVehicles().size()-route.getVehicleAmount();
+        if (diff > 0){
+            route.removeVehicleAmount(diff);
+        } if (diff < 0){
+            ArrayList<Vehicle> possVehicles = new ArrayList<>();
+            for (Vehicle v : this.vehicles) {
+                if (v.getKind().equals(route.getVehicleType())) {
+                    possVehicles.add(v);
+                }
+            }
+            Random rand = new Random();
+            for (int i = 0; i < Math.abs(diff);i++){
+                route.addVehicle(possVehicles.get(rand.nextInt(possVehicles.size())));
+            }
+        }
+        for (Vehicle v : route.getVehicles()){
+            if (!v.getKind().equals(route.getVehicleType())){
+                route.getVehicles().remove(v);
+                manageVehicles(route);
+            }
+        }
     }
 
     public void addBuildingToMap(Building model, int startX, int startY, int height) {
@@ -193,5 +307,30 @@ public class Game {
         for (Factory factory : factories) {
             factory.produce();
         }
+    }
+}
+class PrioPair implements Comparable<PrioPair>{
+    final Station station;
+    final Integer distance;
+
+    public PrioPair(Station station, Integer distance){
+        this.station = station;
+        this.distance = distance;
+    }
+    @Override
+    public int compareTo(PrioPair other) {
+        return (this.distance - other.distance);
+    }
+
+    public Station getStation() {
+        return station;
+    }
+
+    public Integer getDistance() {
+        return distance;
+    }
+
+    boolean containsStation(Station s){
+        return this.getStation().equals(s);
     }
 }
