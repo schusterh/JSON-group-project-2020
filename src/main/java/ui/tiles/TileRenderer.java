@@ -2,15 +2,15 @@ package ui.tiles;
 
 import javafx.scene.canvas.GraphicsContext;
 import ui.RenderLayer;
-import ui.Renderer;
 
 import java.util.ArrayList;
 
 public class TileRenderer {
 
-    ArrayList<TileRenderLayer> renderLayers = new ArrayList<>();
+    LandscapeLayer landscapeLayer;
+    BuildingLayer buildingLayer;
 
-    double zoomFactor = 2;
+    double zoomFactor = 1;
 
     public void increaseZoomFactor() {
         this.zoomFactor += (this.zoomFactor + 0.5 < 3.5) ? 0.5 : 0.0;
@@ -20,22 +20,25 @@ public class TileRenderer {
         this.zoomFactor -= (this.zoomFactor - 0.5 > 0) ? 0.5 : 0.0;
     }
 
-    public TileRenderLayer getLandscapeLayer() {
-        return this.renderLayers.get(0);
+    public LandscapeLayer getLandscapeLayer() {
+        return this.landscapeLayer;
     }
 
-    public void addRenderLayer(TileRenderLayer layer) {
-        this.renderLayers.add(layer);
+    public void addLandscapeLayer(LandscapeLayer layer) {
+        this.landscapeLayer = layer;
     }
 
-    public void removeRenderLayer(TileRenderLayer layer) {
-        this.renderLayers.remove(layer);
+    public void addBuildingLayer(BuildingLayer layer) {
+        this.buildingLayer = layer;
     }
 
     public void drawFrame(GraphicsContext gc, int offsetX, int offsetY) {
 
-        for (RenderLayer layer : this.renderLayers) {
-            layer.draw(gc, offsetX, offsetY, this.zoomFactor);
+        if (landscapeLayer != null) {
+            landscapeLayer.draw(gc, offsetX, offsetY, zoomFactor);
+        }
+        if (buildingLayer != null) {
+            buildingLayer.draw(gc, offsetX, offsetY, zoomFactor);
         }
     }
 }

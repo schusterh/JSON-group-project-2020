@@ -10,23 +10,23 @@ public class Road extends Building {
     private HashMap<String,ArrayList<Double>> points;
     private ArrayList<ArrayList<String>> roads;
     private int dz;
-    private Optional buildmenu;
-    private Optional combines;
-    private Optional special;
+    private Optional<String> buildmenu;
+    private Optional<HashMap<String, String>> combines;
+    private Optional<String> special;
 
 
 
 
     public Road(String name, int width, int depth, HashMap<String,ArrayList<Double>> points, ArrayList<ArrayList<String>> roads, int dz,
                 Optional<String> buildmenu,Optional<HashMap<String,String>> combines, Optional<String> special) {
-        super(width,depth);
+        super(width,depth, name);
         this.name = name;
         this.points = points;
         this.roads = roads;
         this.dz = dz;
-        if (buildmenu.isPresent()) {this.buildmenu = buildmenu;}
-        if (combines.isPresent()) {this.combines = combines;}
-        if(special.isPresent()) {this.special = special;}
+        this.buildmenu = buildmenu;
+        this.combines = combines;
+        this.special = special;
 
     }
 
@@ -41,16 +41,18 @@ public class Road extends Building {
         return roads;
     }
 
-    public Optional getBuildmenu() {
+    public Optional<String> getBuildmenu() {
         return buildmenu;
     }
 
-    public Optional getCombines() {
+    public Optional<HashMap<String, String>> getCombines() {
         return combines;
     }
 
     public int getDz() {
         return dz;
     }
+
+    public Optional<String> getSpecial() { return special; }
 
 }

@@ -1,11 +1,14 @@
 package ui;
 
+import Controller.GameController;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
+import modell.Game;
+import types.GameMode;
 import ui.tiles.TileRenderer;
 
 import java.time.ZonedDateTime;
@@ -15,6 +18,8 @@ public class GameLoop {
     TileRenderer renderer;
     Canvas canvas;
     GraphicsContext gc;
+
+    GameController controller;
 
     ArrayList<String> input = new ArrayList<>();
 
@@ -29,6 +34,10 @@ public class GameLoop {
     int panStep = 10;
 
     int selectionRadius = 0;
+
+    public GameLoop(GameController controller) {
+        this.controller = controller;
+    }
 
     private void prepareCanvas() {
         this.gc.setFill(Color.web("#555568"));
@@ -130,6 +139,10 @@ public class GameLoop {
             this.renderer.decreaseZoomFactor();
             this.input.remove("SUBTRACT");
         }
+        if (this.input.contains("ESCAPE")) {
+            this.controller.setGameMode(GameMode.NORMAL);
+
+        }
         if (this.input.contains("PERIOD")) {
             this.selectionRadius = this.selectionRadius < 6 ? this.selectionRadius + 1 : 6;
             this.renderer.getLandscapeLayer().setRadius(this.selectionRadius);
@@ -141,11 +154,15 @@ public class GameLoop {
             this.input.remove("COMMA");
         }
         if (this.input.contains("CLICK_PRIMARY")) {
-            this.renderer.getLandscapeLayer().increaseHeightOfSelectedTiles();
+            if (this.controller.getGameMode() == GameMode.TERRAIN) {
+                this.controller.increaseHeightOfSelectedTiles();
+            } else if (this.controller.getGameMode() == GameMode.BUILDING) {
+                this.controller.placePendingBuilding();
+            }
             this.input.remove("CLICK_PRIMARY");
         }
         if (this.input.contains("CLICK_SECONDARY")) {
-            this.renderer.getLandscapeLayer().decreaseHeightOfSelectedTiles();
+            this.controller.decreaseHeightOfSelectedTiles();
             this.input.remove("CLICK_SECONDARY");
         }
 

@@ -13,19 +13,22 @@ public class Factory extends Building{
     private String special;
     private ArrayList<Production> productions;
     private HashMap<String, Integer> storage;
+    private HashMap<String, Integer> currentStorage;
     private int dz;
-
+    private String prodMessage;
 
 
     public Factory(String name, int width, int depth, String special, ArrayList<Production> productions, Optional<HashMap<String, Integer>> storage, int dz) {
-        super(width,depth);
+        super(width,depth, name);
         this.name = name;
         this.special = special;
         this.productions = productions;
         this.storage = storage.orElseGet(HashMap::new);
         this.dz = dz;
+        this.currentStorage = new HashMap<>();
     }
 
+    public String getName() { return name; }
 
     public void produce(){
         // Einmal durch alle Produktionen durchiterieren
@@ -39,13 +42,15 @@ public class Factory extends Building{
                 .map(this::consume)
                 .orElseGet(() -> { return true; });
 
+
             if (requirementsChecked) {
                 production.produce.ifPresent(products -> {
                     for (Map.Entry<String, Integer> product : products.entrySet()) {
-                        storage.put(product.getKey(), product.getValue());
+                        currentStorage.put(product.getKey(), product.getValue());
                     }
                 });
             }
+            else this.prodMessage = "Keine Ressourcen :(";
         }
         // füge zur hashmap storage <kind, amount> den amount hinzu, der bei productions unter dem
         // kind steht. schauen ob der key (kind) vorhanden ist, wenn nicht, hinzufügen + amount hinzufügen, ansonsten amount erhöhen
@@ -57,16 +62,16 @@ public class Factory extends Building{
         // ist, abziehen, ansonsten nichts abziehen
         boolean requirementsChecked = true;
 
-        if (!storage.isEmpty()) {
+        if (!currentStorage.isEmpty()) {
             for (Map.Entry<String, Integer> requirement : consumeRequirements.entrySet()) {
-                if (!storage.containsKey(requirement.getKey()) || storage.get(requirement.getKey()) < requirement.getValue()) {
+                if (!currentStorage.containsKey(requirement.getKey()) || currentStorage.get(requirement.getKey()) < requirement.getValue()) {
                     requirementsChecked = false;
                 }
             }
 
             if (requirementsChecked) {
                 for (Map.Entry<String, Integer> consumeEntity : consumeRequirements.entrySet()) {
-                    storage.put(consumeEntity.getKey(), storage.get(consumeEntity.getKey()) - consumeEntity.getValue());
+                    currentStorage.put(consumeEntity.getKey(), currentStorage.get(consumeEntity.getKey()) - consumeEntity.getValue());
                 }
             }
         } else {
@@ -75,4 +80,19 @@ public class Factory extends Building{
         return requirementsChecked;
     }
 
+    public HashMap<String, Integer> getStorage() {
+        return storage;
+    }
+
+    public HashMap<String, Integer> getCurrentStorage() {
+        return currentStorage;
+    }
+
+    public ArrayList<Production> getProductions() {
+        return productions;
+    }
+
+    public String getProdMessage() {
+        return prodMessage;
+    }
 }
