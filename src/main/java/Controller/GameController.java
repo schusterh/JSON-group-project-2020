@@ -31,15 +31,18 @@ public class GameController {
     MusicPlayer music;
     GameLoop gameLoop;
     int tickLenght;
+    int currentTick;
 
     GameMode gameMode;
 
     public GameController(Game model, int tickLength) {
         this.model = model;
         this.tickLenght = tickLength;
+        this.currentTick = 0;
         music = new MusicPlayer(this.model.getBackgroundMusic());
 
         this.timelineTask = event -> {
+            this.currentTick++;
             model.handleUpdate();
             System.out.println("UPDATING EVERYTHING!");
         };
@@ -116,6 +119,7 @@ public class GameController {
                 if (underlyingRoad.model.getClass() == Road.class) {
                     if (roadModel.getCombines().isPresent()) {
                         HashMap<String, String> combines = roadModel.getCombines().get();
+                        System.out.println("Trying to combine " + roadModel.getName() + " and " + underlyingRoad.model.getName());
                         if (combines.containsKey(underlyingRoad.model.getName())) {
                             Road replacementModel = this.model.getRoads().stream().filter(roadFilter -> roadFilter.getName().equals(combines.get(underlyingRoad.model.getName()))).findFirst().orElse(null);
                             if (replacementModel != null) {
