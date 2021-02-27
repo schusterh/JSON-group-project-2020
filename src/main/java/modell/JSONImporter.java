@@ -22,7 +22,6 @@ public class JSONImporter {
     public Game LoadMap() throws Exception {
         String ERROR_MESSAGE = "Not enogh objects in the scenario!";
         final String STANDARD_BG_MUSIC = "happy_tune.mp3";
-        final String STANDARD_MN_MUSIC = "";
         JSONObject json;
         String content = Files.readString(Paths.get(this.file.getAbsolutePath()), StandardCharsets.UTF_8);
         try {
@@ -67,7 +66,6 @@ public class JSONImporter {
             else {
                 music = new ArrayList<>();
                 music.add(STANDARD_BG_MUSIC);
-                music.add(STANDARD_MN_MUSIC);
             }
 
             if(commodities == null || roads == null || railways == null || towers == null || airport_objects == null || nature_objects == null || factories == null || vehicles == null) {
@@ -766,8 +764,8 @@ public class JSONImporter {
     }
 
     public ArrayList<String> getMusic(JSONObject music) throws Exception{
-        ArrayList<String> m = new ArrayList<>(2);
-        if (!music.has("background_music_path") || !music.has("menu_music_path")) {
+        ArrayList<String> m = new ArrayList<>(1);
+        if (!music.has("background_music_path")) {
             throw new Exception("Music not in a correct format!");
         }
         String path_to_backgroundmusic;
@@ -779,15 +777,6 @@ public class JSONImporter {
             throw new Exception("Path to background music in music not in a correct format!");
         }
 
-        String path_to_menumusic;
-        try {
-            path_to_menumusic = music.getString("menu_music_path");
-            m.add(path_to_menumusic);
-        }
-        catch (Exception error2) {
-            throw new Exception("Path to menu music in musicn not in a correct format!");
-
-        }
         return m;
     }
 }
