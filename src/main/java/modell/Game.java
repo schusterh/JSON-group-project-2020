@@ -95,13 +95,13 @@ public class Game {
                     v.setCurrentPoint(v.getNextPoint());
                     v.setNextPoint(v.getPath().get(0));
                 } else {
-                    findPath(v, tick, v.getCurrentCargo().get(0));
+                    findPath(v,tick);
                     drive(v,tick);
                 }
             } else {
                 v.unloadCargo(v.getCurrentCargo().get(0));
                 if (!v.getCurrentCargo().isEmpty())
-                    findPath(v, tick, v.getCurrentCargo().get(0));
+                    findPath(v,tick);
             }
         } if (v.getKind().equals("engine")){
             if (v.getPath()!=null){
@@ -139,70 +139,106 @@ public class Game {
         Factory targetFactory = possTargets.get(randomIndex);
         gb.setTargetStation(this.transportNetwork.getNearStations(targetFactory));
     }
-    public ArrayList<Station> bfs (Station startStation, Station targetStation){
-        ArrayList<Station> shortestPath = new ArrayList<>();
-        PriorityQueue<PrioPair> pq = new PriorityQueue<>();
-        HashMap<Station, Station> origins = new HashMap<>();
-        pq.add(new PrioPair(startStation,0));
+    public ArrayList<Point> bfs (Point startPoint, Station targetStation, String vehicleType, int startTime ){
+
+        ArrayList<Point> shortestPath = new ArrayList<>();
+        Deque<Point> deq = new ArrayDeque<>();
+
+        HashMap<Point, Point> origins = new HashMap<>();
+
+        deq.add(startPoint);
         boolean targetFound = false;
         while (!targetFound){
-            if (pq.peek() != null) {
-                PrioPair currentPair = pq.peek();
-                Station currentStation = currentPair.getStation();
-                HashMap<Station, ArrayList<Point>> nextStations = getTransportNetwork().getAdjStations(currentStation);
-                for (Station s : nextStations.keySet()) {
-                    int dist = nextStations.get(s).size() + currentPair.getDistance();
-                    if (origins.containsKey(s)){
-                        int previousDist = pq.stream().filter(x -> x.getStation()
-                                .equals(s))
-                                .findFirst()
-                                .orElseThrow()
-                                .getDistance();
-                        if (previousDist<dist){
-                            pq.remove(s);
-                            origins.remove(s);
-                            origins.put(s,currentStation);
-                        }
-                    } else { origins.put(s,currentStation); }
+            if (deq.peek() != null) {
 
-                    pq.add(new PrioPair(s, dist));
-                    if (s == targetStation) {
-                        targetFound = true;
-                    }
+                Point currentPoint = deq.peekFirst();
+
+                ArrayList<Point> nextPoints = transportNetwork.getPointConnections().get(currentPoint);
+
+                int depth=0;
+                Point point = deq.peekFirst();
+                while (origins.containsKey(point)){
+                    point = origins.get(point);
+                    depth++;
                 }
-                pq.remove(currentPair);
+                for (Point p : nextPoints) {
+                    if (vehicleType.equals("plane")){
+                        if (!transportNetwork.getReservations().get(p).containsKey(depth+startTime)){
+                            origins.put(p,currentPoint);
+                            deq.add(p);
+                            if (transportNetwork.getStationPoints().get(targetStation).contains(p)){
+                                targetFound = true;
+                                shortestPath.add(p);
+                                Point backtrack = origins.get(p);
+                            }
+                        }
+                    }
+                    if (vehicleType.equals("engine")){
+                        for (TrafficRoute tf : transportNetwork.getRailSections().keySet()){
+                            for (RailSection rs : transportNetwork.getRailSections().get(tf)) {
+                                if (rs.getBetween().contains(p)){
+                                    for (Point b : rs.getBetween()) {
+                                        if (!transportNetwork.getReservations().get(b).containsKey(depth+startTime)){
+                                            origins.put(p,currentPoint);
+                                            deq.add(p);
+                                            if (transportNetwork.getStationPoints().get(targetStation).contains(p)){
+                                                targetFound = true;
+                                                shortestPath.add(p);
+                                                Point backtrack = origins.get(p);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        origins.put(p, currentPoint);
+                        deq.add(p);
+                        if (transportNetwork.getStationPoints().get(targetStation).contains(p)) {
+                            targetFound = true;
+                            shortestPath.add(p);
+                            Point backtrack = origins.get(p);
+                        }
+                    }
+
+                }
+                deq.remove(currentPoint);
+
             } else {
                 throw new IllegalArgumentException("No connecting path can be found.");
             }
         }
-        shortestPath.add(targetStation);
-        Station backtrack = origins.get(targetStation);
-        while (backtrack != null){
-            shortestPath.add(0,backtrack);
+        Point backtrack = shortestPath.get(0);
+        while (backtrack != null) {
+            shortestPath.add(0, backtrack);
             backtrack = origins.get(backtrack);
         }
         return shortestPath;
     }
-    public ArrayList<Point> findPath(Vehicle v, int startTick, GoodsBundle goodsBundle){
-        ArrayList<Point> path = new ArrayList<>();
-        if (v.getKind().equals("road vehicle")){
-            ArrayList<Station> stations = bfs(v.getCurrentStation(),goodsBundle.getTargetStation());
-            int i = 0;
-            while (stations.get(i+1) != null) {
-                for (TrafficRoute tr : transportNetwork.getTrafficRoutes().keySet()){
-                    if (tr.getStations().contains(stations.get(i+1)) && tr.getVehicleType().equals(v.getKind())){
-                        path.addAll(transportNetwork.getAdjStations(stations.get(i)).get(stations.get(i + 1)));
-                        break;
-                    }
-                }
-                i++;
-            }
-        } else if (v.getKind().equals("plane")){
 
+    public ArrayList<Point> findPath(Vehicle v, int startTick){
+        GoodsBundle goodsBundle = v.getCurrentCargo().get(0);
+        ArrayList <Point> path = new ArrayList<>();
 
-        } else if (v.getKind().equals("wagon")){
-
+        if (v.getKind().equals("road vehicle")) {
+            path.addAll(bfs(v.getCurrentPoint(), goodsBundle.getTargetStation(), v.getKind(),startTick));
         }
+
+        if (v.getKind().equals("plane")){
+            path.addAll(bfs (v.getCurrentPoint(), goodsBundle.getTargetStation(),v.getKind(),startTick));
+
+            for (int i = 0; i < path.size(); i++){
+                transportNetwork.addReservations(path.get(i),startTick+i,v);
+            }
+        }
+        if (v.getKind().equals("engine")){
+            path.addAll(bfs (v.getCurrentPoint(), goodsBundle.getTargetStation(), v.getKind(),startTick));
+
+            for (int i = 0; i < path.size(); i++){
+                transportNetwork.addReservations(path.get(i),startTick+i,v);
+            }
+        }
+
         return path;
     }
     public void manageVehicles(TrafficRoute route){
@@ -223,7 +259,7 @@ public class Game {
         }
         for (Vehicle v : route.getVehicles()){
             if (!v.getKind().equals(route.getVehicleType())){
-                route.getVehicles().remove(v);
+                route.removeVehicle(v);
                 manageVehicles(route);
             }
         }

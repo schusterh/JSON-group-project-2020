@@ -1,7 +1,6 @@
 package modell;
 
 import java.nio.charset.StandardCharsets;
-import java.security.Signature;
 import java.util.*;
 
 class Station extends Building{
@@ -145,7 +144,7 @@ public class TransportNetwork {
     ArrayList<String> station_names = new ArrayList<>();
     private HashMap<Station, HashMap<Station, ArrayList<Point>>> adjStations;
     private HashMap<Point, ArrayList<Point>> pointConnections;
-    private HashMap<ArrayList<Station>,ArrayList<Point>> stationConnections;
+    private HashMap<Station,ArrayList<Point>> stationPoints;
     private ArrayList<Point> points;
     private ArrayList<Station> stations;
     private HashMap<TrafficRoute,ArrayList<Point>> trafficRoutes;
@@ -154,11 +153,12 @@ public class TransportNetwork {
     private HashMap<TrafficRoute,ArrayList<RailSection>> railSections;
     private Tower tower;
     private ArrayList<Vehicle> vehicles;
+    private HashMap<Point,HashMap<Integer,Vehicle>> reservations;
 
     public TransportNetwork() {
         this.adjStations = new HashMap<>();
         this.pointConnections = new HashMap<>();
-        this.stationConnections = new HashMap<>();
+        this.stationPoints = new HashMap<>();
         this.points = new ArrayList<>();
         this.stations = new ArrayList<>();
         this.trafficRoutes = new HashMap<>();
@@ -166,6 +166,7 @@ public class TransportNetwork {
         this.signals = new ArrayList<>();
         this.railSections = new HashMap<>();
         this.vehicles = new ArrayList<>();
+        this.reservations = new HashMap<>();
     }
 
     public void addSignal(Point point, String signal) {
@@ -259,9 +260,16 @@ public class TransportNetwork {
         }
     }
 
-    public void addStation(Station s) {
+    public void addStation(Station s, double x, double y) {
         adjStations.putIfAbsent(s, new HashMap<>());
         s.setLabel(stationnameGenerator());
+        for (TrafficRoute route : trafficRoutes.keySet()){
+            for (Point point : route.getPoints()){
+                if (Math.abs(point.getX()-x) <= 1.5 && (Math.abs(point.getY()-y) <= 1.5 )){
+                    route.addStation(s);
+                }
+            }
+        }
     }
 
     public void removeStation(Station s) {
@@ -334,6 +342,10 @@ public class TransportNetwork {
         }
     }
 
+    public HashMap<Station, ArrayList<Point>> getStationPoints() {
+        return stationPoints;
+    }
+
     public boolean equalPoints(Point p1, Point p2){
         double diff = 0.2;
         return Math.abs(p1.getX() - p2.getX()) <= diff && Math.abs(p1.getY() - p2.getY()) <= diff;
@@ -350,6 +362,25 @@ public class TransportNetwork {
 
     HashMap<Station, ArrayList<Point>> getAdjStations(Station s) {
         return adjStations.get(s);
+    }
+
+    public HashMap<Point, ArrayList<Point>> getPointConnections() {
+        return pointConnections;
+    }
+
+    public void addReservations(Point point, Integer tick, Vehicle vehicle) {
+        if (!this.reservations.containsKey(point)) {
+            this.reservations.put(point, new HashMap<>());
+        }
+        this.reservations.get(point).put(tick,vehicle);
+    }
+
+    public HashMap<TrafficRoute, ArrayList<RailSection>> getRailSections() {
+        return railSections;
+    }
+
+    public HashMap<Point, HashMap<Integer, Vehicle>> getReservations() {
+        return reservations;
     }
 
     public ArrayList<Point> getPoints() {
