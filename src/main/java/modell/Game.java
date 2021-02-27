@@ -358,12 +358,23 @@ public class Game {
 
             if (roadModel.getSpecial().isEmpty()) {
                 this.transportNetwork.addTrafficSection((double) pendingBuilding.startX, (double) pendingBuilding.startY, roadModel.getPoints(), roadModel.getRoads());
-                this.possiblyConnectStation(pendingBuilding);
                 System.out.println("Added road to transport network!");
             } else if (roadModel.getSpecial().isPresent()) {
                 if (roadModel.getSpecial().get().equals("busstop")) {
                     System.out.println("Busstop added!");
-                    this.transportNetwork.addStation();
+                    Station newStation = new Station(pendingBuilding.width, pendingBuilding.depth, this.transportNetwork.stationnameGenerator());
+                    ArrayList<OnMapBuilding> adjBuildings = this.getAdjBuildings(pendingBuilding);
+                    if (!adjBuildings.isEmpty()) {
+                        for (OnMapBuilding adjBuilding : adjBuildings) {
+                            if (adjBuilding.model.getClass() == Factory.class) {
+                                newStation.setNearFactory((Factory) adjBuilding.model);
+                                System.out.println("Station " + newStation.getName() + " mit Fabrik " + adjBuilding.model.getName() + " verbunden!");
+                                break;
+                            }
+                        }
+                    }
+                    this.transportNetwork.addStation(newStation, pendingBuilding.getStartX(), pendingBuilding.getStartY());
+                    System.out.println("Neue Station hinzugefügt: " + newStation.getName());
                 }
             }
         }
