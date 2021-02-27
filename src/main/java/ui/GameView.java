@@ -53,8 +53,6 @@ GameView {
        this.gameLoop = new GameLoop(controller);
        this.controller.setGameLoop(this.gameLoop);
        this.renderer = new TileRenderer();
-
-
     }
 
     public void displayGameScreen() {
@@ -68,6 +66,7 @@ GameView {
         Menu lebenMenu = new Menu("Live");
         Menu landscapeMenu = new Menu("Terrain");
         Menu speedMenu = new Menu("Speed");
+        Menu volumeMenu = new Menu("Music");
         Menu exitMenu = new Menu("Exit");
 
         //Creat MenuItems
@@ -78,6 +77,10 @@ GameView {
         MenuItem speichernItem = new MenuItem("Save");
         MenuItem exitItem = new MenuItem("Exit");
 
+        MenuItem fullVolumeItem = new MenuItem("100%");
+        MenuItem halfVolumeItem = new MenuItem("50%");
+        MenuItem muteVolumeItem = new MenuItem("Off");
+
         MenuItem landscapeItem = new MenuItem("Shape");
 
         MenuItem speedItem0 = new MenuItem("0");
@@ -86,6 +89,18 @@ GameView {
         speedItem1.setOnAction(event -> controller.setTickLenght(1));
         MenuItem speedItem2 = new MenuItem("2x");
         speedItem2.setOnAction(event -> controller.setTickLenght(0.5));
+
+        fullVolumeItem.setOnAction(event -> {
+            controller.setVolume(1.0);
+        });
+
+        halfVolumeItem.setOnAction(event -> {
+            controller.setVolume(0.3);
+        });
+
+        muteVolumeItem.setOnAction(event -> {
+            controller.setVolume(0.0);
+        });
 
         // Set Accelerator for Exit MenuItem.
         exitItem.setAccelerator(KeyCombination.keyCombination("Ctrl+E"));
@@ -101,9 +116,10 @@ GameView {
         homeMenu.getItems().addAll(speichernItem, exitItem);
         landscapeMenu.getItems().add(landscapeItem);
         speedMenu.getItems().addAll(speedItem0, speedItem1, speedItem2);
+        volumeMenu.getItems().addAll(fullVolumeItem, halfVolumeItem, muteVolumeItem);
 
         // Add Menus to the MenuBar
-        menuBar.getMenus().addAll(homeMenu, bauenMenu, lebenMenu, landscapeMenu,speedMenu, exitMenu);
+        menuBar.getMenus().addAll(homeMenu, bauenMenu, lebenMenu, landscapeMenu,speedMenu,volumeMenu, exitMenu);
         menuLeiste.setTop(menuBar);
 
 
@@ -179,14 +195,10 @@ GameView {
             }
         }
 
-        bäumeItem.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                topBar.getChildren().remove(borderPane);
-                borderPane.setCenter(hboxNatur);
-                topBar.getChildren().add(borderPane);
-            }
+        bäumeItem.setOnAction(event -> {
+            topBar.getChildren().remove(borderPane);
+            borderPane.setCenter(hboxNatur);
+            topBar.getChildren().add(borderPane);
         });
 
 
@@ -211,14 +223,10 @@ GameView {
         }
 
 
-        straßenItem.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                topBar.getChildren().remove(borderPane);
-                borderPane.setCenter(hboxRoad);
-                topBar.getChildren().add(borderPane);
-            }
+        straßenItem.setOnAction(event -> {
+            topBar.getChildren().remove(borderPane);
+            borderPane.setCenter(hboxRoad);
+            topBar.getChildren().add(borderPane);
         });
 
 
@@ -244,14 +252,10 @@ GameView {
         }
 
 
-        gleiseItem.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                topBar.getChildren().remove(borderPane);
-                borderPane.setCenter(hboxRailway);
-                topBar.getChildren().add(borderPane);
-            }
+        gleiseItem.setOnAction(event -> {
+            topBar.getChildren().remove(borderPane);
+            borderPane.setCenter(hboxRailway);
+            topBar.getChildren().add(borderPane);
         });
 
 
@@ -275,14 +279,10 @@ GameView {
             }
         }
 
-        airportItem.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                topBar.getChildren().remove(borderPane);
-                borderPane.setCenter(hboxAirport);
-                topBar.getChildren().add(borderPane);
-            }
+        airportItem.setOnAction(event -> {
+            topBar.getChildren().remove(borderPane);
+            borderPane.setCenter(hboxAirport);
+            topBar.getChildren().add(borderPane);
         });
 
 
