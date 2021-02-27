@@ -765,7 +765,7 @@ public class JSONImporter {
 
     public ArrayList<String> getMusic(JSONObject music) throws Exception{
         ArrayList<String> m = new ArrayList<>(1);
-        if (!music.has("background_music_path") || !music.has("menu_music_path")) {
+        if (!music.has("background_music_path")) {
             throw new Exception("Music not in a correct format!");
         }
         String path_to_backgroundmusic;
