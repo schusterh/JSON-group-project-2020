@@ -216,14 +216,14 @@ public class Game {
     }
 
     public void addBuildingToMap(Building model, int startX, int startY, int height) {
-        System.out.println(model.getClass());
+
         this.map.plainGround(startX, startY, model.getWidth(), model.getDepth(), height, model.getClass() != Road.class);
         this.buildingsOnMap.add(new OnMapBuilding(model, startX, startY, height));
         this.sortBuildings();
     }
 
     public void addBuildingToMap(OnMapBuilding pendingBuilding) {
-        System.out.println(pendingBuilding.model.getClass());
+
         boolean isConcrete = pendingBuilding.model.getClass() != NatureObject.class && pendingBuilding.model.getClass() != Road.class;
         this.map.plainGround(pendingBuilding.startX, pendingBuilding.startY, pendingBuilding.width, pendingBuilding.depth, pendingBuilding.height, isConcrete);
         this.buildingsOnMap.add(pendingBuilding);

@@ -31,7 +31,7 @@ public class Map {
         int[][] heightMap = mapGen.generateHeightmap();
 
         this.landscapeMap = mapGen.convertHeightMapToTileMap(heightMap);
-        System.out.println("Landscape generation complete!");
+
     }
 
     public int getDepth() {
@@ -80,7 +80,7 @@ public class Map {
                             int neighborHeight = this.landscapeMap[x + neighborX][y + neighborY].height;
                             if (newHeight - neighborHeight > 1 || newHeight - neighborHeight < -1) {
                                 changeRelativeHeightOfTile(x + neighborX, y + neighborY, change);
-                                System.out.println("Updated Tile in Model at [" + x + ", " + y + "]");
+
                             }
                         }
                     }
@@ -94,7 +94,7 @@ public class Map {
             for (int y = startY; y < (startY + depth); y++) {
                 if (isConcrete) this.landscapeMap[x][y].tileIndex = 4;
                 this.landscapeMap[x][y].height = height;
-                System.out.println("Set Tileindex at [" + x + ", " + y + "]");
+
             }
         }
     }

@@ -27,11 +27,13 @@ public class GameController {
     EventHandler<ActionEvent> timelineTask;
     MusicPlayer music;
     GameLoop gameLoop;
+    int tickLenght;
 
     GameMode gameMode;
 
     public GameController(Game model, int tickLength) {
         this.model = model;
+        this.tickLenght = tickLength;
         music = new MusicPlayer(this.model.getBackgroundMusic());
 
         this.timelineTask = event -> {
@@ -40,7 +42,7 @@ public class GameController {
         };
 
         this.timeline = new Timeline(
-                new KeyFrame(Duration.seconds(tickLength),
+                new KeyFrame(Duration.seconds(this.tickLenght),
                         this.timelineTask)
         );
         this.timeline.setCycleCount(Timeline.INDEFINITE);
@@ -72,7 +74,6 @@ public class GameController {
 
     public void startGame() {
         this.view.displayGameScreen();
-        System.out.println("WELL2?");
         this.startAnimation();
         music.playBackgroundMusic();
 
@@ -123,5 +124,16 @@ public class GameController {
     public void startSimulation() {
        // this.view.startview();
         this.startAnimation();
+    }
+
+    public void setTickLenght(double new_Lenght) {
+        this.stopAnimation();
+        this.timeline = new Timeline(
+                new KeyFrame(Duration.seconds(new_Lenght),
+                        this.timelineTask));
+        this.timeline.setCycleCount(Timeline.INDEFINITE);
+        this.startAnimation();
+        System.out.println("GAMESPEEED CHANGEEED!!!!");
+
     }
 }
