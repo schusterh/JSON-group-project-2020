@@ -33,7 +33,7 @@ public class MenuView {
 
     public void displayWelcomeScreen() {
 
-        final String TITLE = "Wirtschaftssimulator";
+        final String TITLE = "GGG";
         final String BUTTON_LABEL = "Choose a scene";
         this.stage.setTitle(TITLE);
 
