@@ -38,6 +38,20 @@ public class Game {
         this.map = map;
         this.music = music;
         this.addFactoriesToMap();
+
+        for(int i = 0; i < 100; i++) {
+            this.addStonesToMap();
+        }
+
+        for(int i = 0; i < 100; i++) {
+            this.addTreesToMap();
+        }
+
+        for (int i = 0; i < 10; i++) {
+            this.addRuinsToMap();
+        }
+
+
     }
 
     public ArrayList<Railway> getRailways() {
@@ -243,6 +257,7 @@ public class Game {
 
     public void addFactoriesToMap() {
         Random r = new Random();
+
         for (Factory factory : this.factories) {
             int posX = r.nextInt(this.map.getWidth()-4);
             int posY = r.nextInt(this.map.getDepth()-4);
@@ -251,9 +266,63 @@ public class Game {
                 posX = r.nextInt(this.map.getWidth()-1);
                 posY = r.nextInt(this.map.getDepth()-1);
             }
+
             this.addBuildingToMap(new OnMapBuilding(factory, posX, posY, this.map.getTile(posX, posY).height));
         }
     }
+
+    public void addTreesToMap() {
+        Random r = new Random();
+        for (NatureObject natob : this.nature_objects) {
+            if (natob.getBuildmenu().isPresent()) {
+                int posX = r.nextInt(this.map.getWidth() - 4);
+                int posY = r.nextInt(this.map.getDepth() - 4);
+
+                while (this.isInMap(posX, posY, natob.getWidth(), natob.getDepth()) && this.isOccupied(posX, posY) && this.isInWater(posX, posY, natob.getWidth(), natob.getDepth())) {
+                    posX = r.nextInt(this.map.getWidth() - 1);
+                    posY = r.nextInt(this.map.getDepth() - 1);
+                }
+                this.addBuildingToMap(new OnMapBuilding(natob, posX, posY, this.map.getTile(posX, posY).height));
+            }
+        }
+    }
+
+    public void addStonesToMap() {
+        Random r = new Random();
+        for (NatureObject natob : this.nature_objects) {
+            if (natob.getName().equals("stone")) {
+                System.out.println(natob.getName());
+                int posX = r.nextInt(this.map.getWidth() - 4);
+                int posY = r.nextInt(this.map.getDepth() - 4);
+
+                while (this.isInMap(posX, posY, natob.getWidth(), natob.getDepth()) && this.isOccupied(posX, posY) && this.isInWater(posX, posY, natob.getWidth(), natob.getDepth())) {
+                    posX = r.nextInt(this.map.getWidth() - 1);
+                    posY = r.nextInt(this.map.getDepth() - 1);
+                }
+                this.addBuildingToMap(new OnMapBuilding(natob, posX, posY, this.map.getTile(posX, posY).height));
+            }
+        }
+    }
+
+
+    public void addRuinsToMap() {
+        Random r = new Random();
+        for (NatureObject natob : this.nature_objects) {
+            if (natob.getName().equals("ruine") || natob.getName().equals("road-ruine") || natob.getName().equals("wohnhaus-ruine")) {
+                System.out.println(natob.getName());
+                int posX = r.nextInt(this.map.getWidth() - 4);
+                int posY = r.nextInt(this.map.getDepth() - 4);
+
+                while (this.isInMap(posX, posY, natob.getWidth(), natob.getDepth()) && this.isOccupied(posX, posY) && !this.isInWater(posX, posY, natob.getWidth(), natob.getDepth())) {
+                    posX = r.nextInt(this.map.getWidth() - 1);
+                    posY = r.nextInt(this.map.getDepth() - 1);
+                }
+                this.addBuildingToMap(new OnMapBuilding(natob, posX, posY, this.map.getTile(posX, posY).height));
+            }
+        }
+    }
+
+
 
     public boolean isOccupied(int x, int y) {
         for (OnMapBuilding building : this.buildingsOnMap) {
