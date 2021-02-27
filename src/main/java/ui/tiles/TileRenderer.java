@@ -12,26 +12,50 @@ public class TileRenderer {
 
     double zoomFactor = 1;
 
+    /**
+     * Increases zoom factor for all layers
+     */
     public void increaseZoomFactor() {
         this.zoomFactor += (this.zoomFactor + 0.5 < 3.5) ? 0.5 : 0.0;
     }
 
+    /**
+     * Decreases zoom factor for all layers
+     */
     public void decreaseZoomFactor() {
         this.zoomFactor -= (this.zoomFactor - 0.5 > 0) ? 0.5 : 0.0;
     }
 
+    /**
+     * Returns landscape layer
+     * @return LandscapeLayer instance
+     */
     public LandscapeLayer getLandscapeLayer() {
         return this.landscapeLayer;
     }
 
+    /**
+     * Sets landscape layer for game instance
+     * @param layer Instance of LandscapeLayer
+     */
     public void addLandscapeLayer(LandscapeLayer layer) {
         this.landscapeLayer = layer;
     }
 
+    /**
+     * Sets building layer for game instance
+     * @param layer Instance of BuildingLayer
+     */
     public void addBuildingLayer(BuildingLayer layer) {
         this.buildingLayer = layer;
     }
 
+    /**
+     * Handles single frame update step
+     * @param gc GraphicsContext that should be drawn on
+     * @param offsetX current X Offset from map
+     * @param offsetY current Y Offset from map
+     */
     public void drawFrame(GraphicsContext gc, int offsetX, int offsetY) {
 
         if (landscapeLayer != null) {
