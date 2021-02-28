@@ -1,6 +1,7 @@
 package modell;
 
 import types.OnMapBuilding;
+import types.Point;
 
 import java.util.*;
 import java.util.stream.Collectors;

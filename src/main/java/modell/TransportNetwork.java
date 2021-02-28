@@ -1,5 +1,7 @@
 package modell;
 
+import types.Point;
+
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -35,23 +37,6 @@ class Station extends Building{
 
     public void setNearFactory(Factory nearFactory) {
         this.nearFactory = nearFactory;
-    }
-}
-
-class Point {
-    Double x;
-    Double y;
-    Point (Double x, Double y){
-        this.x = x;
-        this.y = y;
-    }
-
-    public Double getX() {
-        return x;
-    }
-
-    public Double getY() {
-        return y;
     }
 }
 
@@ -167,6 +152,10 @@ public class TransportNetwork {
         this.railSections = new HashMap<>();
         this.vehicles = new ArrayList<>();
         this.reservations = new HashMap<>();
+    }
+
+    public ArrayList<Vehicle> getVehicles() {
+        return vehicles;
     }
 
     public void addSignal(Point point, String signal) {
