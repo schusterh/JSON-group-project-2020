@@ -400,6 +400,7 @@ public class TransportNetwork {
             for (Point point : route.getPoints()){
                 if (Math.abs(point.getX()-x) <= 3 && (Math.abs(point.getY()-y) <= 3 )){
                     route.addStation(s);
+                    System.out.println("New Station added to route");
                 }
             }
         }
