@@ -493,7 +493,7 @@ public class Game {
             int posX = r.nextInt(this.map.getWidth()-4);
             int posY = r.nextInt(this.map.getDepth()-4);
 
-            while (this.isInMap(posX, posY, factory.getWidth(), factory.getDepth()) && this.isOccupied(posX, posY) && this.isInWater(posX, posY, factory.getWidth(), factory.getDepth())) {
+            while (!this.isInMap(posX, posY, factory.getWidth(), factory.getDepth()) || this.isOccupied(posX, posY) || this.isInWater(posX, posY, factory.getWidth(), factory.getDepth())) {
                 posX = r.nextInt(this.map.getWidth()-1);
                 posY = r.nextInt(this.map.getDepth()-1);
             }
@@ -506,10 +506,10 @@ public class Game {
         Random r = new Random();
         for (NatureObject natob : this.nature_objects) {
             if (natob.getBuildmenu().isPresent()) {
-                int posX = r.nextInt(this.map.getWidth() - 4);
-                int posY = r.nextInt(this.map.getDepth() - 4);
+                int posX = r.nextInt(this.map.getWidth() - 1);
+                int posY = r.nextInt(this.map.getDepth() - 1);
 
-                while (this.isInMap(posX, posY, natob.getWidth(), natob.getDepth()) && this.isOccupied(posX, posY) && this.isInWater(posX, posY, natob.getWidth(), natob.getDepth())) {
+                while (!this.isInMap(posX, posY, natob.getWidth(), natob.getDepth()) || this.isOccupied(posX, posY) || this.isInWater(posX, posY, natob.getWidth(), natob.getDepth())) {
                     posX = r.nextInt(this.map.getWidth() - 1);
                     posY = r.nextInt(this.map.getDepth() - 1);
                 }
@@ -523,10 +523,10 @@ public class Game {
         for (NatureObject natob : this.nature_objects) {
             if (natob.getName().equals("stone")) {
                 System.out.println(natob.getName());
-                int posX = r.nextInt(this.map.getWidth() - 4);
-                int posY = r.nextInt(this.map.getDepth() - 4);
+                int posX = r.nextInt(this.map.getWidth() - natob.getWidth() - 1);
+                int posY = r.nextInt(this.map.getDepth() - natob.getDepth() - 1);
 
-                while (this.isInMap(posX, posY, natob.getWidth(), natob.getDepth()) && this.isOccupied(posX, posY) && this.isInWater(posX, posY, natob.getWidth(), natob.getDepth())) {
+                while (!this.isInMap(posX, posY, natob.getWidth(), natob.getDepth()) || this.isOccupied(posX, posY) || this.isInWater(posX, posY, natob.getWidth(), natob.getDepth())) {
                     posX = r.nextInt(this.map.getWidth() - 1);
                     posY = r.nextInt(this.map.getDepth() - 1);
                 }
@@ -544,7 +544,7 @@ public class Game {
                 int posX = r.nextInt(this.map.getWidth() - 4);
                 int posY = r.nextInt(this.map.getDepth() - 4);
 
-                while (this.isInMap(posX, posY, natob.getWidth(), natob.getDepth()) && this.isOccupied(posX, posY) && !this.isInWater(posX, posY, natob.getWidth(), natob.getDepth())) {
+                while (this.isInMap(posX, posY, natob.getWidth(), natob.getDepth()) && this.isOccupied(posX, posY) && this.isInWater(posX, posY, natob.getWidth(), natob.getDepth())) {
                     posX = r.nextInt(this.map.getWidth() - 1);
                     posY = r.nextInt(this.map.getDepth() - 1);
                 }
@@ -570,14 +570,14 @@ public class Game {
 
     public boolean isInWater(int x, int y, int width, int depth) {
         int waterCount = 0;
-        for (int xCount = 0; xCount < width; xCount++) {
-            for (int yCount = 0; yCount < depth; yCount++) {
-                if (this.map.getTile(xCount, yCount).height == -1) {
+        for (int xPos = x; xPos < x + width; xPos++) {
+            for (int yPos = 0; yPos < y+depth; yPos++) {
+                if (this.map.getTile(xPos, yPos).height == -1) {
                     waterCount++;
                 }
             }
         }
-        return waterCount >= 2;
+        return waterCount >= 1;
     }
 
     public boolean isInMap(int x, int y, int width, int depth) {

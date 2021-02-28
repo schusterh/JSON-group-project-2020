@@ -94,7 +94,6 @@ public class Map {
             for (int y = startY; y < (startY + depth); y++) {
                 if (isConcrete) this.landscapeMap[x][y].tileIndex = 4;
                 this.landscapeMap[x][y].height = height;
-
             }
         }
     }
