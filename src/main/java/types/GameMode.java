@@ -3,5 +3,6 @@ package types;
 public enum GameMode {
     NORMAL,
     TERRAIN,
-    BUILDING
+    BUILDING,
+    DEMOLITION
 }

@@ -12,6 +12,12 @@ public class MapGenerator {
 
     public long seed;
 
+    /**
+     * Instantiates a new map generator instance
+     * @param width width of map
+     * @param height height of map
+     * @param seed random seed for generation
+     */
     public MapGenerator(int width, int height, long seed) {
         this.mapWidth = width;
         this.mapHeight = height;
@@ -19,12 +25,20 @@ public class MapGenerator {
         this.seed = seed;
     }
 
+    /**
+     * Generates a new heightmap for further use
+     * @return int[][] heightmap [-1;3]
+     */
     public int[][] generateHeightmap() {
 
+        // Uses OpenSimplexNoise-Implementation (NOT OURS! Credit in java file for this class)
         OpenSimplexNoise noise = new OpenSimplexNoise(seed);
 
         int[][] mapHeights = new int[this.mapWidth][this.mapHeight];
 
+        /*
+         * Evaluates generated image and parts grey values into discrete steps for rough heightmap generation
+         */
         for (int y = 0; y < this.mapHeight; y++)
         {
             for (int x = 0; x < this.mapWidth; x++)
@@ -51,6 +65,11 @@ public class MapGenerator {
         return mapHeights;
     }
 
+    /**
+     * Converts the generated heightmap into a tilemap for rendering
+     * @param heightMap int[][] heightmap from generateHeightmap
+     * @return Tile[][] Map of tiles
+     */
     public Tile[][] convertHeightMapToTileMap(int[][] heightMap) {
         Random random = new Random(seed);
         Tile[][] tileMap = new Tile[heightMap.length][heightMap[0].length];
@@ -61,6 +80,9 @@ public class MapGenerator {
 
                 Tile tile = new Tile(heightMap[x][y], isLand ? 1 : 0);
 
+                /*
+                 * Adds random grass
+                 */
                 if (isLand) {
                     double nature = random.nextDouble();
                     if (nature < 0.1) {

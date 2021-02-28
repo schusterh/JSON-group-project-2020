@@ -91,13 +91,13 @@ GameView {
      * @param stage      the stage
      */
     public GameView(Game model, GameController controller, Stage stage) {
-       this.model = model;
-       this.controller = controller;
-       this.stage = stage;
+        this.model = model;
+        this.controller = controller;
+        this.stage = stage;
 
-       this.gameLoop = new GameLoop(controller);
-       this.controller.setGameLoop(this.gameLoop);
-       this.renderer = new TileRenderer();
+        this.gameLoop = new GameLoop(controller);
+        this.controller.setGameLoop(this.gameLoop);
+        this.renderer = new TileRenderer();
     }
 
     /**
@@ -111,8 +111,7 @@ GameView {
         //Creat Menus for MenuBar
         Menu homeMenu = new Menu("Home");
         Menu bauenMenu = new Menu("Building");
-        Menu lebenMenu = new Menu("Live");
-        Menu landscapeMenu = new Menu("Terrain");
+        Menu landscapeMenu = new Menu("Edit");
         Menu speedMenu = new Menu("Speed");
         Menu volumeMenu = new Menu("Music");
         Menu languageMenu = new Menu("Language");
@@ -130,7 +129,8 @@ GameView {
         MenuItem halfVolumeItem = new MenuItem("50%");
         MenuItem muteVolumeItem = new MenuItem("Off");
 
-        MenuItem landscapeItem = new MenuItem("Shape");
+        MenuItem landscapeItem = new MenuItem("Terrain");
+        MenuItem demolitionItem = new MenuItem("Demolition");
 
         MenuItem speedItem0 = new MenuItem("0");
         speedItem0.setOnAction(event -> controller.stopAnimation());
@@ -196,7 +196,6 @@ GameView {
             if(homeMenu.getText().equals("Home")) {
             homeMenu.setText("Start");
             bauenMenu.setText("Bauen");
-            lebenMenu.setText("Leben");
             landscapeMenu.setText("Landschaft");
             speedMenu.setText("Geschwindigkeit");
             volumeMenu.setText("Musik");
@@ -215,7 +214,6 @@ GameView {
             else {
                 homeMenu.setText("Home");
                 bauenMenu.setText("Building");
-                lebenMenu.setText("Live");
                 landscapeMenu.setText("Terrain");
                 speedMenu.setText("Speed");
                 volumeMenu.setText("Music");
@@ -237,10 +235,43 @@ GameView {
         exitItem.setAccelerator(KeyCombination.keyCombination("Ctrl+E"));
 
         landscapeItem.setOnAction(event -> controller.setGameMode(GameMode.TERRAIN));
+        demolitionItem.setOnAction(event -> controller.setGameMode(GameMode.DEMOLITION));
 
         // Close Game with Exit
         exitItem.setOnAction(event -> System.exit(0));
 
+        BorderPane menuLeiste = new BorderPane();
+        // Add menuItems to the Menus
+        bauenMenu.getItems().addAll(straßenItem, gleiseItem, airportItem, bäumeItem);
+        homeMenu.getItems().addAll(exitItem);
+        landscapeMenu.getItems().addAll(landscapeItem, demolitionItem);
+        speedMenu.getItems().addAll(speedItem0, speedItem1, speedItem2);
+        volumeMenu.getItems().addAll(fullVolumeItem, halfVolumeItem, muteVolumeItem);
+        languageMenu.getItems().addAll(changeLang);
+
+        // Add Menus to the MenuBar
+        menuBar.getMenus().addAll(homeMenu, bauenMenu, landscapeMenu,speedMenu,volumeMenu);
+        menuLeiste.setTop(menuBar);
+
+
+
+        //Label messageLabel = new Label("Pflanze neue Bäume:");
+
+        //HBox hbox = new HBox();
+        HBox hboxNatur = new HBox();
+        HBox hboxRoad = new HBox();
+        //HBox hboxBuildings = new HBox();
+        HBox hboxRailway = new HBox();
+        HBox hboxAirport = new HBox();
+
+        BorderPane borderPane = new BorderPane();
+        borderPane.setStyle("-fx-background-color: #FFFFFF;");
+
+
+        borderPane.setBottom(closeButton);
+        //borderPane.setCenter(hbox);
+        //borderPane.setTop(messageLabel);
+        //borderPane.setPrefSize(1024,150);
 
         this.landscapeLayer = new LandscapeLayer(this.model, this.controller, this.TILE_DIMENSION, this.TILE_HEIGHT_OFFSET);
         this.buildingLayer = new BuildingLayer(this.model, this.controller, this.TILE_DIMENSION, this.TILE_HEIGHT_OFFSET);
