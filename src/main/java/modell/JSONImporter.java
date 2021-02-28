@@ -163,6 +163,7 @@ public class JSONImporter {
                 ArrayList<HashMap<String, Integer>> cargo = null;
                 if (vehicle.has("cargo")) {
                     try {
+
                         cargo = new ArrayList<>();
                         JSONArray cargo_data = new JSONArray();
                         if (vehicle.get("cargo") instanceof JSONObject) {
