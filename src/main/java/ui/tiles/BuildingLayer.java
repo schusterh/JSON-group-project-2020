@@ -113,7 +113,7 @@ public class BuildingLayer implements RenderLayer {
                 gc.drawImage(toBePlacedBuilding.graphic, startPos[0], startPos[1], toBePlacedBuilding.graphic.getWidth() * zoomFactor, toBePlacedBuilding.graphic.getHeight() * zoomFactor);
 
             }
-            gc.setGlobalAlpha(1f);
+            //gc.setGlobalAlpha(1.0);
             gc.setEffect(null);
         }
     }
