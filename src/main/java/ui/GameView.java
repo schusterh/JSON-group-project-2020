@@ -143,7 +143,6 @@ GameView {
         //borderPane.setPrefSize(1024,150);
 
         this.landscapeLayer = new LandscapeLayer(this.model, this.controller, this.TILE_DIMENSION, this.TILE_HEIGHT_OFFSET);
-        System.out.println("BLUBS?");
         this.buildingLayer = new BuildingLayer(this.model, this.controller, this.TILE_DIMENSION, this.TILE_HEIGHT_OFFSET);
         landscapeLayer.makeInteractable(this.gameLoop);
         this.renderer.addLandscapeLayer(landscapeLayer);

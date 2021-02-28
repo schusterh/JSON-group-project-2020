@@ -59,6 +59,10 @@ public class BuildingLayer implements RenderLayer {
         this.toBePlacedBuilding = new OnMapBuilding(model, 0, 0, 2);
     }
 
+    public boolean isPendingBuildingCombination() {
+        return this.combinationOverlay != null;
+    }
+
     public OnMapBuilding getToBePlacedBuilding() {
         return this.combinationOverlay != null ? this.combinationOverlay : this.toBePlacedBuilding;
     }
