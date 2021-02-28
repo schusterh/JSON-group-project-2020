@@ -107,9 +107,6 @@ public class GameLoop {
             this.mouseX = ((int)event.getX());
             this.mouseY = ((int)event.getY());
         });
-
-
-
     }
 
     public void startGame() {

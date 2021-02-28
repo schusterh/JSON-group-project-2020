@@ -54,6 +54,10 @@ public class GameController {
         this.timeline.setCycleCount(Timeline.INDEFINITE);
     }
 
+    public void setVolume(double volume) {
+        this.music.setVolume(volume);
+    }
+
     public void setGameLoop(GameLoop loop) {
         this.gameLoop = loop;
     }
@@ -99,7 +103,7 @@ public class GameController {
 
         if (pendingBuilding.model.getClass() == Road.class) {
             Road pendingRoad = (Road) pendingBuilding.model;
-            if (!pendingRoad.getSpecial().isPresent()) {
+            if (pendingRoad.getSpecial().isEmpty()) {
                 ArrayList<OnMapBuilding> adjRoads = this.model.getAdjRoads(pendingBuilding);
                 return !adjRoads.isEmpty();
             }
