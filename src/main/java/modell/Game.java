@@ -653,16 +653,6 @@ public class Game {
      * Randomly places all possible factories on the map
      */
     public void addFactoriesToMap() {
-
-        for (Factory factory : this.factories) {
-            if (factory.getName().equals("kieswerk")) {
-                this.addBuildingToMap(new OnMapBuilding(factory, 3, 3, this.map.getTile(3, 3).height), false);
-            } else if (factory.getName().equals("glasfabrik")) {
-                this.addBuildingToMap(new OnMapBuilding(factory, 1, 9, this.map.getTile(1, 9).height), false);
-            }
-        }
-
-        /*
         Random r = new Random();
 
         for (Factory factory : this.factories) {
@@ -675,7 +665,7 @@ public class Game {
             }
 
             this.addBuildingToMap(new OnMapBuilding(factory, posX, posY, this.map.getTile(posX, posY).height), false);
-        }*/
+        }
     }
 
     /**
