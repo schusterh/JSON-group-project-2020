@@ -177,6 +177,7 @@ public class Game {
             if (transportNetwork.getPointConnections().containsKey(v.getNextPoint())){
                 v.setCurrentPoint(v.getNextPoint());
                 v.setNextPoint(v.getPath().get(0));
+                v.getPath().remove(0);
             } else {
                 findPath(v,tick);
                 drive(v,tick);
@@ -192,9 +193,9 @@ public class Game {
     /**
      * Ein Güterpaket sucht sich von seiner ursprünglichen Fabrik aus ein Ziel
      * @param gb: Güterpaket
-     * @param f: Ursprungs-Fabrik
+     * @param station: Ursprungs-Station
      */
-    public void findTarget(GoodsBundle gb, Factory f){
+    public void findTarget(GoodsBundle gb, Station station){
         HashMap<Factory, Double> possibleTargets = new HashMap<>();
         ArrayList<Factory> possTargets = new ArrayList<>();
         for (Factory g : this.getFactories()) {
@@ -202,16 +203,15 @@ public class Game {
                     .isPresent()).filter(p -> p.getConsume().get()
                     .containsKey(gb.getGoodType()))
                     .forEach(p -> possibleTargets.put(g, null));
-            Station nearF = transportNetwork.getNearStations(f);
             Station nearG = transportNetwork.getNearStations(g);
             double distance = Math.sqrt((transportNetwork.getStationPoints().get(nearG).get(0).getX()
-                    - transportNetwork.getStationPoints().get(nearF).get(0).getX())
+                    - transportNetwork.getStationPoints().get(station).get(0).getX())
                     * (transportNetwork.getStationPoints().get(nearG).get(0).getX()
-                    - transportNetwork.getStationPoints().get(nearF).get(0).getX())
+                    - transportNetwork.getStationPoints().get(station).get(0).getX())
                     + (transportNetwork.getStationPoints().get(nearG).get(0).getY()
-                    - transportNetwork.getStationPoints().get(nearF).get(0).getY())
+                    - transportNetwork.getStationPoints().get(station).get(0).getY())
                     * (transportNetwork.getStationPoints().get(nearG).get(0).getY()
-                    - transportNetwork.getStationPoints().get(nearF).get(0).getY()
+                    - transportNetwork.getStationPoints().get(station).get(0).getY()
                     ));
             double weight = (double) (g.getStorage().get(gb.getGoodType())
                     - g.getCurrentStorage().get(gb.getGoodType()))
@@ -267,7 +267,8 @@ public class Game {
                         if (!transportNetwork.getReservations().get(p).containsKey(depth+startTime)){
                             origins.put(p,currentPoint);
                             deq.add(p);
-                            if (transportNetwork.getStationPoints().get(targetStation).equals(p)){
+
+                            if (transportNetwork.getStationPoints().get(targetStation).contains(p)){
                                 targetFound = true;
                                 shortestPath.add(p);
                                 Point backtrack = origins.get(p);
@@ -371,8 +372,12 @@ public class Game {
             }
             Random rand = new Random();
             for (int i = 0; i < Math.abs(diff);i++){
-                route.addVehicle(possVehicles.get(rand.nextInt(possVehicles.size())));
-                vehiclesOnMap.add(possVehicles.get(rand.nextInt(possVehicles.size())));
+                Vehicle vehicle = possVehicles.get(rand.nextInt(possVehicles.size()));
+                route.addVehicle(vehicle);
+                vehiclesOnMap.add(vehicle);
+                vehicle.setCurrentPoint(transportNetwork.getStationPoints().get(route.getStations().get(0)).get(0));
+
+
             }
         }
         for (Vehicle v : route.getVehicles()){
@@ -802,7 +807,7 @@ public class Game {
     public void handleUpdate(int tick) {
         if (!factoriesOnMap.isEmpty()) {
             for (Factory factory : factoriesOnMap) {
-                factory.produce();
+                factory.produce(transportNetwork.getNearStations(factory));
             }
         }
         for (TrafficRoute trafficRoute : transportNetwork.getTrafficRoutes().keySet()){
@@ -812,6 +817,13 @@ public class Game {
             for (Vehicle v : vehiclesOnMap) {
                 drive(v, tick);
 
+            }
+        }
+        for (Station station:transportNetwork.getStationPoints().keySet()) {
+            for (GoodsBundle goodsBundle : station.getHoldingArea()){
+                if (goodsBundle.getTargetStation() == null){
+                    findTarget(goodsBundle,station);
+                }
             }
         }
         System.out.println("läuft");
