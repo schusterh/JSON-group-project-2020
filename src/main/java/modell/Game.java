@@ -192,9 +192,9 @@ public class Game {
     /**
      * Ein Güterpaket sucht sich von seiner ursprünglichen Fabrik aus ein Ziel
      * @param gb: Güterpaket
-     * @param f: Ursprungs-Fabrik
+     * @param station: Ursprungs-Station
      */
-    public void findTarget(GoodsBundle gb, Factory f){
+    public void findTarget(GoodsBundle gb, Station station){
         HashMap<Factory, Double> possibleTargets = new HashMap<>();
         ArrayList<Factory> possTargets = new ArrayList<>();
         for (Factory g : this.getFactories()) {
@@ -202,16 +202,15 @@ public class Game {
                     .isPresent()).filter(p -> p.getConsume().get()
                     .containsKey(gb.getGoodType()))
                     .forEach(p -> possibleTargets.put(g, null));
-            Station nearF = transportNetwork.getNearStations(f);
             Station nearG = transportNetwork.getNearStations(g);
             double distance = Math.sqrt((transportNetwork.getStationPoints().get(nearG).get(0).getX()
-                    - transportNetwork.getStationPoints().get(nearF).get(0).getX())
+                    - transportNetwork.getStationPoints().get(station).get(0).getX())
                     * (transportNetwork.getStationPoints().get(nearG).get(0).getX()
-                    - transportNetwork.getStationPoints().get(nearF).get(0).getX())
+                    - transportNetwork.getStationPoints().get(station).get(0).getX())
                     + (transportNetwork.getStationPoints().get(nearG).get(0).getY()
-                    - transportNetwork.getStationPoints().get(nearF).get(0).getY())
+                    - transportNetwork.getStationPoints().get(station).get(0).getY())
                     * (transportNetwork.getStationPoints().get(nearG).get(0).getY()
-                    - transportNetwork.getStationPoints().get(nearF).get(0).getY()
+                    - transportNetwork.getStationPoints().get(station).get(0).getY()
                     ));
             double weight = (double) (g.getStorage().get(gb.getGoodType())
                     - g.getCurrentStorage().get(gb.getGoodType()))
@@ -807,7 +806,7 @@ public class Game {
     public void handleUpdate(int tick) {
         if (!factoriesOnMap.isEmpty()) {
             for (Factory factory : factoriesOnMap) {
-                factory.produce();
+                factory.produce(transportNetwork.getNearStations(factory));
             }
         }
         for (TrafficRoute trafficRoute : transportNetwork.getTrafficRoutes().keySet()){
@@ -817,6 +816,13 @@ public class Game {
             for (Vehicle v : vehiclesOnMap) {
                 drive(v, tick);
 
+            }
+        }
+        for (Station station:transportNetwork.getStationPoints().keySet()) {
+            for (GoodsBundle goodsBundle : station.getHoldingArea()){
+                if (goodsBundle.getTargetStation() == null){
+                    findTarget(goodsBundle,station);
+                }
             }
         }
         System.out.println("läuft");
