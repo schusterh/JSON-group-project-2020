@@ -162,7 +162,7 @@ GameView {
         languageMenu.getItems().addAll(changeLang);
 
         // Add Menus to the MenuBar
-        menuBar.getMenus().addAll(homeMenu, bauenMenu, lebenMenu, landscapeMenu,speedMenu,volumeMenu,languageMenu);
+        menuBar.getMenus().addAll(homeMenu, bauenMenu, landscapeMenu,speedMenu,volumeMenu,languageMenu);
 
         BorderPane menuLeiste = new BorderPane();
         menuLeiste.setTop(menuBar);
@@ -239,8 +239,6 @@ GameView {
 
         // Close Game with Exit
         exitItem.setOnAction(event -> System.exit(0));
-
-        BorderPane menuLeiste = new BorderPane();
         // Add menuItems to the Menus
         bauenMenu.getItems().addAll(straßenItem, gleiseItem, airportItem, bäumeItem);
         homeMenu.getItems().addAll(exitItem);
@@ -255,16 +253,6 @@ GameView {
 
 
 
-        //Label messageLabel = new Label("Pflanze neue Bäume:");
-
-        //HBox hbox = new HBox();
-        HBox hboxNatur = new HBox();
-        HBox hboxRoad = new HBox();
-        //HBox hboxBuildings = new HBox();
-        HBox hboxRailway = new HBox();
-        HBox hboxAirport = new HBox();
-
-        BorderPane borderPane = new BorderPane();
         borderPane.setStyle("-fx-background-color: #FFFFFF;");
 
 
