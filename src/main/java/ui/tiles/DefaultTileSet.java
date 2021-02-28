@@ -17,6 +17,14 @@ public class DefaultTileSet implements TileSet {
     public final int TILE_WIDTH;
     public final int TILE_HEIGHT;
 
+    /**
+     * Tileset constructor
+     * @param tileSetPath
+     * @param colCount
+     * @param rowCount
+     * @param tileWidth
+     * @param tileHeight
+     */
     public DefaultTileSet(String tileSetPath, int colCount, int rowCount, int tileWidth, int tileHeight) {
         this.colCount = colCount;
         this.rowCount = rowCount;

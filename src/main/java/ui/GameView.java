@@ -45,6 +45,12 @@ GameView {
     final int TILE_DIMENSION = 138;
     final int TILE_HEIGHT_OFFSET = 26;
 
+    /**
+     *
+     * @param model
+     * @param controller
+     * @param stage
+     */
     public GameView(Game model, GameController controller, Stage stage) {
        this.model = model;
        this.controller = controller;
