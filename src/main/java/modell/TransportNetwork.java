@@ -1,9 +1,11 @@
 package modell;
 
-import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+/**
+ *
+ */
 class Station extends Building{
     private ArrayList<GoodsBundle> holdingArea;
     private String label;
@@ -66,7 +68,7 @@ class TrafficRoute {
     private String vehicleType;
     private int vehicleAmount;
     private ArrayList<Vehicle> vehicles;
-    private ArrayList<Point> points;
+    private ArrayList<Point> points = new ArrayList<>();
 
 
     public TrafficRoute(ArrayList<Station> stations, String vehicleType, int vehicleAmount, ArrayList<Vehicle> vehicles){
@@ -230,36 +232,39 @@ public class TransportNetwork {
             for (Station s : stationPoints.keySet()) {
                 for (Point p : stationPoints.get(s)) {
                     if (Math.abs(p.getX() - xPos) <= 3 && (p.getY() - yPos) <= 3) {
-
+                        boolean routeExists = false;
                         for (TrafficRoute trafficRoute : trafficRoutes.keySet()) {
                             if (trafficRoute.getStations().contains(s)) {
-                                //trafficRouteExists = true;
+                                routeExists = true;
                                 for (String point : newPoints.keySet()) {
-                                    Point newPoint = new Point(newPoints.get(point).get(0), newPoints.get(point).get(1));
+                                    Point newPoint = new Point(newPoints.get(point).get(0)+xPos, newPoints.get(point).get(1)+yPos);
                                     trafficRoute.addPoints(newPoint);
                                     System.out.println("New Point added to Route!");
                                     addedToRoute = true;
                                 }
-                            } else {
-                                String vehicleType = "";
-                                if (type.getName().equals("Road")) {
-                                    vehicleType = "road vehicle";
-                                }
-                                if (type.getName().equals("Railway")) {
-                                    vehicleType = "engine";
-                                }
-                                if (type.getName().equals("AirportObject")) {
-                                    vehicleType = "plane";
-                                }
-
-                                TrafficRoute newRoute = new TrafficRoute(new ArrayList<Station>(), vehicleType, 1, new ArrayList<Vehicle>());
-                                trafficRoute.addStation(s);
-                                System.out.println("New Route!");
-                                addedToRoute = true;
+                            }
+                        }
+                        if (trafficRoutes.isEmpty() || !routeExists){
+                            String vehicleType = "";
+                            if (type.getName().equals("modell.Road")) {
+                                vehicleType = "road vehicle";
+                            }
+                            if (type.getName().equals("modell.Railway")) {
+                                vehicleType = "engine";
+                            }
+                            if (type.getName().equals("modell.AirportObject")) {
+                                vehicleType = "plane";
                             }
 
-                        // (!trafficRouteExists) {
-
+                            TrafficRoute newRoute = new TrafficRoute(new ArrayList<Station>(), vehicleType, 1, new ArrayList<Vehicle>());
+                            newRoute.addStation(s);
+                            trafficRoutes.put(newRoute,new ArrayList<>());
+                            for (String point : newPoints.keySet()) {
+                                trafficRoutes.get(newRoute).add(new Point(newPoints.get(point).get(0)+xPos,
+                                        newPoints.get(point).get(1)+yPos));
+                            }
+                            System.out.println("New Route!");
+                            addedToRoute = true;
                         }
                     }
 
