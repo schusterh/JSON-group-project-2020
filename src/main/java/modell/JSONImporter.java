@@ -955,7 +955,7 @@ public class JSONImporter {
         catch (Exception error1) {
             throw new Exception("Path to background music in music not in a correct format!");
         }
-        if (!new File("path/to/file.txt").isFile()) {
+        if (getClass().getResourceAsStream("/music/" + path_to_backgroundmusic) == null) {
             throw new Exception("File for background music not found!");
         }
 
