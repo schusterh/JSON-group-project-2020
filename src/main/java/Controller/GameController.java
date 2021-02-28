@@ -42,6 +42,7 @@ public class GameController {
         this.tickLenght = tickLength;
         this.currentTick = 0;
         music = new MusicPlayer(this.model.getBackgroundMusic());
+        this.gameMode = GameMode.NORMAL;
 
         this.timelineTask = event -> {
             this.currentTick++;

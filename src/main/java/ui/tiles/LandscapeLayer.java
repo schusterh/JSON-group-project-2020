@@ -13,8 +13,6 @@ import ui.RenderLayer;
 
 import java.util.ArrayList;
 
-
-
 public class LandscapeLayer implements RenderLayer {
 
     final String TILE_SET_URI = "tilesets/finalTiles.png";
