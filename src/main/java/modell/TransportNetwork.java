@@ -4,13 +4,19 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
- *
+ * Stationen haben unbegrenzten Platz für Güter, einen eindeutigen Namen, und können in der Nähe einer Fabrik stehen.
  */
 class Station extends Building{
     private ArrayList<GoodsBundle> holdingArea;
     private String label;
     private Factory nearFactory;
 
+    /**
+     *
+     * @param width
+     * @param depth
+     * @param name
+     */
     Station(int width, int depth, String name){
         super(width,depth, name);
         this.holdingArea = new ArrayList<>();
@@ -58,10 +64,10 @@ class Point {
     }
 }
 
-/*
-Routen verbinden mehrere Stationen miteinander, beginnen und enden an Stationen und haben
-festgelegte Verkehrsmittel. Sie müssen nicht zwangsweise Fabriken verbinden.
-Wenn die Anzahl oder der Typ von Fahrzeugen nicht stimmt, werden diese gelöscht.
+/**
+ * Routen verbinden mehrere Stationen miteinander, beginnen und enden an Stationen und haben
+ * festgelegte Verkehrsmittel. Sie müssen nicht zwangsweise Fabriken verbinden.
+ * Wenn die Anzahl oder der Typ von Fahrzeugen nicht stimmt, werden diese gelöscht.
  */
 class TrafficRoute {
     private ArrayList<Station> stations;
@@ -70,7 +76,13 @@ class TrafficRoute {
     private ArrayList<Vehicle> vehicles;
     private ArrayList<Point> points = new ArrayList<>();
 
-
+    /**
+     *
+     * @param stations: Stationen auf dieser Route
+     * @param vehicleType: Fahrzeugtyp, also Road vehicle, Engine, oder Plane
+     * @param vehicleAmount: erlaubte Anzahl an Fahrzeugen auf dieser Strecke
+     * @param vehicles: Fahrzeuge auf dieser Strecke
+     */
     public TrafficRoute(ArrayList<Station> stations, String vehicleType, int vehicleAmount, ArrayList<Vehicle> vehicles){
         this.stations = stations;
         this.vehicleType = vehicleType;
@@ -122,10 +134,21 @@ class TrafficRoute {
 
 
 }
+
+/**
+ * RailSection (Schienenblöcke) sind eine Reihe von Schienen (Railway), die durch zwei Signale abgeteilt sind.
+ */
 class RailSection {
     private String signal1;
     private String signal2;
     private ArrayList<Point> between;
+
+    /**
+     *
+     * @param signal1
+     * @param signal2
+     * @param between: Punkte zwischen diesen beiden Signalen
+     */
     public RailSection(String signal1, String signal2,ArrayList<Point> between){
         this.signal1 = signal1;
         this.signal2 = signal2;
@@ -146,27 +169,31 @@ class RailSection {
     }
 }
 
+/**
+ * Das Transportnetzwerk besteht aus Stationen und Verbindungen.
+ */
 public class TransportNetwork {
+
     ArrayList<String> station_names = new ArrayList<>();
-    private HashMap<Station, HashMap<Station, ArrayList<Point>>> adjStations;
+    //private HashMap<Station, HashMap<Station, ArrayList<Point>>> adjStations;
     private HashMap<Point, ArrayList<Point>> pointConnections;
-    private HashMap<Station,ArrayList<Point>> stationPoints;
+    private HashMap<Station,ArrayList<Point>> stations;
     private ArrayList<Point> points;
-    private ArrayList<Station> stations;
+    //private ArrayList<Station> stations;
     private HashMap<TrafficRoute,ArrayList<Point>> trafficRoutes;
+    private HashMap<TrafficRoute,ArrayList<RailSection>> railSections;
     private HashMap<Factory, Station> nearStations;
     private ArrayList<String> signals;
-    private HashMap<TrafficRoute,ArrayList<RailSection>> railSections;
     private Tower tower;
     private ArrayList<Vehicle> vehicles;
     private HashMap<Point,HashMap<Integer,Vehicle>> reservations;
 
     public TransportNetwork() {
-        this.adjStations = new HashMap<>();
+        //this.adjStations = new HashMap<>();
         this.pointConnections = new HashMap<>();
-        this.stationPoints = new HashMap<>();
+        this.stations = new HashMap<>();
         this.points = new ArrayList<>();
-        this.stations = new ArrayList<>();
+        //this.stations = new ArrayList<>();
         this.trafficRoutes = new HashMap<>();
         this.nearStations = new HashMap<>();
         this.signals = new ArrayList<>();
@@ -229,8 +256,8 @@ public class TransportNetwork {
         //nur für objekte, die punkte und punktverbindungen auf der karte hinzufügenw
         boolean addedToRoute = false;
         while (!addedToRoute) {
-            for (Station s : stationPoints.keySet()) {
-                for (Point p : stationPoints.get(s)) {
+            for (Station s : stations.keySet()) {
+                for (Point p : stations.get(s)) {
                     if (Math.abs(p.getX() - xPos) <= 3 && (p.getY() - yPos) <= 3) {
                         boolean routeExists = false;
                         for (TrafficRoute trafficRoute : trafficRoutes.keySet()) {
@@ -312,10 +339,10 @@ public class TransportNetwork {
     }
 
     public void addStation(Station s, double x, double y) {
-        adjStations.putIfAbsent(s, new HashMap<>());
+        //adjStations.putIfAbsent(s, new HashMap<>());
         s.setLabel(stationnameGenerator());
-        stationPoints.put(s,new ArrayList<Point>());
-        stationPoints.get(s).add(new Point(x,y));
+        stations.put(s,new ArrayList<Point>());
+        stations.get(s).add(new Point(x,y));
 
 
         for (TrafficRoute route : trafficRoutes.keySet()){
@@ -328,8 +355,15 @@ public class TransportNetwork {
     }
 
     public void removeStation(Station s) {
-        adjStations.values().forEach(e -> e.remove(s));
-        adjStations.remove(s);
+        //adjStations.values().forEach(e -> e.remove(s));
+        //adjStations.remove(s);
+        for (TrafficRoute route : trafficRoutes.keySet() ) {
+            for (Station station : route.getStations()){
+                if (station == s){
+                    route.removeStation(s);
+                }
+            }
+        }
     }
 
 
@@ -382,11 +416,11 @@ public class TransportNetwork {
 
         }
 
-        adjStations.get(s1).put(s2, distance);
-        adjStations.get(s2).put(s1, distance);
+        //adjStations.get(s1).put(s2, distance);
+        //adjStations.get(s2).put(s1, distance);
     }
 
-    public void removeConnection(Station s1, Station s2) {
+    /*public void removeConnection(Station s1, Station s2) {
         HashMap<Station, ArrayList<Point>> connectS1 = adjStations.get(s1);
         HashMap<Station, ArrayList<Point>> connectS2 = adjStations.get(s2);
         if (connectS1 != null) {
@@ -397,8 +431,10 @@ public class TransportNetwork {
         }
     }
 
+     */
+
     public HashMap<Station, ArrayList<Point>> getStationPoints() {
-        return stationPoints;
+        return stations;
     }
 
     public boolean equalPoints(Point p1, Point p2){
@@ -417,9 +453,11 @@ public class TransportNetwork {
         return nearStations.get(f);
     }
 
-    HashMap<Station, ArrayList<Point>> getAdjStations(Station s) {
+    /*HashMap<Station, ArrayList<Point>> getAdjStations(Station s) {
         return adjStations.get(s);
     }
+
+     */
 
     public HashMap<Point, ArrayList<Point>> getPointConnections() {
         return pointConnections;
