@@ -18,6 +18,7 @@ public class Vehicle {
     private HashMap<Station,String> cargoTarget;
     private Point currentPoint;
     private Point nextPoint;
+    private ArrayList<Vehicle> possibleWagons;
 
     // Konstruktor
     public Vehicle(String name,String kind, String graphic, double speed, Optional<ArrayList<HashMap<String,Integer>>> cargo){
@@ -27,6 +28,7 @@ public class Vehicle {
         this.graphic = graphic;
         this.speed = speed;
         this.cargo = cargo;
+        this.possibleWagons = new ArrayList<>();
 
     }
 
@@ -106,6 +108,18 @@ public class Vehicle {
 
     public ArrayList<GoodsBundle> getCurrentCargo() {
         return currentCargo;
+    }
+
+    public void addWagon(Vehicle wagon) {
+        this.possibleWagons.add(wagon);
+    }
+
+    public void removeWagon(Vehicle wagon) {
+        this.possibleWagons.remove(wagon);
+    }
+
+    public ArrayList<Vehicle> getPossibleWagons() {
+        return this.possibleWagons;
     }
 }
 

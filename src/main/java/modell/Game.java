@@ -6,6 +6,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
+/**
+ * This class represents the acutal game with all its components.
+ * Most of the objects that can be seen in the game are stored in arraylists of a specific type.
+ */
 public class Game {
 
     private ArrayList<Vehicle> vehicles;
@@ -24,8 +28,25 @@ public class Game {
     private TransportNetwork transportNetwork;
     private HashMap<String, int[]> directions;
 
+    /**
+     * The Current mouse tile index.
+     */
     int[] currentMouseTileIndex;
 
+    /**
+     * Instantiates a new Game.
+     *
+     * @param commodities     the commodities
+     * @param roads           the roads
+     * @param railways        the railways
+     * @param towers          the towers
+     * @param airport_objects the airport objects
+     * @param nature_objects  the nature objects
+     * @param factories       the factories
+     * @param vehicles        the vehicles
+     * @param map             the map
+     * @param music           the music
+     */
     public Game(ArrayList<String> commodities, ArrayList<Road> roads, ArrayList<Railway> railways, ArrayList<Tower> towers
     , ArrayList<AirportObject> airport_objects, ArrayList<NatureObject> nature_objects, ArrayList<Factory> factories,
                 ArrayList<Vehicle> vehicles, Map map, ArrayList<String> music) {
@@ -49,6 +70,8 @@ public class Game {
         this.directions.put("sw", new int[]{0,-1});
         this.directions.put("nw", new int[]{-1,0});
 
+
+        // the amount of trees,stones and ruins that will be randomly placed on the map
         for(int i = 0; i < 100; i++) {
             this.addStonesToMap();
         }
@@ -64,38 +87,83 @@ public class Game {
 
     }
 
+    /**
+     * Gets railways.
+     *
+     * @return the railways
+     */
     public ArrayList<Railway> getRailways() {
         return railways;
     }
 
+    /**
+     * Gets factories.
+     *
+     * @return the factories
+     */
     public ArrayList<Factory> getFactories() {
         return factories;
     }
 
+    /**
+     * Gets roads.
+     *
+     * @return the roads
+     */
     public ArrayList<Road> getRoads() {
         return roads;
     }
 
+    /**
+     * Gets nature objects.
+     *
+     * @return the nature objects
+     */
     public ArrayList<NatureObject> getNatureObjects() {
         return nature_objects;
     }
 
+    /**
+     * Gets commodities.
+     *
+     * @return the commodities
+     */
     public ArrayList<String> getCommodities() {
         return commodities;
     }
 
+    /**
+     * Gets vehicles.
+     *
+     * @return the vehicles
+     */
     public ArrayList<Vehicle> getVehicles() {
         return vehicles;
     }
 
+    /**
+     * Gets airport objects.
+     *
+     * @return the airport objects
+     */
     public ArrayList<AirportObject> getAirportObjects() {
         return airport_objects;
     }
 
+    /**
+     * Gets towers.
+     *
+     * @return the towers
+     */
     public ArrayList<Tower> getTowers() {
         return towers;
     }
 
+    /**
+     * Gets buildings on map.
+     *
+     * @return the buildings on map
+     */
     public List<OnMapBuilding> getBuildingsOnMap() { return buildingsOnMap; }
 
     /**
@@ -316,6 +384,14 @@ public class Game {
         }
     }
 
+    /**
+     * Add building to map.
+     *
+     * @param model  the model
+     * @param startX the start x
+     * @param startY the start y
+     * @param height the height
+     */
     public void addBuildingToMap(Building model, int startX, int startY, int height) {
 
         this.map.plainGround(startX, startY, model.getWidth(), model.getDepth(), height, model.getClass() != Road.class);
@@ -323,6 +399,12 @@ public class Game {
         this.sortBuildings();
     }
 
+    /**
+     * Add building to map.
+     *
+     * @param pendingBuilding the pending building
+     * @param isCombination   the is combination
+     */
     public void addBuildingToMap(OnMapBuilding pendingBuilding, boolean isCombination) {
 
         boolean isConcrete = pendingBuilding.model.getClass() != NatureObject.class && pendingBuilding.model.getClass() != Road.class;
@@ -458,6 +540,13 @@ public class Game {
         this.sortBuildings();
     }
 
+    /**
+     * Gets building at tile.
+     *
+     * @param xPos the x pos
+     * @param yPos the y pos
+     * @return the building at tile
+     */
     public Optional<OnMapBuilding> getBuildingAtTile(int xPos, int yPos) {
         for (OnMapBuilding building : this.buildingsOnMap) {
             if (building.startX == xPos && building.startY == yPos) {
@@ -510,6 +599,13 @@ public class Game {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Tile has building optional.
+     *
+     * @param xPos the x pos
+     * @param yPos the y pos
+     * @return the optional
+     */
     public Optional<OnMapBuilding> tileHasBuilding(int xPos, int yPos) {
         for (OnMapBuilding building : this.buildingsOnMap) {
             if (building.startX <= xPos && xPos <= building.startX + building.width
@@ -520,10 +616,18 @@ public class Game {
         return Optional.empty();
     }
 
+    /**
+     * Gets map.
+     *
+     * @return the map
+     */
     public Map getMap() {
         return map;
     }
 
+    /**
+     * Add factories to map.
+     */
     public void addFactoriesToMap() {
         Random r = new Random();
 
@@ -540,6 +644,9 @@ public class Game {
         }
     }
 
+    /**
+     * Add trees to map.
+     */
     public void addTreesToMap() {
         Random r = new Random();
         for (NatureObject natob : this.nature_objects) {
@@ -556,6 +663,9 @@ public class Game {
         }
     }
 
+    /**
+     * Add stones to map.
+     */
     public void addStonesToMap() {
         Random r = new Random();
         for (NatureObject natob : this.nature_objects) {
@@ -574,6 +684,9 @@ public class Game {
     }
 
 
+    /**
+     * Add ruins to map.
+     */
     public void addRuinsToMap() {
         Random r = new Random();
         for (NatureObject natob : this.nature_objects) {
@@ -592,7 +705,13 @@ public class Game {
     }
 
 
-
+    /**
+     * Is occupied boolean.
+     *
+     * @param x the x
+     * @param y the y
+     * @return the boolean
+     */
     public boolean isOccupied(int x, int y) {
         for (OnMapBuilding building : this.buildingsOnMap) {
             if (x >= building.startX &&
@@ -606,6 +725,15 @@ public class Game {
         return false;
     }
 
+    /**
+     * Is in water boolean.
+     *
+     * @param x     the x
+     * @param y     the y
+     * @param width the width
+     * @param depth the depth
+     * @return the boolean
+     */
     public boolean isInWater(int x, int y, int width, int depth) {
         int waterCount = 0;
         for (int xPos = x; xPos < x + width; xPos++) {
@@ -618,21 +746,50 @@ public class Game {
         return waterCount >= 1;
     }
 
+    /**
+     * Is in map boolean.
+     *
+     * @param x     the x
+     * @param y     the y
+     * @param width the width
+     * @param depth the depth
+     * @return the boolean
+     */
     public boolean isInMap(int x, int y, int width, int depth) {
         return x >= 0 && x + width < this.map.getWidth() - 1 &&
                 y >= 0 && y + depth < this.map.getDepth() - 1;
     }
 
+    /**
+     * Sets current mouse tile index.
+     *
+     * @param pos the pos
+     */
     public void setCurrentMouseTileIndex(int[] pos) {
         this.currentMouseTileIndex = pos;
     }
 
+    /**
+     * Get current mouse tile index int [ ].
+     *
+     * @return the int [ ]
+     */
     public int[] getCurrentMouseTileIndex() { return currentMouseTileIndex; }
 
+    /**
+     * Gets transport network.
+     *
+     * @return the transport network
+     */
     public TransportNetwork getTransportNetwork() {
         return transportNetwork;
     }
 
+    /**
+     * Gets background music.
+     *
+     * @return the background music
+     */
     public String getBackgroundMusic() {
         return this.music.get(0);
     }

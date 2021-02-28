@@ -85,6 +85,7 @@ public class GameController {
     public void startGame() {
         this.view.displayGameScreen();
         this.startAnimation();
+
         music.playBackgroundMusic();
 
     }
