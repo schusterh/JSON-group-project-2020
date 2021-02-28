@@ -99,24 +99,18 @@ public class Game {
     public List<OnMapBuilding> getBuildingsOnMap() { return buildingsOnMap; }
 
     public void drive (Vehicle v, int tick){
-        if (v.getKind().equals("road vehicle")){
-            if (v.getPath()!=null) {
-                if (transportNetwork.getPoints().contains(v.getNextPoint())){
-                    v.setCurrentPoint(v.getNextPoint());
-                    v.setNextPoint(v.getPath().get(0));
-                } else {
-                    findPath(v,tick);
-                    drive(v,tick);
-                }
+        if (v.getPath()!=null) {
+            if (transportNetwork.getPointConnections().containsKey(v.getNextPoint())){
+                v.setCurrentPoint(v.getNextPoint());
+                v.setNextPoint(v.getPath().get(0));
             } else {
-
-                if (!v.getCurrentCargo().isEmpty())
-                    v.unloadCargo(v.getCurrentCargo().get(0));
-                    findPath(v,tick);
+                findPath(v,tick);
+                drive(v,tick);
             }
-        } if (v.getKind().equals("engine")){
-            if (v.getPath()!=null){
-
+        } else {
+            if (!v.getCurrentCargo().isEmpty()) {
+                v.unloadCargo(v.getCurrentCargo().get(0));
+                findPath(v, tick);
             }
         }
     }
@@ -132,9 +126,18 @@ public class Game {
                     .forEach(p -> possibleTargets.put(g, null));
             Station nearF = transportNetwork.getNearStations(f);
             Station nearG = transportNetwork.getNearStations(g);
+            double distance = Math.sqrt((transportNetwork.getStationPoints().get(nearG).get(0).getX()
+                    - transportNetwork.getStationPoints().get(nearF).get(0).getX())
+                    * (transportNetwork.getStationPoints().get(nearG).get(0).getX()
+                    - transportNetwork.getStationPoints().get(nearF).get(0).getX())
+                    + (transportNetwork.getStationPoints().get(nearG).get(0).getY()
+                    - transportNetwork.getStationPoints().get(nearF).get(0).getY())
+                    * (transportNetwork.getStationPoints().get(nearG).get(0).getY()
+                    - transportNetwork.getStationPoints().get(nearF).get(0).getY()
+                    ));
             double weight = (double) (g.getStorage().get(gb.getGoodType())
                     - g.getCurrentStorage().get(gb.getGoodType()))
-                    / transportNetwork.getAdjStations(nearF).get(nearG).size();
+                    / distance;
             possibleTargets.put(g, weight);
             possTargets.add(g);
         }

@@ -178,7 +178,7 @@ public class TransportNetwork {
     //private HashMap<Station, HashMap<Station, ArrayList<Point>>> adjStations;
     private HashMap<Point, ArrayList<Point>> pointConnections;
     private HashMap<Station,ArrayList<Point>> stations;
-    private ArrayList<Point> points;
+    //private ArrayList<Point> points;
     //private ArrayList<Station> stations;
     private HashMap<TrafficRoute,ArrayList<Point>> trafficRoutes;
     private HashMap<TrafficRoute,ArrayList<RailSection>> railSections;
@@ -192,7 +192,7 @@ public class TransportNetwork {
         //this.adjStations = new HashMap<>();
         this.pointConnections = new HashMap<>();
         this.stations = new HashMap<>();
-        this.points = new ArrayList<>();
+        //this.points = new ArrayList<>();
         //this.stations = new ArrayList<>();
         this.trafficRoutes = new HashMap<>();
         this.nearStations = new HashMap<>();
@@ -478,9 +478,11 @@ public class TransportNetwork {
         return reservations;
     }
 
-    public ArrayList<Point> getPoints() {
+    /*public ArrayList<Point> getPoints() {
         return points;
     }
+
+     */
 
     public HashMap<TrafficRoute, ArrayList<Point>> getTrafficRoutes() {
         return trafficRoutes;
