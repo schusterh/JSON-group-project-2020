@@ -78,6 +78,10 @@ public class BuildingLayer implements RenderLayer {
         this.toBePlacedBuilding = new OnMapBuilding(model, 0, 0, 2);
     }
 
+    public boolean isPendingBuildingCombination() {
+        return this.combinationOverlay != null;
+    }
+
     /**
      * Returns the pending building if it's not a combination, else returns the combination
      * @return OnMapBuilding instance to be placed on the map
@@ -155,7 +159,7 @@ public class BuildingLayer implements RenderLayer {
                 gc.drawImage(toBePlacedBuilding.graphic, startPos[0], startPos[1], toBePlacedBuilding.graphic.getWidth() * zoomFactor, toBePlacedBuilding.graphic.getHeight() * zoomFactor);
 
             }
-            //gc.setGlobalAlpha(1.0);
+            gc.setGlobalAlpha(1f);
             gc.setEffect(null);
         }
     }

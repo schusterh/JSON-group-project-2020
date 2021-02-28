@@ -163,13 +163,17 @@ public class GameLoop {
             this.panY -= this.panStep;
         if (this.input.contains("D"))
             this.panX -= this.panStep;
-        if (this.input.contains("ADD")) {
+        if (this.input.contains("ADD") || this.input.contains("PLUS") || this.input.contains("CLOSE_BRACKET")) {
             this.renderer.increaseZoomFactor();
             this.input.remove("ADD");
+            this.input.remove("PLUS");
+            this.input.remove("CLOSE_BRACKET");
         }
-        if (this.input.contains("SUBTRACT")) {
+        if (this.input.contains("SUBTRACT") || this.input.contains("MINUS") || this.input.contains("SLASH")) {
             this.renderer.decreaseZoomFactor();
             this.input.remove("SUBTRACT");
+            this.input.remove("MINUS");
+            this.input.remove("SLASH");
         }
         if (this.input.contains("ESCAPE")) {
             this.controller.setGameMode(GameMode.NORMAL);

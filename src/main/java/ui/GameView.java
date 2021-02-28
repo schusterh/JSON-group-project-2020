@@ -149,7 +149,6 @@ GameView {
         //borderPane.setPrefSize(1024,150);
 
         this.landscapeLayer = new LandscapeLayer(this.model, this.controller, this.TILE_DIMENSION, this.TILE_HEIGHT_OFFSET);
-        System.out.println("BLUBS?");
         this.buildingLayer = new BuildingLayer(this.model, this.controller, this.TILE_DIMENSION, this.TILE_HEIGHT_OFFSET);
         landscapeLayer.makeInteractable(this.gameLoop);
         this.renderer.addLandscapeLayer(landscapeLayer);
@@ -185,7 +184,7 @@ GameView {
                 Button bNatur = new Button();
 
 
-                //ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + nature.getName() + ".png")));
+
 
                 StandardImage std_nature = new StandardImage("/buildings/tree.png");
                 ImageView imageView = new ImageView(std_nature.setImage("/buildings/" + nature.getName() + ".png"));
@@ -216,7 +215,7 @@ GameView {
                 Button bRoad = new Button();
                 StandardImage std_road = new StandardImage("/buildings/error_tile.png");
                 ImageView imageView = new ImageView(std_road.setImage("/buildings/" + road.getName() + ".png"));
-                //ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + road.getName() + ".png")));
+
                 imageView.setPreserveRatio(true);
                 imageView.setFitHeight(100);
                 bRoad.setGraphic(imageView);
@@ -245,7 +244,6 @@ GameView {
                 ImageView imageView = new ImageView(std_rail.setImage("/buildings/" + railway.getName() + ".png"));
 
 
-                //ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + railway.getName() + ".png")));
                 imageView.setPreserveRatio(true);
                 imageView.setFitHeight(50);
                 bRailway.setGraphic(imageView);
@@ -285,11 +283,35 @@ GameView {
             }
         }
 
+
+        for (Tower t : this.model.getTowers()) {
+
+            if (t.getBuildmenu().equals("airport") && t.getSpecial().equals("tower")) {
+                Button bTower = new Button();
+
+                StandardImage std_airport = new StandardImage("/buildings/error_tile.png");
+                ImageView imageView = new ImageView(std_airport.setImage("/buildings/" + t.getName() + ".png"));
+
+                imageView.setPreserveRatio(true);
+                imageView.setFitHeight(100);
+
+                bTower.setGraphic(imageView);
+
+                bTower.setOnAction(event -> {
+                    buildingLayer.placeBuilding(t);
+                });
+                hboxAirport.getChildren().add(bTower);
+            }
+        }
+
         airportItem.setOnAction(event -> {
             topBar.getChildren().remove(borderPane);
             borderPane.setCenter(hboxAirport);
             topBar.getChildren().add(borderPane);
         });
+
+
+
 
 
         // When user click on the bäume item.

@@ -6,12 +6,18 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
+/**
+ * This class represents the acutal game with all its components.
+ * Most of the objects that can be seen in the game are stored in arraylists of a specific type.
+ */
 public class Game {
 
     private ArrayList<Vehicle> vehicles;
+    private ArrayList<Vehicle> vehiclesOnMap = new ArrayList<>();
     private ArrayList<Road> roads;
     private ArrayList<Railway> railways;
     private ArrayList<Factory> factories;
+    private ArrayList<Factory> factoriesOnMap = new ArrayList<>();
     private ArrayList<String> commodities;
     private ArrayList<NatureObject> nature_objects ;
     private ArrayList<Tower> towers;
@@ -22,8 +28,25 @@ public class Game {
     private TransportNetwork transportNetwork;
     private HashMap<String, int[]> directions;
 
+    /**
+     * The Current mouse tile index.
+     */
     int[] currentMouseTileIndex;
 
+    /**
+     * Instantiates a new Game.
+     *
+     * @param commodities     the commodities
+     * @param roads           the roads
+     * @param railways        the railways
+     * @param towers          the towers
+     * @param airport_objects the airport objects
+     * @param nature_objects  the nature objects
+     * @param factories       the factories
+     * @param vehicles        the vehicles
+     * @param map             the map
+     * @param music           the music
+     */
     public Game(ArrayList<String> commodities, ArrayList<Road> roads, ArrayList<Railway> railways, ArrayList<Tower> towers
     , ArrayList<AirportObject> airport_objects, ArrayList<NatureObject> nature_objects, ArrayList<Factory> factories,
                 ArrayList<Vehicle> vehicles, Map map, ArrayList<String> music) {
@@ -47,6 +70,8 @@ public class Game {
         this.directions.put("sw", new int[]{0,-1});
         this.directions.put("nw", new int[]{-1,0});
 
+
+        // the amount of trees,stones and ruins that will be randomly placed on the map
         for(int i = 0; i < 100; i++) {
             this.addStonesToMap();
         }
@@ -62,63 +87,112 @@ public class Game {
 
     }
 
+    /**
+     * Gets railways.
+     *
+     * @return the railways
+     */
     public ArrayList<Railway> getRailways() {
         return railways;
     }
 
+    /**
+     * Gets factories.
+     *
+     * @return the factories
+     */
     public ArrayList<Factory> getFactories() {
         return factories;
     }
 
+    /**
+     * Gets roads.
+     *
+     * @return the roads
+     */
     public ArrayList<Road> getRoads() {
         return roads;
     }
 
+    /**
+     * Gets nature objects.
+     *
+     * @return the nature objects
+     */
     public ArrayList<NatureObject> getNatureObjects() {
         return nature_objects;
     }
 
+    /**
+     * Gets commodities.
+     *
+     * @return the commodities
+     */
     public ArrayList<String> getCommodities() {
         return commodities;
     }
 
+    /**
+     * Gets vehicles.
+     *
+     * @return the vehicles
+     */
     public ArrayList<Vehicle> getVehicles() {
         return vehicles;
     }
 
+    /**
+     * Gets airport objects.
+     *
+     * @return the airport objects
+     */
     public ArrayList<AirportObject> getAirportObjects() {
         return airport_objects;
     }
 
+    /**
+     * Gets towers.
+     *
+     * @return the towers
+     */
     public ArrayList<Tower> getTowers() {
         return towers;
     }
 
+    /**
+     * Gets buildings on map.
+     *
+     * @return the buildings on map
+     */
     public List<OnMapBuilding> getBuildingsOnMap() { return buildingsOnMap; }
 
+    /**
+     * Ein Fahrzeug fährt jeden Tick einen Punkt weiter
+     * @param v: Fahrzeug
+     * @param tick: Tick
+     */
     public void drive (Vehicle v, int tick){
-        if (v.getKind().equals("road vehicle")){
-            if (v.getPath()!=null) {
-                if (transportNetwork.getPoints().contains(v.getNextPoint())){
-                    v.setCurrentPoint(v.getNextPoint());
-                    v.setNextPoint(v.getPath().get(0));
-                } else {
-                    findPath(v,tick);
-                    drive(v,tick);
-                }
+        if (v.getPath()!=null) {
+            if (transportNetwork.getPointConnections().containsKey(v.getNextPoint())){
+                v.setCurrentPoint(v.getNextPoint());
+                v.setNextPoint(v.getPath().get(0));
             } else {
-                v.unloadCargo(v.getCurrentCargo().get(0));
-                if (!v.getCurrentCargo().isEmpty())
-                    findPath(v,tick);
+                findPath(v,tick);
+                drive(v,tick);
             }
-        } if (v.getKind().equals("engine")){
-            if (v.getPath()!=null){
-
+        } else {
+            if (!v.getCurrentCargo().isEmpty()) {
+                v.unloadCargo(v.getCurrentCargo().get(0));
+                findPath(v, tick);
             }
         }
     }
 
-
+    /**
+     * Ein Güterpaket sucht sich von seiner ursprünglichen Fabrik aus ein Ziel
+     * @param gb: Güterpaket
+     * @param f: Ursprungs-Fabrik
+     */
     public void findTarget(GoodsBundle gb, Factory f){
         HashMap<Factory, Double> possibleTargets = new HashMap<>();
         ArrayList<Factory> possTargets = new ArrayList<>();
@@ -129,9 +203,18 @@ public class Game {
                     .forEach(p -> possibleTargets.put(g, null));
             Station nearF = transportNetwork.getNearStations(f);
             Station nearG = transportNetwork.getNearStations(g);
+            double distance = Math.sqrt((transportNetwork.getStationPoints().get(nearG).get(0).getX()
+                    - transportNetwork.getStationPoints().get(nearF).get(0).getX())
+                    * (transportNetwork.getStationPoints().get(nearG).get(0).getX()
+                    - transportNetwork.getStationPoints().get(nearF).get(0).getX())
+                    + (transportNetwork.getStationPoints().get(nearG).get(0).getY()
+                    - transportNetwork.getStationPoints().get(nearF).get(0).getY())
+                    * (transportNetwork.getStationPoints().get(nearG).get(0).getY()
+                    - transportNetwork.getStationPoints().get(nearF).get(0).getY()
+                    ));
             double weight = (double) (g.getStorage().get(gb.getGoodType())
                     - g.getCurrentStorage().get(gb.getGoodType()))
-                    / transportNetwork.getAdjStations(nearF).get(nearG).size();
+                    / distance;
             possibleTargets.put(g, weight);
             possTargets.add(g);
         }
@@ -147,6 +230,15 @@ public class Game {
         Factory targetFactory = possTargets.get(randomIndex);
         gb.setTargetStation(this.transportNetwork.getNearStations(targetFactory));
     }
+
+    /**
+     * Breitensuche über die Punkte, die das Netzwerk bilden, evtl unter Berücksichtigung der Reservierungen
+     * @param startPoint: Startpunkt
+     * @param targetStation: Zielfabrik
+     * @param vehicleType: Verkehrstyp
+     * @param startTime: Starttick
+     * @return kürzester Weg von startPoint zu targetStation
+     */
     public ArrayList<Point> bfs (Point startPoint, Station targetStation, String vehicleType, int startTime ){
 
         ArrayList<Point> shortestPath = new ArrayList<>();
@@ -174,7 +266,7 @@ public class Game {
                         if (!transportNetwork.getReservations().get(p).containsKey(depth+startTime)){
                             origins.put(p,currentPoint);
                             deq.add(p);
-                            if (transportNetwork.getStationPoints().get(targetStation).contains(p)){
+                            if (transportNetwork.getStationPoints().get(targetStation).equals(p)){
                                 targetFound = true;
                                 shortestPath.add(p);
                                 Point backtrack = origins.get(p);
@@ -224,31 +316,47 @@ public class Game {
         return shortestPath;
     }
 
+    /**
+     * Fahrzeuge suchen sich den Weg für einen Teil ihres Cargos.
+     * @param v: Fahrzeug
+     * @param startTick: Startzeitpunkt
+     * @return
+     */
     public ArrayList<Point> findPath(Vehicle v, int startTick){
-        GoodsBundle goodsBundle = v.getCurrentCargo().get(0);
-        ArrayList <Point> path = new ArrayList<>();
+        if (!v.getCurrentCargo().isEmpty()) {
+            GoodsBundle goodsBundle = v.getCurrentCargo().get(0);
+            ArrayList<Point> path = new ArrayList<>();
 
-        if (v.getKind().equals("road vehicle")) {
-            path.addAll(bfs(v.getCurrentPoint(), goodsBundle.getTargetStation(), v.getKind(),startTick));
-        }
-
-        if (v.getKind().equals("plane")){
-            path.addAll(bfs (v.getCurrentPoint(), goodsBundle.getTargetStation(),v.getKind(),startTick));
-
-            for (int i = 0; i < path.size(); i++){
-                transportNetwork.addReservations(path.get(i),startTick+i,v);
+            if (v.getKind().equals("road vehicle")) {
+                path.addAll(bfs(v.getCurrentPoint(), goodsBundle.getTargetStation(), v.getKind(), startTick));
             }
-        }
-        if (v.getKind().equals("engine")){
-            path.addAll(bfs (v.getCurrentPoint(), goodsBundle.getTargetStation(), v.getKind(),startTick));
 
-            for (int i = 0; i < path.size(); i++){
-                transportNetwork.addReservations(path.get(i),startTick+i,v);
+            if (v.getKind().equals("plane")) {
+                path.addAll(bfs(v.getCurrentPoint(), goodsBundle.getTargetStation(), v.getKind(), startTick));
+
+                for (int i = 0; i < path.size(); i++) {
+                    transportNetwork.addReservations(path.get(i), startTick + i, v);
+                }
             }
-        }
+            if (v.getKind().equals("engine")) {
+                path.addAll(bfs(v.getCurrentPoint(), goodsBundle.getTargetStation(), v.getKind(), startTick));
 
-        return path;
+                for (int i = 0; i < path.size(); i++) {
+                    transportNetwork.addReservations(path.get(i), startTick + i, v);
+                }
+            }
+            return path;
+        }
+        else return new ArrayList<>();
+
+
     }
+
+    /**
+     * Löscht Fahrzeuge, wenn es auf der Route zu viele gibt, oder wenn sie dem Typ der Route nicht entsprechen.
+     * Fügt Fahrzeuge hinzu, wenn es auf der Route zu wenige gibt.
+     * @param route
+     */
     public void manageVehicles(TrafficRoute route){
         int diff = route.getVehicles().size()-route.getVehicleAmount();
         if (diff > 0){
@@ -263,12 +371,15 @@ public class Game {
             Random rand = new Random();
             for (int i = 0; i < Math.abs(diff);i++){
                 route.addVehicle(possVehicles.get(rand.nextInt(possVehicles.size())));
+                vehiclesOnMap.add(possVehicles.get(rand.nextInt(possVehicles.size())));
             }
         }
         for (Vehicle v : route.getVehicles()){
             if (!v.getKind().equals(route.getVehicleType())){
                 route.removeVehicle(v);
+                vehiclesOnMap.remove(v);
                 manageVehicles(route);
+
             }
         }
     }
@@ -288,13 +399,20 @@ public class Game {
     }
 
     /**
-     * Places a pending building on the map
-     * @param pendingBuilding Pending Building
+     * Add building to map.
+     *
+     * @param pendingBuilding the pending building
+     * @param isCombination   true if is tile combination
      */
-    public void addBuildingToMap(OnMapBuilding pendingBuilding) {
+    public void addBuildingToMap(OnMapBuilding pendingBuilding, boolean isCombination) {
 
         boolean isConcrete = pendingBuilding.model.getClass() != NatureObject.class && pendingBuilding.model.getClass() != Road.class;
         this.map.plainGround(pendingBuilding.startX, pendingBuilding.startY, pendingBuilding.width, pendingBuilding.depth, pendingBuilding.height, isConcrete);
+
+        if (isCombination) {
+            Optional<OnMapBuilding> underlyingRoad = getBuildingAtTile(pendingBuilding.startX, pendingBuilding.startY);
+            underlyingRoad.ifPresent(buildingsOnMap::remove);
+        }
         this.buildingsOnMap.add(pendingBuilding);
 
         if (pendingBuilding.model.getClass() == Road.class) {
@@ -392,7 +510,7 @@ public class Game {
              * Handles transport logic
              */
             if (roadModel.getSpecial().isEmpty()) {
-                this.transportNetwork.addTrafficSection((double) pendingBuilding.startX, (double) pendingBuilding.startY, roadModel.getPoints(), roadModel.getRoads());
+                this.transportNetwork.addTrafficSection((double) pendingBuilding.startX, (double) pendingBuilding.startY, roadModel.getPoints(), roadModel.getRoads(),Road.class);
                 System.out.println("Added road to transport network!");
             } else if (roadModel.getSpecial().isPresent()) {
                 if (roadModel.getSpecial().get().equals("busstop")) {
@@ -522,12 +640,12 @@ public class Game {
             int posX = r.nextInt(this.map.getWidth()-4);
             int posY = r.nextInt(this.map.getDepth()-4);
 
-            while (this.isInMap(posX, posY, factory.getWidth(), factory.getDepth()) && this.isOccupied(posX, posY) && this.isInWater(posX, posY, factory.getWidth(), factory.getDepth())) {
+            while (!this.isInMap(posX, posY, factory.getWidth(), factory.getDepth()) || this.isOccupied(posX, posY) || this.isInWater(posX, posY, factory.getWidth(), factory.getDepth())) {
                 posX = r.nextInt(this.map.getWidth()-1);
                 posY = r.nextInt(this.map.getDepth()-1);
             }
 
-            this.addBuildingToMap(new OnMapBuilding(factory, posX, posY, this.map.getTile(posX, posY).height));
+            this.addBuildingToMap(new OnMapBuilding(factory, posX, posY, this.map.getTile(posX, posY).height), false);
         }
     }
 
@@ -538,14 +656,14 @@ public class Game {
         Random r = new Random();
         for (NatureObject natob : this.nature_objects) {
             if (natob.getBuildmenu().isPresent()) {
-                int posX = r.nextInt(this.map.getWidth() - 4);
-                int posY = r.nextInt(this.map.getDepth() - 4);
+                int posX = r.nextInt(this.map.getWidth() - 1);
+                int posY = r.nextInt(this.map.getDepth() - 1);
 
-                while (this.isInMap(posX, posY, natob.getWidth(), natob.getDepth()) && this.isOccupied(posX, posY) && this.isInWater(posX, posY, natob.getWidth(), natob.getDepth())) {
+                while (!this.isInMap(posX, posY, natob.getWidth(), natob.getDepth()) || this.isOccupied(posX, posY) || this.isInWater(posX, posY, natob.getWidth(), natob.getDepth())) {
                     posX = r.nextInt(this.map.getWidth() - 1);
                     posY = r.nextInt(this.map.getDepth() - 1);
                 }
-                this.addBuildingToMap(new OnMapBuilding(natob, posX, posY, this.map.getTile(posX, posY).height));
+                this.addBuildingToMap(new OnMapBuilding(natob, posX, posY, this.map.getTile(posX, posY).height), false);
             }
         }
     }
@@ -558,14 +676,14 @@ public class Game {
         for (NatureObject natob : this.nature_objects) {
             if (natob.getName().equals("stone")) {
                 System.out.println(natob.getName());
-                int posX = r.nextInt(this.map.getWidth() - 4);
-                int posY = r.nextInt(this.map.getDepth() - 4);
+                int posX = r.nextInt(this.map.getWidth() - natob.getWidth() - 1);
+                int posY = r.nextInt(this.map.getDepth() - natob.getDepth() - 1);
 
-                while (this.isInMap(posX, posY, natob.getWidth(), natob.getDepth()) && this.isOccupied(posX, posY) && this.isInWater(posX, posY, natob.getWidth(), natob.getDepth())) {
+                while (!this.isInMap(posX, posY, natob.getWidth(), natob.getDepth()) || this.isOccupied(posX, posY) || this.isInWater(posX, posY, natob.getWidth(), natob.getDepth())) {
                     posX = r.nextInt(this.map.getWidth() - 1);
                     posY = r.nextInt(this.map.getDepth() - 1);
                 }
-                this.addBuildingToMap(new OnMapBuilding(natob, posX, posY, this.map.getTile(posX, posY).height));
+                this.addBuildingToMap(new OnMapBuilding(natob, posX, posY, this.map.getTile(posX, posY).height), false);
             }
         }
     }
@@ -581,11 +699,11 @@ public class Game {
                 int posX = r.nextInt(this.map.getWidth() - 4);
                 int posY = r.nextInt(this.map.getDepth() - 4);
 
-                while (this.isInMap(posX, posY, natob.getWidth(), natob.getDepth()) && this.isOccupied(posX, posY) && !this.isInWater(posX, posY, natob.getWidth(), natob.getDepth())) {
+                while (this.isInMap(posX, posY, natob.getWidth(), natob.getDepth()) && this.isOccupied(posX, posY) && this.isInWater(posX, posY, natob.getWidth(), natob.getDepth())) {
                     posX = r.nextInt(this.map.getWidth() - 1);
                     posY = r.nextInt(this.map.getDepth() - 1);
                 }
-                this.addBuildingToMap(new OnMapBuilding(natob, posX, posY, this.map.getTile(posX, posY).height));
+                this.addBuildingToMap(new OnMapBuilding(natob, posX, posY, this.map.getTile(posX, posY).height), false);
             }
         }
     }
@@ -620,14 +738,14 @@ public class Game {
      */
     public boolean isInWater(int x, int y, int width, int depth) {
         int waterCount = 0;
-        for (int xCount = 0; xCount < width; xCount++) {
-            for (int yCount = 0; yCount < depth; yCount++) {
-                if (this.map.getTile(xCount, yCount).height == -1) {
+        for (int xPos = x; xPos < x + width; xPos++) {
+            for (int yPos = y; yPos < y+depth; yPos++) {
+                if (this.map.getTile(xPos, yPos).height == -1) {
                     waterCount++;
                 }
             }
         }
-        return waterCount >= 2;
+        return waterCount >= 1;
     }
 
     /**
@@ -657,10 +775,20 @@ public class Game {
      */
     public int[] getCurrentMouseTileIndex() { return currentMouseTileIndex; }
 
+    /**
+     * Gets transport network.
+     *
+     * @return the transport network
+     */
     public TransportNetwork getTransportNetwork() {
         return transportNetwork;
     }
 
+    /**
+     * Gets background music.
+     *
+     * @return the background music
+     */
     public String getBackgroundMusic() {
         return this.music.get(0);
     }
@@ -672,34 +800,21 @@ public class Game {
     /**
      * Handles model update
      */
-    public void handleUpdate() {
-        for (Factory factory : factories) {
-            factory.produce();
+    public void handleUpdate(int tick) {
+        if (!factoriesOnMap.isEmpty()) {
+            for (Factory factory : factoriesOnMap) {
+                factory.produce();
+            }
         }
-    }
-}
-class PrioPair implements Comparable<PrioPair>{
-    final Station station;
-    final Integer distance;
+        for (TrafficRoute trafficRoute : transportNetwork.getTrafficRoutes().keySet()){
+            manageVehicles(trafficRoute);
+        }
+        if (!vehiclesOnMap.isEmpty()) {
+            for (Vehicle v : vehiclesOnMap) {
+                drive(v, tick);
 
-    public PrioPair(Station station, Integer distance){
-        this.station = station;
-        this.distance = distance;
-    }
-    @Override
-    public int compareTo(PrioPair other) {
-        return (this.distance - other.distance);
-    }
-
-    public Station getStation() {
-        return station;
-    }
-
-    public Integer getDistance() {
-        return distance;
-    }
-
-    boolean containsStation(Station s){
-        return this.getStation().equals(s);
+            }
+        }
+        System.out.println("läuft");
     }
 }
