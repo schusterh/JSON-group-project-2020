@@ -223,23 +223,49 @@ public class TransportNetwork {
         }
     }
 
-    public void addTrafficSection(Double xPos, Double yPos, HashMap<String, ArrayList<Double>> newPoints, ArrayList<ArrayList<String>> newConnect) {
-        //nur für objekte, die punkte und punktverbindungen auf der karte hinzufügen
-        for (Station s : stationPoints.keySet()){
-            for (Point p : stationPoints.get(s)){
-                if (Math.abs(p.getX()-xPos)<=1 && (p.getY()-yPos)<=1){
-                    for (TrafficRoute trafficRoute : trafficRoutes.keySet()){
-                        if (trafficRoute.getStations().contains(s)){
-                            for (String point : newPoints.keySet()){
-                                Point newPoint = new Point(newPoints.get(point).get(0),newPoints.get(point).get(1));
-                                trafficRoute.addPoints(newPoint);
+    public void addTrafficSection(Double xPos, Double yPos, HashMap<String, ArrayList<Double>> newPoints, ArrayList<ArrayList<String>> newConnect, Class type) {
+        //nur für objekte, die punkte und punktverbindungen auf der karte hinzufügenw
+        boolean addedToRoute = false;
+        while (!addedToRoute) {
+            for (Station s : stationPoints.keySet()) {
+                for (Point p : stationPoints.get(s)) {
+                    if (Math.abs(p.getX() - xPos) <= 3 && (p.getY() - yPos) <= 3) {
+
+                        for (TrafficRoute trafficRoute : trafficRoutes.keySet()) {
+                            if (trafficRoute.getStations().contains(s)) {
+                                //trafficRouteExists = true;
+                                for (String point : newPoints.keySet()) {
+                                    Point newPoint = new Point(newPoints.get(point).get(0), newPoints.get(point).get(1));
+                                    trafficRoute.addPoints(newPoint);
+                                    System.out.println("New Point added to Route!");
+                                    addedToRoute = true;
+                                }
+                            } else {
+                                String vehicleType = "";
+                                if (type.getName().equals("Road")) {
+                                    vehicleType = "road vehicle";
+                                }
+                                if (type.getName().equals("Railway")) {
+                                    vehicleType = "engine";
+                                }
+                                if (type.getName().equals("AirportObject")) {
+                                    vehicleType = "plane";
+                                }
+
+                                TrafficRoute newRoute = new TrafficRoute(new ArrayList<Station>(), vehicleType, 1, new ArrayList<Vehicle>());
+                                trafficRoute.addStation(s);
+                                System.out.println("New Route!");
+                                addedToRoute = true;
                             }
+
+                        // (!trafficRouteExists) {
+
                         }
                     }
-                    //TrafficRoute route = new TrafficRoute()
-                }
-            }
 
+                }
+
+            }
         }
         HashMap<Point,ArrayList<String>> connections = new HashMap<>();
         for (String name : newPoints.keySet()) {

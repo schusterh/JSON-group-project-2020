@@ -396,7 +396,7 @@ public class Game {
             });*/
 
             if (roadModel.getSpecial().isEmpty()) {
-                this.transportNetwork.addTrafficSection((double) pendingBuilding.startX, (double) pendingBuilding.startY, roadModel.getPoints(), roadModel.getRoads());
+                this.transportNetwork.addTrafficSection((double) pendingBuilding.startX, (double) pendingBuilding.startY, roadModel.getPoints(), roadModel.getRoads(),Road.class);
                 System.out.println("Added road to transport network!");
             } else if (roadModel.getSpecial().isPresent()) {
                 if (roadModel.getSpecial().get().equals("busstop")) {
