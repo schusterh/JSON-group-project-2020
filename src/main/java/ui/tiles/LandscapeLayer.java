@@ -40,6 +40,13 @@ public class LandscapeLayer implements RenderLayer {
 
     GameLoop gameLoop;
 
+    /**
+     * Landscape Layer Constructor
+     * @param model Game Instance
+     * @param controller Controller Instance
+     * @param tileDimension Dimension of ground tile graphic
+     * @param tileOffsetY Height of tile border for height displacement calculation
+     */
     public LandscapeLayer(Game model, GameController controller, int tileDimension, int tileOffsetY) {
         this.model = model;
         this.controller = controller;
@@ -49,23 +56,46 @@ public class LandscapeLayer implements RenderLayer {
         this.tileSet = new DefaultTileSet(this.TILE_SET_URI, this.TILE_SET_COLS, this.TILE_SET_ROWS, tileDimension, tileDimension);
     }
 
-    public void setOffsetFromCenterY(int offsetY) {
-        this.tileOffsetY = offsetY;
-    }
-
+    /**
+     * Sets game loop and (counterproductively) sets map to non-interactive to allow building and terrain mode separately
+     * @param loop GameLoop Instance
+     */
     public void makeInteractable(GameLoop loop) {
         this.isInteractable = false;
         this.gameLoop = loop;
     }
 
+    /**
+     * Sets interactivity status (meaning if terrain can be modified with mouse clicks or not)
+     * @param value interactive state
+     */
     public void setInteractive(boolean value) {
         this.isInteractable = value;
     }
 
+    /**
+     * Gets wether a mouse cursor is left or right of a hypothetical line
+     *
+     * Belongs to quick and dirty method of finding out wether the mouse cursor is inside a conves polygon (tile boundaries)
+     * @param xp X Position of mouse cursor
+     * @param yp Y Position of mouse cursor
+     * @param x1 X Position 1 of line
+     * @param y1 Y Position 1 of line
+     * @param x2 X Position 2 of line
+     * @param y2 Y Position 2 of line
+     * @return true if point is left of line
+     */
     private int isLeftOfVector(double xp, double yp, double x1, double y1, double x2, double y2) {
         return (yp - y1) * (x2 - x1) - (xp -x1) * (y2 - y1) > 0 ? 1 : 0;
     }
 
+    /**
+     * Gets all tiles that are within a specified radius in circle shape
+     * @param centerX Center X tile position
+     * @param centerY Center Y tile position
+     * @param radius Radius in tiles
+     * @return List of all tiles inside radius
+     */
     private ArrayList<Coordinate> getTilesInCircle(int centerX, int centerY, int radius) {
         ArrayList<Coordinate> result = new ArrayList<>();
 
@@ -80,6 +110,16 @@ public class LandscapeLayer implements RenderLayer {
         return result;
     }
 
+    /**
+     * Quick and dirty method of finding out wether a point is inside a convex polygon (tile boundaries) or not by
+     * finding out wether the point is on the left side of all lines (works with all convex polygons with sides n > 3)
+     * @param xp X Position of mouse cursor
+     * @param yp Y Position of mouse cursor
+     * @param polyPoiNum Number of sides on polygon
+     * @param polyX List of X coordinates for lines
+     * @param polyY List of Y coordinates for lines
+     * @return true if point is inside polygon, false if not
+     */
     private boolean isInsidePolygon(double xp, double yp, int polyPoiNum, double[] polyX, double[] polyY) {
         int result = 0;
 
@@ -90,10 +130,24 @@ public class LandscapeLayer implements RenderLayer {
         return result == polyPoiNum;
     }
 
+    /**
+     * Sets selection radius in number of tiles
+     * @param radius radius in number of tiles
+     */
     public void setRadius(int radius) {
         this.selectionRadius = radius;
     }
 
+    /**
+     * Paints all tiles in selection radius with border and overlay
+     * @param gc GraphicsContext to be drawn on
+     * @param x X Position of Tile to be painted
+     * @param y Y Position of Tile to be painted
+     * @param offsetX current Offset X Position of Map
+     * @param offsetY current Offset Y Position of Map
+     * @param tileResolution Resolution of base tile
+     * @param zoomFactor current zoom factor
+     */
     private void paintTileSelected(GraphicsContext gc, int x, int y, int offsetX, int offsetY, int[] tileResolution, double zoomFactor) {
 
         double heightOffset = this.model.getMap().getTile(x, y).height * this.tileOffsetY;
@@ -109,6 +163,13 @@ public class LandscapeLayer implements RenderLayer {
         gc.fillText("[x: " + x + ", y: " + y + "]", posX + (double)tileResolution[0]/4, posY + (double) tileResolution[1]/2);
     }
 
+    /**
+     * Draws single frame step to canvas
+     * @param gc GraphicsContext to be drawn on
+     * @param offsetX current Offset X Position of Map
+     * @param offsetY current Offset Y Position of Map
+     * @param zoomFactor current Zoom Factor
+     */
     @Override
     public void draw(GraphicsContext gc, int offsetX, int offsetY, double zoomFactor) {
         int[] tileResolution = this.tileSet.getTileResolution();
@@ -139,10 +200,17 @@ public class LandscapeLayer implements RenderLayer {
         }
     }
 
+    /**
+     * Returns selected Tiles
+     * @return List of selected tiles
+     */
     public ArrayList<Coordinate> getSelectedTiles() {
         return selectedTiles;
     }
 
+    /**
+     * Resets List of all tiles and clears it
+     */
     public void clearSelectedTiles() {
         this.selectedTiles.clear();
     }

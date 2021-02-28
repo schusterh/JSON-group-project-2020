@@ -172,11 +172,7 @@ public class Game {
      * @param tick: Tick
      */
     public void drive (Vehicle v, int tick){
-        System.out.println("Path: ");
         if (v.getPath()!=null) {
-            for (Point point : v.getPath()) {
-                System.out.println("Point on Path: [" + point.getX() + ", " + point.getY() + "]");
-            }
             if (transportNetwork.getPointConnections().containsKey(v.getNextPoint())){
                 v.setCurrentPoint(v.getNextPoint());
                 v.setNextPoint(v.getPath().get(0));
@@ -407,12 +403,11 @@ public class Game {
     }
 
     /**
-     * Add building to map.
-     *
-     * @param model  the model
-     * @param startX the start x
-     * @param startY the start y
-     * @param height the height
+     * Places a building on the map
+     * @param model model of new building
+     * @param startX start X position of Map
+     * @param startY start Y position of Map
+     * @param height height of new Building
      */
     public void addBuildingToMap(Building model, int startX, int startY, int height) {
 
@@ -425,7 +420,7 @@ public class Game {
      * Add building to map.
      *
      * @param pendingBuilding the pending building
-     * @param isCombination   the is combination
+     * @param isCombination   true if is tile combination
      */
     public void addBuildingToMap(OnMapBuilding pendingBuilding, boolean isCombination) {
 
@@ -443,6 +438,9 @@ public class Game {
 
             Optional<OnMapBuilding> previousRoadOptional;
             Optional<OnMapBuilding> nextRoadOptional;
+            /*
+             * JSON implementation doesnt handle extension of roads in same direction, therefore we need to do it manually
+             */
             switch (roadModel.getName()) {
                 case "road-ne":
                     previousRoadOptional = this.getBuildingAtTile(pendingBuilding.getStartX(), pendingBuilding.getStartY()+1);
@@ -477,7 +475,7 @@ public class Game {
                         OnMapBuilding nextRoad = nextRoadOptional.get();
                         if (nextRoad.model.getClass() == Road.class) {
                             Road nextRoadModel = (Road) nextRoad.model;
-                            if (nextRoadModel.getPoints().containsKey("ne")) {
+                            if (nextRoadModel.getPoints().containsKey("sw")) {
                                 this.roads.stream().filter(roadFilter -> roadFilter.getName().equals("road-ne-sw")).findFirst().ifPresent(pendingBuilding::replaceModel);
                             }
                         }
@@ -497,7 +495,7 @@ public class Game {
                         OnMapBuilding nextRoad = nextRoadOptional.get();
                         if (nextRoad.model.getClass() == Road.class) {
                             Road nextRoadModel = (Road) nextRoad.model;
-                            if (nextRoadModel.getPoints().containsKey("ne")) {
+                            if (nextRoadModel.getPoints().containsKey("se")) {
                                 this.roads.stream().filter(roadFilter -> roadFilter.getName().equals("road-ne-sw")).findFirst().ifPresent(pendingBuilding::replaceModel);
                             }
                         }
@@ -512,30 +510,23 @@ public class Game {
                             this.roads.stream().filter(roadFilter -> roadFilter.getName().equals("road-nw-se")).findFirst().ifPresent(previousRoad::replaceModel);
                         }
                     }
+                    if (nextRoadOptional.isPresent()) {
+                        OnMapBuilding nextRoad = nextRoadOptional.get();
+                        if (nextRoad.model.getClass() == Road.class) {
+                            Road nextRoadModel = (Road) nextRoad.model;
+                            if (nextRoadModel.getPoints().containsKey("nw")) {
+                                this.roads.stream().filter(roadFilter -> roadFilter.getName().equals("road-nw-se")).findFirst().ifPresent(pendingBuilding::replaceModel);
+                            }
+                        }
+                    }
                     break;
                 default:
                     break;
             }
-            /*roadModel.getCombines().ifPresent(combines -> {
-                ArrayList<OnMapBuilding> adjBuildings = this.getAdjRoads(pendingBuilding);
-                if (!adjBuildings.isEmpty()) {
-                    for (OnMapBuilding adjBuilding : adjBuildings) {
-                        if (combines.containsKey(adjBuilding.model.getName())) {
-                            Road replacementModel = this.roads.stream().filter(roadFilter -> roadFilter.getName().equals(combines.get(adjBuilding.model.getName()))).findFirst().orElse(null);
-                            if (replacementModel != null) {
-                                adjBuilding.replaceModel(replacementModel);
-                            }
-                        }
-                        else if (adjBuilding.model.getName().equals(roadModel.getName())) {
-                            Road replacementModel = this.roads.stream().filter(roadFilter -> roadFilter.getName().equals(this.roadExtensions.get(roadModel.getName()))).findFirst().orElse(null);
-                            if (replacementModel != null) {
-                                adjBuilding.replaceModel(replacementModel);
-                            }
-                        }
-                    }
-                }
-            });*/
 
+            /*
+             * Handles transport logic
+             */
             if (roadModel.getSpecial().isEmpty()) {
                 //this.transportNetwork.addTrafficSection((double) pendingBuilding.startX, (double) pendingBuilding.startY, roadModel.getPoints(), roadModel.getRoads(),Road.class);
                 System.out.println("Added road to transport network!");
@@ -564,11 +555,10 @@ public class Game {
     }
 
     /**
-     * Gets building at tile.
-     *
-     * @param xPos the x pos
-     * @param yPos the y pos
-     * @return the building at tile
+     * Gets the OnMapBuilding at a specific position if possible
+     * @param xPos x Position of expected building
+     * @param yPos y Position of expected building
+     * @return Optional OnMapBuilding
      */
     public Optional<OnMapBuilding> getBuildingAtTile(int xPos, int yPos) {
         for (OnMapBuilding building : this.buildingsOnMap) {
@@ -579,6 +569,11 @@ public class Game {
         return Optional.empty();
     }
 
+    /**
+     * Checks for roads in adjacent tiles (4D) and returns all roads found
+     * @param newRoad Road at center (pending building)
+     * @return List of all adjacent roads
+     */
     public ArrayList<OnMapBuilding> getAdjRoads(OnMapBuilding newRoad) {
         ArrayList<OnMapBuilding> returnList = new ArrayList<>();
 
@@ -596,6 +591,11 @@ public class Game {
         return returnList;
     }
 
+    /**
+     * Checks for adjacent buildings (9D) and returns all found
+     * @param newBuilding Building at center
+     * @return List of all adjacent buildings
+     */
     public ArrayList<OnMapBuilding> getAdjBuildings(OnMapBuilding newBuilding) {
         ArrayList<OnMapBuilding> returnList = new ArrayList<>();
 
@@ -615,6 +615,9 @@ public class Game {
         return returnList;
     }
 
+    /**
+     * Sorts building for correct render order
+     */
     private void sortBuildings() {
         this.buildingsOnMap = this.buildingsOnMap.stream()
                 .sorted(Comparator.comparingInt(OnMapBuilding::getStartY))
@@ -623,11 +626,10 @@ public class Game {
     }
 
     /**
-     * Tile has building optional.
-     *
-     * @param xPos the x pos
-     * @param yPos the y pos
-     * @return the optional
+     * Checks if there is a building on a specific tile
+     * @param xPos x Position of specified tile
+     * @param yPos y Position of specified tile
+     * @return true if there is a building on position
      */
     public Optional<OnMapBuilding> tileHasBuilding(int xPos, int yPos) {
         for (OnMapBuilding building : this.buildingsOnMap) {
@@ -640,16 +642,15 @@ public class Game {
     }
 
     /**
-     * Gets map.
-     *
-     * @return the map
+     * Returns the map instance
+     * @return map instance
      */
     public Map getMap() {
         return map;
     }
 
     /**
-     * Add factories to map.
+     * Randomly places all possible factories on the map
      */
     public void addFactoriesToMap() {
 
@@ -678,7 +679,7 @@ public class Game {
     }
 
     /**
-     * Add trees to map.
+     * Randomly places tree on the map
      */
     public void addTreesToMap() {
         Random r = new Random();
@@ -697,7 +698,7 @@ public class Game {
     }
 
     /**
-     * Add stones to map.
+     * Randomly places stone on the map
      */
     public void addStonesToMap() {
         Random r = new Random();
@@ -716,9 +717,8 @@ public class Game {
         }
     }
 
-
     /**
-     * Add ruins to map.
+     * Randomly places ruins on the map
      */
     public void addRuinsToMap() {
         Random r = new Random();
@@ -739,11 +739,10 @@ public class Game {
 
 
     /**
-     * Is occupied boolean.
-     *
-     * @param x the x
-     * @param y the y
-     * @return the boolean
+     * Checks if there is already a building on a specific tile
+     * @param x x Position
+     * @param y y Position
+     * @return true if tile is occupied
      */
     public boolean isOccupied(int x, int y) {
         for (OnMapBuilding building : this.buildingsOnMap) {
@@ -759,13 +758,12 @@ public class Game {
     }
 
     /**
-     * Is in water boolean.
-     *
-     * @param x     the x
-     * @param y     the y
-     * @param width the width
-     * @param depth the depth
-     * @return the boolean
+     * Checks if a building would be placed in water
+     * @param x x Start Position of building
+     * @param y y Start Position of building
+     * @param width width of building
+     * @param depth depth of building
+     * @return true if at least one tile is submerged in water
      */
     public boolean isInWater(int x, int y, int width, int depth) {
         int waterCount = 0;
@@ -780,13 +778,12 @@ public class Game {
     }
 
     /**
-     * Is in map boolean.
-     *
-     * @param x     the x
-     * @param y     the y
-     * @param width the width
-     * @param depth the depth
-     * @return the boolean
+     * Checks if a building would be placed fully on the map
+     * @param x x Start Position of building
+     * @param y y Start Position of building
+     * @param width width of building
+     * @param depth depth of building
+     * @return true if building is completely inside map borders
      */
     public boolean isInMap(int x, int y, int width, int depth) {
         return x >= 0 && x + width < this.map.getWidth() - 1 &&
@@ -794,18 +791,16 @@ public class Game {
     }
 
     /**
-     * Sets current mouse tile index.
-     *
-     * @param pos the pos
+     * Sets current tile position of mouse cursor
+     * @param pos x coordinate at [0], y coordinate at [1]
      */
     public void setCurrentMouseTileIndex(int[] pos) {
         this.currentMouseTileIndex = pos;
     }
 
     /**
-     * Get current mouse tile index int [ ].
-     *
-     * @return the int [ ]
+     * Gets the current tile position of mouse cursor
+     * @return pos x coordinate at [0], y coordinate at [1]
      */
     public int[] getCurrentMouseTileIndex() { return currentMouseTileIndex; }
 
@@ -835,6 +830,9 @@ public class Game {
         return this.vehiclesOnMap;
     }
 
+    /**
+     * Handles model update
+     */
     public void handleUpdate(int tick) {
         for (Factory factory : factories) {
             factory.produce(transportNetwork.getNearStations(factory));
