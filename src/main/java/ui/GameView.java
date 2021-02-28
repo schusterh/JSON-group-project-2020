@@ -46,13 +46,13 @@ GameView {
     final int TILE_HEIGHT_OFFSET = 26;
 
     public GameView(Game model, GameController controller, Stage stage) {
-       this.model = model;
-       this.controller = controller;
-       this.stage = stage;
+        this.model = model;
+        this.controller = controller;
+        this.stage = stage;
 
-       this.gameLoop = new GameLoop(controller);
-       this.controller.setGameLoop(this.gameLoop);
-       this.renderer = new TileRenderer();
+        this.gameLoop = new GameLoop(controller);
+        this.controller.setGameLoop(this.gameLoop);
+        this.renderer = new TileRenderer();
     }
 
     public void displayGameScreen() {
@@ -63,8 +63,7 @@ GameView {
         //Creat Menus
         Menu homeMenu = new Menu("Home");
         Menu bauenMenu = new Menu("Building");
-        Menu lebenMenu = new Menu("Live");
-        Menu landscapeMenu = new Menu("Terrain");
+        Menu landscapeMenu = new Menu("Edit");
         Menu speedMenu = new Menu("Speed");
         Menu volumeMenu = new Menu("Music");
         Menu exitMenu = new Menu("Exit");
@@ -81,7 +80,8 @@ GameView {
         MenuItem halfVolumeItem = new MenuItem("50%");
         MenuItem muteVolumeItem = new MenuItem("Off");
 
-        MenuItem landscapeItem = new MenuItem("Shape");
+        MenuItem landscapeItem = new MenuItem("Terrain");
+        MenuItem demolitionItem = new MenuItem("Demolition");
 
         MenuItem speedItem0 = new MenuItem("0");
         speedItem0.setOnAction(event -> controller.stopAnimation());
@@ -106,6 +106,7 @@ GameView {
         exitItem.setAccelerator(KeyCombination.keyCombination("Ctrl+E"));
 
         landscapeItem.setOnAction(event -> controller.setGameMode(GameMode.TERRAIN));
+        demolitionItem.setOnAction(event -> controller.setGameMode(GameMode.DEMOLITION));
 
         // When user click on the Exit item.
         exitItem.setOnAction(event -> System.exit(0));
@@ -114,12 +115,12 @@ GameView {
         // Add menuItems to the Menus
         bauenMenu.getItems().addAll(straßenItem, gleiseItem, airportItem, bäumeItem);
         homeMenu.getItems().addAll(speichernItem, exitItem);
-        landscapeMenu.getItems().add(landscapeItem);
+        landscapeMenu.getItems().addAll(landscapeItem, demolitionItem);
         speedMenu.getItems().addAll(speedItem0, speedItem1, speedItem2);
         volumeMenu.getItems().addAll(fullVolumeItem, halfVolumeItem, muteVolumeItem);
 
         // Add Menus to the MenuBar
-        menuBar.getMenus().addAll(homeMenu, bauenMenu, lebenMenu, landscapeMenu,speedMenu,volumeMenu, exitMenu);
+        menuBar.getMenus().addAll(homeMenu, bauenMenu, landscapeMenu,speedMenu,volumeMenu, exitMenu);
         menuLeiste.setTop(menuBar);
 
 
