@@ -176,6 +176,7 @@ public class Game {
             if (transportNetwork.getPointConnections().containsKey(v.getNextPoint())){
                 v.setCurrentPoint(v.getNextPoint());
                 v.setNextPoint(v.getPath().get(0));
+                v.getPath().remove(0);
             } else {
                 findPath(v,tick);
                 drive(v,tick);
@@ -266,7 +267,8 @@ public class Game {
                         if (!transportNetwork.getReservations().get(p).containsKey(depth+startTime)){
                             origins.put(p,currentPoint);
                             deq.add(p);
-                            if (transportNetwork.getStationPoints().get(targetStation).equals(p)){
+
+                            if (transportNetwork.getStationPoints().get(targetStation).contains(p)){
                                 targetFound = true;
                                 shortestPath.add(p);
                                 Point backtrack = origins.get(p);
