@@ -98,6 +98,11 @@ public class Game {
 
     public List<OnMapBuilding> getBuildingsOnMap() { return buildingsOnMap; }
 
+    /**
+     * Ein Fahrzeug fährt jeden Tick einen Punkt weiter
+     * @param v: Fahrzeug
+     * @param tick: Tick
+     */
     public void drive (Vehicle v, int tick){
         if (v.getPath()!=null) {
             if (transportNetwork.getPointConnections().containsKey(v.getNextPoint())){
@@ -115,7 +120,11 @@ public class Game {
         }
     }
 
-
+    /**
+     * Ein Güterpaket sucht sich von seiner ursprünglichen Fabrik aus ein Ziel
+     * @param gb: Güterpaket
+     * @param f: Ursprungs-Fabrik
+     */
     public void findTarget(GoodsBundle gb, Factory f){
         HashMap<Factory, Double> possibleTargets = new HashMap<>();
         ArrayList<Factory> possTargets = new ArrayList<>();
@@ -154,6 +163,14 @@ public class Game {
         gb.setTargetStation(this.transportNetwork.getNearStations(targetFactory));
     }
 
+    /**
+     * Breitensuche über die Punkte, die das Netzwerk bilden, evtl unter Berücksichtigung der Reservierungen
+     * @param startPoint: Startpunkt
+     * @param targetStation: Zielfabrik
+     * @param vehicleType: Verkehrstyp
+     * @param startTime: Starttick
+     * @return kürzester Weg von startPoint zu targetStation
+     */
     public ArrayList<Point> bfs (Point startPoint, Station targetStation, String vehicleType, int startTime ){
 
         ArrayList<Point> shortestPath = new ArrayList<>();
@@ -231,6 +248,12 @@ public class Game {
         return shortestPath;
     }
 
+    /**
+     * Fahrzeuge suchen sich den Weg für einen Teil ihres Cargos.
+     * @param v: Fahrzeug
+     * @param startTick: Startzeitpunkt
+     * @return
+     */
     public ArrayList<Point> findPath(Vehicle v, int startTick){
         if (!v.getCurrentCargo().isEmpty()) {
             GoodsBundle goodsBundle = v.getCurrentCargo().get(0);
@@ -260,6 +283,12 @@ public class Game {
 
 
     }
+
+    /**
+     * Löscht Fahrzeuge, wenn es auf der Route zu viele gibt, oder wenn sie dem Typ der Route nicht entsprechen.
+     * Fügt Fahrzeuge hinzu, wenn es auf der Route zu wenige gibt.
+     * @param route
+     */
     public void manageVehicles(TrafficRoute route){
         int diff = route.getVehicles().size()-route.getVehicleAmount();
         if (diff > 0){
@@ -628,30 +657,5 @@ public class Game {
             }
         }
         System.out.println("läuft");
-    }
-}
-class PrioPair implements Comparable<PrioPair>{
-    final Station station;
-    final Integer distance;
-
-    public PrioPair(Station station, Integer distance){
-        this.station = station;
-        this.distance = distance;
-    }
-    @Override
-    public int compareTo(PrioPair other) {
-        return (this.distance - other.distance);
-    }
-
-    public Station getStation() {
-        return station;
-    }
-
-    public Integer getDistance() {
-        return distance;
-    }
-
-    boolean containsStation(Station s){
-        return this.getStation().equals(s);
     }
 }
