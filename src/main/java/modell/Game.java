@@ -9,9 +9,11 @@ import java.util.stream.Collectors;
 public class Game {
 
     private ArrayList<Vehicle> vehicles;
+    private ArrayList<Vehicle> vehiclesOnMap = new ArrayList<>();
     private ArrayList<Road> roads;
     private ArrayList<Railway> railways;
     private ArrayList<Factory> factories;
+    private ArrayList<Factory> factoriesOnMap = new ArrayList<>();
     private ArrayList<String> commodities;
     private ArrayList<NatureObject> nature_objects ;
     private ArrayList<Tower> towers;
@@ -107,8 +109,9 @@ public class Game {
                     drive(v,tick);
                 }
             } else {
-                v.unloadCargo(v.getCurrentCargo().get(0));
+
                 if (!v.getCurrentCargo().isEmpty())
+                    v.unloadCargo(v.getCurrentCargo().get(0));
                     findPath(v,tick);
             }
         } if (v.getKind().equals("engine")){
@@ -175,7 +178,7 @@ public class Game {
                         if (!transportNetwork.getReservations().get(p).containsKey(depth+startTime)){
                             origins.put(p,currentPoint);
                             deq.add(p);
-                            if (transportNetwork.getStationPoints().get(targetStation).contains(p)){
+                            if (transportNetwork.getStationPoints().get(targetStation).equals(p)){
                                 targetFound = true;
                                 shortestPath.add(p);
                                 Point backtrack = origins.get(p);
@@ -226,29 +229,33 @@ public class Game {
     }
 
     public ArrayList<Point> findPath(Vehicle v, int startTick){
-        GoodsBundle goodsBundle = v.getCurrentCargo().get(0);
-        ArrayList <Point> path = new ArrayList<>();
+        if (!v.getCurrentCargo().isEmpty()) {
+            GoodsBundle goodsBundle = v.getCurrentCargo().get(0);
+            ArrayList<Point> path = new ArrayList<>();
 
-        if (v.getKind().equals("road vehicle")) {
-            path.addAll(bfs(v.getCurrentPoint(), goodsBundle.getTargetStation(), v.getKind(),startTick));
-        }
-
-        if (v.getKind().equals("plane")){
-            path.addAll(bfs (v.getCurrentPoint(), goodsBundle.getTargetStation(),v.getKind(),startTick));
-
-            for (int i = 0; i < path.size(); i++){
-                transportNetwork.addReservations(path.get(i),startTick+i,v);
+            if (v.getKind().equals("road vehicle")) {
+                path.addAll(bfs(v.getCurrentPoint(), goodsBundle.getTargetStation(), v.getKind(), startTick));
             }
-        }
-        if (v.getKind().equals("engine")){
-            path.addAll(bfs (v.getCurrentPoint(), goodsBundle.getTargetStation(), v.getKind(),startTick));
 
-            for (int i = 0; i < path.size(); i++){
-                transportNetwork.addReservations(path.get(i),startTick+i,v);
+            if (v.getKind().equals("plane")) {
+                path.addAll(bfs(v.getCurrentPoint(), goodsBundle.getTargetStation(), v.getKind(), startTick));
+
+                for (int i = 0; i < path.size(); i++) {
+                    transportNetwork.addReservations(path.get(i), startTick + i, v);
+                }
             }
-        }
+            if (v.getKind().equals("engine")) {
+                path.addAll(bfs(v.getCurrentPoint(), goodsBundle.getTargetStation(), v.getKind(), startTick));
 
-        return path;
+                for (int i = 0; i < path.size(); i++) {
+                    transportNetwork.addReservations(path.get(i), startTick + i, v);
+                }
+            }
+            return path;
+        }
+        else return new ArrayList<>();
+
+
     }
     public void manageVehicles(TrafficRoute route){
         int diff = route.getVehicles().size()-route.getVehicleAmount();
@@ -264,12 +271,15 @@ public class Game {
             Random rand = new Random();
             for (int i = 0; i < Math.abs(diff);i++){
                 route.addVehicle(possVehicles.get(rand.nextInt(possVehicles.size())));
+                vehiclesOnMap.add(possVehicles.get(rand.nextInt(possVehicles.size())));
             }
         }
         for (Vehicle v : route.getVehicles()){
             if (!v.getKind().equals(route.getVehicleType())){
                 route.removeVehicle(v);
+                vehiclesOnMap.remove(v);
                 manageVehicles(route);
+
             }
         }
     }
@@ -605,16 +615,21 @@ public class Game {
     }
 
     public void handleUpdate(int tick) {
-        for (Factory factory : factories) {
-            factory.produce();
+        if (!factoriesOnMap.isEmpty()) {
+            for (Factory factory : factoriesOnMap) {
+                factory.produce();
+            }
         }
         for (TrafficRoute trafficRoute : transportNetwork.getTrafficRoutes().keySet()){
             manageVehicles(trafficRoute);
         }
-        for (Vehicle v : vehicles){
-            drive(v,tick);
-            System.out.println("läuft");
+        if (!vehiclesOnMap.isEmpty()) {
+            for (Vehicle v : vehiclesOnMap) {
+                drive(v, tick);
+
+            }
         }
+        System.out.println("läuft");
     }
 }
 class PrioPair implements Comparable<PrioPair>{

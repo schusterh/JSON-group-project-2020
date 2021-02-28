@@ -1,5 +1,6 @@
 package modell;
 
+import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -89,6 +90,9 @@ class TrafficRoute {
 
     public ArrayList<Point> getPoints() {
         return points;
+    }
+    public void addPoints(Point point){
+        this.points.add(point);
     }
 
     public ArrayList<Vehicle> getVehicles() {
@@ -221,7 +225,22 @@ public class TransportNetwork {
 
     public void addTrafficSection(Double xPos, Double yPos, HashMap<String, ArrayList<Double>> newPoints, ArrayList<ArrayList<String>> newConnect) {
         //nur für objekte, die punkte und punktverbindungen auf der karte hinzufügen
+        for (Station s : stationPoints.keySet()){
+            for (Point p : stationPoints.get(s)){
+                if (Math.abs(p.getX()-xPos)<=1 && (p.getY()-yPos)<=1){
+                    for (TrafficRoute trafficRoute : trafficRoutes.keySet()){
+                        if (trafficRoute.getStations().contains(s)){
+                            for (String point : newPoints.keySet()){
+                                Point newPoint = new Point(newPoints.get(point).get(0),newPoints.get(point).get(1));
+                                trafficRoute.addPoints(newPoint);
+                            }
+                        }
+                    }
+                    //TrafficRoute route = new TrafficRoute()
+                }
+            }
 
+        }
         HashMap<Point,ArrayList<String>> connections = new HashMap<>();
         for (String name : newPoints.keySet()) {
             Point p = new Point(newPoints.get(name).get(0) + xPos, newPoints.get(name).get(1) + yPos);
@@ -257,12 +276,17 @@ public class TransportNetwork {
             if (!duplicate){
                 pointConnections.put(point,connectingPoints);
             }
+
         }
     }
 
     public void addStation(Station s, double x, double y) {
         adjStations.putIfAbsent(s, new HashMap<>());
         s.setLabel(stationnameGenerator());
+        stationPoints.put(s,new ArrayList<Point>());
+        stationPoints.get(s).add(new Point(x,y));
+
+
         for (TrafficRoute route : trafficRoutes.keySet()){
             for (Point point : route.getPoints()){
                 if (Math.abs(point.getX()-x) <= 1.5 && (Math.abs(point.getY()-y) <= 1.5 )){
