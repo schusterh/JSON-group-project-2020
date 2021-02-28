@@ -116,7 +116,6 @@ GameView {
             if(homeMenu.getText().equals("Home")) {
             homeMenu.setText("Start");
             bauenMenu.setText("Bauen");
-            lebenMenu.setText("Leben");
             landscapeMenu.setText("Landschaft");
             speedMenu.setText("Geschwindigkeit");
             volumeMenu.setText("Musik");
@@ -134,7 +133,6 @@ GameView {
             else {
                 homeMenu.setText("Home");
                 bauenMenu.setText("Building");
-                lebenMenu.setText("Live");
                 landscapeMenu.setText("Terrain");
                 speedMenu.setText("Speed");
                 volumeMenu.setText("Music");
@@ -164,14 +162,14 @@ GameView {
         BorderPane menuLeiste = new BorderPane();
         // Add menuItems to the Menus
         bauenMenu.getItems().addAll(straßenItem, gleiseItem, airportItem, bäumeItem);
-        homeMenu.getItems().addAll(speichernItem, exitItem);
+        homeMenu.getItems().addAll(exitItem);
         landscapeMenu.getItems().addAll(landscapeItem, demolitionItem);
         speedMenu.getItems().addAll(speedItem0, speedItem1, speedItem2);
         volumeMenu.getItems().addAll(fullVolumeItem, halfVolumeItem, muteVolumeItem);
         languageMenu.getItems().addAll(changeLang);
 
         // Add Menus to the MenuBar
-        menuBar.getMenus().addAll(homeMenu, bauenMenu, landscapeMenu,speedMenu,volumeMenu, exitMenu);
+        menuBar.getMenus().addAll(homeMenu, bauenMenu, landscapeMenu,speedMenu,volumeMenu);
         menuLeiste.setTop(menuBar);
 
 
