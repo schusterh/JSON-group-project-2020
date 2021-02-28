@@ -116,7 +116,6 @@ GameView {
         Menu volumeMenu = new Menu("Music");
         Menu languageMenu = new Menu("Language");
 
-
         //Creat MenuItems (Unterpunkte der Menüpunkte)
         MenuItem straßenItem = new MenuItem("Roads");
         MenuItem gleiseItem = new MenuItem("Rails");
@@ -139,7 +138,6 @@ GameView {
         MenuItem speedItem2 = new MenuItem("2x");
         speedItem2.setOnAction(event -> controller.setTickLenght(0.5));
 
-
         //Musik Lautstärke
         fullVolumeItem.setOnAction(event -> {
             controller.setVolume(1.0);
@@ -156,7 +154,7 @@ GameView {
         // Add menuItems to the Menus
         bauenMenu.getItems().addAll(straßenItem, gleiseItem, airportItem, bäumeItem);
         homeMenu.getItems().addAll(exitItem);
-        landscapeMenu.getItems().add(landscapeItem);
+        landscapeMenu.getItems().addAll(landscapeItem, demolitionItem);
         speedMenu.getItems().addAll(speedItem0, speedItem1, speedItem2);
         volumeMenu.getItems().addAll(fullVolumeItem, halfVolumeItem, muteVolumeItem);
         languageMenu.getItems().addAll(changeLang);
@@ -166,6 +164,16 @@ GameView {
 
         BorderPane menuLeiste = new BorderPane();
         menuLeiste.setTop(menuBar);
+
+        // Set Accelerator for Exit MenuItem.
+        exitItem.setAccelerator(KeyCombination.keyCombination("Ctrl+E"));
+
+        landscapeItem.setOnAction(event -> controller.setGameMode(GameMode.TERRAIN));
+        demolitionItem.setOnAction(event -> controller.setGameMode(GameMode.DEMOLITION));
+
+        // When user click on the Exit item.
+        exitItem.setOnAction(event -> System.exit(0));
+
 
         //Verschiedene HBoxen für die Unterschiedlichen Baumenüs (Natur, Road, Rail und Airport)
         HBox hboxNatur = new HBox();
@@ -196,7 +204,7 @@ GameView {
             if(homeMenu.getText().equals("Home")) {
             homeMenu.setText("Start");
             bauenMenu.setText("Bauen");
-            landscapeMenu.setText("Landschaft");
+            landscapeMenu.setText("Bearbeiten");
             speedMenu.setText("Geschwindigkeit");
             volumeMenu.setText("Musik");
             languageMenu.setText("Sprache");
@@ -208,13 +216,14 @@ GameView {
             changeLang.setText("Sprache wechseln");
             closeButton.setText("Zuklappen");
             muteVolumeItem.setText("Aus");
-            landscapeItem.setText("Form");
+            landscapeItem.setText("Terrain");
+            demolitionItem.setText("Abriss");
             }
             //Englisch
             else {
                 homeMenu.setText("Home");
                 bauenMenu.setText("Building");
-                landscapeMenu.setText("Terrain");
+                landscapeMenu.setText("Edit");
                 speedMenu.setText("Speed");
                 volumeMenu.setText("Music");
                 languageMenu.setText("Language");
@@ -226,7 +235,8 @@ GameView {
                 changeLang.setText("Change language");
                 closeButton.setText("Close");
                 muteVolumeItem.setText("Off");
-                landscapeItem.setText("Shape");
+                landscapeItem.setText("Terrain");
+                demolitionItem.setText("Demolition");
             }
         });
 
