@@ -144,9 +144,9 @@ public class JSONImporter {
                 Vehicle r = new Vehicle(name, kind, graphic, speed, Optional.ofNullable(cargo));
                 v.add(r);
             }
-            return v;
+
         }
-        return null;
+        return v;
     }
 
     public ArrayList<Road> getRoads(JSONObject roads) throws Exception {
