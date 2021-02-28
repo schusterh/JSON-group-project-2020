@@ -17,7 +17,7 @@ public class Game {
     private ArrayList<Road> roads;
     private ArrayList<Railway> railways;
     private ArrayList<Factory> factories;
-    private ArrayList<Factory> factoriesOnMap = new ArrayList<>();
+    //private ArrayList<Factory> factoriesOnMap = new ArrayList<>();
     private ArrayList<String> commodities;
     private ArrayList<NatureObject> nature_objects ;
     private ArrayList<Tower> towers;
@@ -804,8 +804,8 @@ public class Game {
     }
 
     public void handleUpdate(int tick) {
-        if (!factoriesOnMap.isEmpty()) {
-            for (Factory factory : factoriesOnMap) {
+        if (!factories.isEmpty()) {
+            for (Factory factory : factories) {
                 factory.produce(transportNetwork.getNearStations(factory));
             }
         }

@@ -412,6 +412,7 @@ public class TransportNetwork {
             for (Point point : route.getPoints()){
                 if (Math.abs(point.getX()-x) <= 1.5 && (Math.abs(point.getY()-y) <= 1.5 )){
                     route.addStation(s);
+                    System.out.println("New Station added to route");
                 }
             }
         }
