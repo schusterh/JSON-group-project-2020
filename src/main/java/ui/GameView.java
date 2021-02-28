@@ -279,11 +279,35 @@ GameView {
             }
         }
 
+
+        for (Tower t : this.model.getTowers()) {
+
+            if (t.getBuildmenu().equals("airport") && t.getSpecial().equals("tower")) {
+                Button bTower = new Button();
+
+                StandardImage std_airport = new StandardImage("/buildings/error_tile.png");
+                ImageView imageView = new ImageView(std_airport.setImage("/buildings/" + t.getName() + ".png"));
+                //ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + airport.getName() + ".png")));
+                imageView.setPreserveRatio(true);
+                imageView.setFitHeight(100);
+
+                bTower.setGraphic(imageView);
+
+                bTower.setOnAction(event -> {
+                    buildingLayer.placeBuilding(t);
+                });
+                hboxAirport.getChildren().add(bTower);
+            }
+        }
+
         airportItem.setOnAction(event -> {
             topBar.getChildren().remove(borderPane);
             borderPane.setCenter(hboxAirport);
             topBar.getChildren().add(borderPane);
         });
+
+
+
 
 
         // When user click on the bäume item.

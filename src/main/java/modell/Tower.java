@@ -19,4 +19,12 @@ public class Tower extends Building{
     public int getMaxplanes() {
         return maxplanes;
     }
+
+    public String getBuildmenu() {
+        return buildmenu;
+    }
+
+    public String getSpecial() {
+        return special;
+    }
 }
