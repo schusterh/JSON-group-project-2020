@@ -1,36 +1,50 @@
 package ui;
 
 import Controller.MenuController;
-import javafx.geometry.Pos;
-import javafx.scene.Group;
+import javafx.geometry.Pos;;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.shape.Box;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import modell.Game;
 import modell.JSONImporter;
-import types.Tile;
 
 import java.io.File;
-import java.util.Stack;
 
 
+/**
+ * The type Menu view.
+ */
 public class MenuView {
 
+    /**
+     * The Controller.
+     */
     MenuController controller;
+    /**
+     * The Stage.
+     */
     Stage stage;
 
+    /**
+     * Instantiates a new Menu view.
+     *
+     * @param stage      the stage
+     * @param controller the controller
+     */
     public MenuView(Stage stage, MenuController controller) {
         this.stage = stage;
         this.controller = controller;
     }
 
+    /**
+     * Displays a  welcome screen. On the welcome screen you can choose your scenario with a file chooser.
+     */
     public void displayWelcomeScreen() {
 
         final String TITLE = "GGG";
@@ -61,6 +75,7 @@ public class MenuView {
                 Game prerequisites = importer.LoadMap();
                 this.controller.createGame(prerequisites, this.stage);
             }
+
             catch (Exception ex) {
                 Stage popupwindow=new Stage();
 
@@ -68,14 +83,14 @@ public class MenuView {
                 popupwindow.setTitle("Error!");
 
 
-                Label label1= new Label(ex.getMessage());
+                Label message= new Label(ex.getMessage());
 
 
-                Button button1= new Button("Close");
+                Button closeButton = new Button("Close");
 
-                button1.setOnAction(d -> popupwindow.close());
+                closeButton.setOnAction(d -> popupwindow.close());
                 VBox layout= new VBox(10);
-                layout.getChildren().addAll(label1, button1);
+                layout.getChildren().addAll(message, closeButton);
                 layout.setAlignment(Pos.CENTER);
                 Scene error_scene= new Scene(layout, 300, 250);
                 popupwindow.setScene(error_scene);
