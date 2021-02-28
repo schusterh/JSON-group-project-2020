@@ -10,15 +10,34 @@ import org.json.*;
 
 import javax.swing.*;
 
+/**
+ * The JSON Importer is used to choose a scenario specified as a JSON-file. All information that is necessary for the game to run,
+ * must be specified in the file. The JSON Imported reads the file and checks if all obligatory data is present and if that data is in a
+ * correct format. If this is not the case, then the JSON-Importer gives back an error message wich includes the problem.
+ */
 public class JSONImporter {
+
 
     private File file;
 
 
+    /**
+     * Instantiates a new Json importer.
+     *
+     * @param file the JSON-file from the file chooser window.
+     */
     public JSONImporter(File file) {
         this.file = file;
     }
 
+    /**
+     * LoadMap() is the main function of the JSON-Importer. Its main purpose is to call all other server functions
+     * and gather all the necesary information into the correct type of data. With that data it creates a Game Object
+     * which represents the actual game later being played.
+     *
+     * @return the game
+     * @throws Exception Throws a set of different exception-messages, depending on where it occurs.
+     */
     public Game LoadMap() throws Exception {
         String ERROR_MESSAGE = "Not enogh objects in the scenario!";
         final String STANDARD_BG_MUSIC = "happy_tune.mp3";
@@ -47,17 +66,26 @@ public class JSONImporter {
 
             JSONObject js_vehicles = json.getJSONObject("vehicles");
             ArrayList<Vehicle> vehicles = getVehicles(js_vehicles);
+            System.out.println(vehicles);
+
             JSONObject js_buildings = json.getJSONObject("buildings");
             ArrayList<Road> roads = getRoads(js_buildings);
+
             ArrayList<Railway> railways = getRailways(js_buildings);
             ArrayList<Factory> factories = getFactories(js_buildings);
+
             JSONArray js_commodities = json.getJSONArray("commodities");
             ArrayList<String> commodities = getCommodities(js_commodities);
+
             JSONObject js_map = json.getJSONObject("map");
             Map map = getMap(js_map);
+
             ArrayList<NatureObject> nature_objects = getNatureObjects(js_buildings);
+
             ArrayList<Tower> towers = getTowers(js_buildings);
+
             ArrayList<AirportObject> airport_objects = getAirportObjects(js_buildings);
+
             ArrayList<String> music;
             if(json.has("music")) {
                 JSONObject json_music = json.getJSONObject("music");
@@ -68,6 +96,7 @@ public class JSONImporter {
                 music.add(STANDARD_BG_MUSIC);
             }
 
+            // If there is at least one type of every necessary object
             if(commodities == null || roads == null || railways == null || towers == null || airport_objects == null || nature_objects == null || factories == null || vehicles == null) {
                 throw new Exception(ERROR_MESSAGE);
             }
@@ -77,6 +106,13 @@ public class JSONImporter {
         }
     }
 
+    /**
+     * Gets an arraylist of all the vehicles specified in the json file.
+     *
+     * @param vehicles the jsonobject with the name "vehicles" in the json file.
+     * @return the arraylist of vehicle objects
+     * @throws Exception with a specified error message depending on what the error is.
+     */
     public ArrayList<Vehicle> getVehicles(JSONObject vehicles) throws Exception{
 
         String ERROR_MESSAGE = "Error! The vehicle is not in a supported format!";
@@ -119,7 +155,6 @@ public class JSONImporter {
                 ArrayList<HashMap<String, Integer>> cargo = null;
                 if (vehicle.has("cargo")) {
                     try {
-
                         cargo = new ArrayList<>();
                         JSONArray cargo_data = new JSONArray();
                         if (vehicle.get("cargo") instanceof JSONObject) {
@@ -127,6 +162,8 @@ public class JSONImporter {
                         } else if (vehicle.get("cargo") instanceof JSONArray) {
                             cargo_data = vehicle.getJSONArray("cargo");
                         }
+
+
                         for (int i = 0; i < cargo_data.length(); i++) {
                             JSONObject obj = cargo_data.getJSONObject(i);
                             for (String item : obj.keySet()) {
@@ -144,11 +181,17 @@ public class JSONImporter {
                 Vehicle r = new Vehicle(name, kind, graphic, speed, Optional.ofNullable(cargo));
                 v.add(r);
             }
-            return v;
         }
-        return null;
+        return v;
     }
 
+    /**
+     * Gets an arraylist of all the roads specified in the json file.
+     *
+     * @param roads a json object of all elements in "buildings" of the json file.
+     * @return the arraylist of all road types objects
+     * @throws Exception with a specified error message depending on what the error is.
+     */
     public ArrayList<Road> getRoads(JSONObject roads) throws Exception {
         String ERROR_MESSAGE = "Error! The road is not in a supported format!";
         ArrayList<Road> r = new ArrayList<>();
@@ -258,6 +301,13 @@ public class JSONImporter {
         return r;
     }
 
+    /**
+     * Gets an arraylist of all the rails specified in the json file.
+     *
+     * @param rails a json object of all elements in "buildings" of the json file.
+     * @return the arraylist of all rail types
+     * @throws Exception with a specified error message depending on what the error is.
+     */
     public ArrayList<Railway> getRailways(JSONObject rails) throws Exception{
         ArrayList<Railway> r = new ArrayList<>();
 
@@ -393,6 +443,13 @@ public class JSONImporter {
     }
 
 
+    /**
+     * Gets an arraylist of all the factories specified in the json file.
+     *
+     * @param factories a json object of all elements in "buildings" of the json file.
+     * @return the arraylist of all factory types objects
+     * @throws Exception with a specified error message depending on what the error is.
+     */
     public ArrayList<Factory> getFactories(JSONObject factories) throws Exception{
         String ERROR_MESSAGE = "Error! The factory is not in a supported format!";
         ArrayList<Factory> f = new ArrayList<>();
@@ -500,6 +557,13 @@ public class JSONImporter {
         return f;
     }
 
+    /**
+     * Gets an arraylist of all the comodities specified in the json file.
+     *
+     * @param comodities the jsonobject with the key "comodities" in the json file.
+     * @return the arraylist of all commodities
+     * @throws Exception with a specified error message depending on what the error is.
+     */
     public ArrayList<String> getCommodities(JSONArray comodities) throws Exception{
         String ERROR_MESSAGE = "Error! The commodity-list is empty!";
         ArrayList<String> c = new ArrayList<>();
@@ -520,6 +584,13 @@ public class JSONImporter {
         return c;
     }
 
+    /**
+     * Gets a map object specified in the json file.
+     *
+     * @param map the jsonobject with the key "map" in the json file.
+     * @return map object
+     * @throws Exception with a specified error message depending on what the error is.
+     */
     public Map getMap(JSONObject map) throws Exception{
         String ERROR_MESSAGE = "Error! The map is not in a supported format!";
         if (!map.has("gamemode") || !map.has("mapgen") || !map.has("width") || !map.has("depth")) {
@@ -563,6 +634,13 @@ public class JSONImporter {
         }
     }
 
+    /**
+     * Gets an arraylist of all the nature objects specified in the json file.
+     *
+     * @param natobs a json object of all elements in "buildings" of the json file.
+     * @return the arraylist of all objects which can be identified as nature objects
+     * @throws Exception with a specified error message depending on what the error is.
+     */
     public ArrayList<NatureObject> getNatureObjects(JSONObject natobs) throws Exception{
         String ERROR_MESSAGE = "Error! The nature object is not in a supported format!";
         ArrayList<NatureObject> no  = new ArrayList<>();
@@ -627,6 +705,13 @@ public class JSONImporter {
         return no;
     }
 
+    /**
+     * Gets towers.
+     *
+     * @param towers the towers
+     * @return the towers
+     * @throws Exception the exception
+     */
     public ArrayList<Tower> getTowers(JSONObject towers) throws Exception{
         String ERROR_MESSAGE = "Error! The tower is not in a supported format!";
         ArrayList<Tower> t = new ArrayList<>();
@@ -651,6 +736,14 @@ public class JSONImporter {
         }
         return t;
     }
+
+    /**
+     * Gets airport objects.
+     *
+     * @param airobjs the airobjs
+     * @return the airport objects
+     * @throws Exception the exception
+     */
     public ArrayList<AirportObject> getAirportObjects(JSONObject airobjs) throws Exception{
         String ERROR_MESSAGE = "Error! The airport object is not in a supported format!";
         ArrayList<AirportObject> r = new ArrayList<>();
@@ -763,6 +856,13 @@ public class JSONImporter {
         return r;
     }
 
+    /**
+     * Gets music.
+     *
+     * @param music the music
+     * @return the music
+     * @throws Exception the exception
+     */
     public ArrayList<String> getMusic(JSONObject music) throws Exception{
         ArrayList<String> m = new ArrayList<>(1);
         if (!music.has("background_music_path")) {
