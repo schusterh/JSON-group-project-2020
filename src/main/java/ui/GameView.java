@@ -67,15 +67,17 @@ GameView {
         Menu landscapeMenu = new Menu("Terrain");
         Menu speedMenu = new Menu("Speed");
         Menu volumeMenu = new Menu("Music");
-        Menu exitMenu = new Menu("Exit");
+        Menu languageMenu = new Menu("Language");
+
 
         //Creat MenuItems
         MenuItem straßenItem = new MenuItem("Roads");
         MenuItem gleiseItem = new MenuItem("Rails");
         MenuItem airportItem = new MenuItem("Airport");
         MenuItem bäumeItem = new MenuItem("Natur");
-        MenuItem speichernItem = new MenuItem("Save");
+
         MenuItem exitItem = new MenuItem("Exit");
+        MenuItem changeLang = new MenuItem("Change language");
 
         MenuItem fullVolumeItem = new MenuItem("100%");
         MenuItem halfVolumeItem = new MenuItem("50%");
@@ -102,6 +104,48 @@ GameView {
             controller.setVolume(0.0);
         });
 
+        Button closeButton = new Button("Close");
+
+        changeLang.setOnAction(event -> {
+            if(homeMenu.getText().equals("Home")) {
+            homeMenu.setText("Start");
+            bauenMenu.setText("Bauen");
+            lebenMenu.setText("Leben");
+            landscapeMenu.setText("Landschaft");
+            speedMenu.setText("Geschwindigkeit");
+            volumeMenu.setText("Musik");
+            languageMenu.setText("Sprache");
+            straßenItem.setText("Wege");
+            gleiseItem.setText("Gleise");
+            airportItem.setText("Flughafen");
+            bäumeItem.setText("Natur");
+            exitItem.setText("Verlassen");
+            changeLang.setText("Sprache wechseln");
+            closeButton.setText("Zuklappen");
+            muteVolumeItem.setText("Aus");
+            landscapeItem.setText("Form");
+            }
+            else {
+                homeMenu.setText("Home");
+                bauenMenu.setText("Building");
+                lebenMenu.setText("Live");
+                landscapeMenu.setText("Terrain");
+                speedMenu.setText("Speed");
+                volumeMenu.setText("Music");
+                languageMenu.setText("Language");
+                straßenItem.setText("Roads");
+                gleiseItem.setText("Rails");
+                airportItem.setText("Airport");
+                bäumeItem.setText("Nature");
+                exitItem.setText("Exit");
+                changeLang.setText("Change language");
+                closeButton.setText("Close");
+                muteVolumeItem.setText("Off");
+                landscapeItem.setText("Shape");
+            }
+        });
+
+
         // Set Accelerator for Exit MenuItem.
         exitItem.setAccelerator(KeyCombination.keyCombination("Ctrl+E"));
 
@@ -113,17 +157,18 @@ GameView {
         BorderPane menuLeiste = new BorderPane();
         // Add menuItems to the Menus
         bauenMenu.getItems().addAll(straßenItem, gleiseItem, airportItem, bäumeItem);
-        homeMenu.getItems().addAll(speichernItem, exitItem);
+        homeMenu.getItems().addAll(exitItem);
         landscapeMenu.getItems().add(landscapeItem);
         speedMenu.getItems().addAll(speedItem0, speedItem1, speedItem2);
         volumeMenu.getItems().addAll(fullVolumeItem, halfVolumeItem, muteVolumeItem);
+        languageMenu.getItems().addAll(changeLang);
 
         // Add Menus to the MenuBar
-        menuBar.getMenus().addAll(homeMenu, bauenMenu, lebenMenu, landscapeMenu,speedMenu,volumeMenu, exitMenu);
+        menuBar.getMenus().addAll(homeMenu, bauenMenu, lebenMenu, landscapeMenu,speedMenu,volumeMenu,languageMenu);
         menuLeiste.setTop(menuBar);
 
 
-        Button closeButton = new Button("Close");
+
         //Label messageLabel = new Label("Pflanze neue Bäume:");
 
         //HBox hbox = new HBox();
