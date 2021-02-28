@@ -98,8 +98,14 @@ public class GameController {
     public boolean isBuildingPossible() {
         OnMapBuilding pendingBuilding = this.view.getBuildingLayer().getToBePlacedBuilding();
 
-        if (model.isInWater(pendingBuilding.startX, pendingBuilding.startY, pendingBuilding.width, pendingBuilding.depth)) return false;
-        if (!model.isInMap(pendingBuilding.startX, pendingBuilding.startY, pendingBuilding.width, pendingBuilding.depth)) return false;
+        if (model.isInWater(pendingBuilding.startX, pendingBuilding.startY, pendingBuilding.width, pendingBuilding.depth)) {
+            System.out.println("Building is in water!");
+            return false;
+        }
+        if (!model.isInMap(pendingBuilding.startX, pendingBuilding.startY, pendingBuilding.width, pendingBuilding.depth)) {
+            System.out.println("Building is not in map! :(");
+            return false;
+        }
 
         if (pendingBuilding.model.getClass() == Road.class) {
             Road pendingRoad = (Road) pendingBuilding.model;

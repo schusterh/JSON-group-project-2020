@@ -419,16 +419,6 @@ public class Game {
         return Optional.empty();
     }
 
-    public void possiblyConnectStation(OnMapBuilding newRoad) {
-        if (newRoad.model.getClass() == Road.class) {
-            Road roadModel = (Road) newRoad.model;
-        }
-    }
-
-    public void updateRoadNetwork(OnMapBuilding newRoad) {
-        ArrayList<OnMapBuilding> adjBuildings = this.getAdjBuildings(newRoad);
-    }
-
     public ArrayList<OnMapBuilding> getAdjRoads(OnMapBuilding newRoad) {
         ArrayList<OnMapBuilding> returnList = new ArrayList<>();
 
@@ -570,13 +560,18 @@ public class Game {
 
     public boolean isInWater(int x, int y, int width, int depth) {
         int waterCount = 0;
+        System.out.println("Building X: " + x);
+        System.out.println("Building Y: " + y);
+        System.out.println("Building Width: " + width);
+        System.out.println("Building Depth: " + depth);
         for (int xPos = x; xPos < x + width; xPos++) {
-            for (int yPos = 0; yPos < y+depth; yPos++) {
+            for (int yPos = y; yPos < y+depth; yPos++) {
                 if (this.map.getTile(xPos, yPos).height == -1) {
                     waterCount++;
                 }
             }
         }
+        System.out.println("Tiles in water: " + waterCount);
         return waterCount >= 1;
     }
 
