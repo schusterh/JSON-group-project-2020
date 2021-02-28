@@ -10,9 +10,11 @@ import java.util.stream.Collectors;
 public class Game {
 
     private ArrayList<Vehicle> vehicles;
+    private ArrayList<Vehicle> vehiclesOnMap = new ArrayList<>();
     private ArrayList<Road> roads;
     private ArrayList<Railway> railways;
     private ArrayList<Factory> factories;
+    private ArrayList<Factory> factoriesOnMap = new ArrayList<>();
     private ArrayList<String> commodities;
     private ArrayList<NatureObject> nature_objects ;
     private ArrayList<Tower> towers;
@@ -97,29 +99,33 @@ public class Game {
 
     public List<OnMapBuilding> getBuildingsOnMap() { return buildingsOnMap; }
 
+    /**
+     * Ein Fahrzeug fährt jeden Tick einen Punkt weiter
+     * @param v: Fahrzeug
+     * @param tick: Tick
+     */
     public void drive (Vehicle v, int tick){
-        if (v.getKind().equals("road vehicle")){
-            if (v.getPath()!=null) {
-                if (transportNetwork.getPoints().contains(v.getNextPoint())){
-                    v.setCurrentPoint(v.getNextPoint());
-                    v.setNextPoint(v.getPath().get(0));
-                } else {
-                    findPath(v,tick);
-                    drive(v,tick);
-                }
+        if (v.getPath()!=null) {
+            if (transportNetwork.getPointConnections().containsKey(v.getNextPoint())){
+                v.setCurrentPoint(v.getNextPoint());
+                v.setNextPoint(v.getPath().get(0));
             } else {
-                v.unloadCargo(v.getCurrentCargo().get(0));
-                if (!v.getCurrentCargo().isEmpty())
-                    findPath(v,tick);
+                findPath(v,tick);
+                drive(v,tick);
             }
-        } if (v.getKind().equals("engine")){
-            if (v.getPath()!=null){
-
+        } else {
+            if (!v.getCurrentCargo().isEmpty()) {
+                v.unloadCargo(v.getCurrentCargo().get(0));
+                findPath(v, tick);
             }
         }
     }
 
-
+    /**
+     * Ein Güterpaket sucht sich von seiner ursprünglichen Fabrik aus ein Ziel
+     * @param gb: Güterpaket
+     * @param f: Ursprungs-Fabrik
+     */
     public void findTarget(GoodsBundle gb, Factory f){
         HashMap<Factory, Double> possibleTargets = new HashMap<>();
         ArrayList<Factory> possTargets = new ArrayList<>();
@@ -130,9 +136,18 @@ public class Game {
                     .forEach(p -> possibleTargets.put(g, null));
             Station nearF = transportNetwork.getNearStations(f);
             Station nearG = transportNetwork.getNearStations(g);
+            double distance = Math.sqrt((transportNetwork.getStationPoints().get(nearG).get(0).getX()
+                    - transportNetwork.getStationPoints().get(nearF).get(0).getX())
+                    * (transportNetwork.getStationPoints().get(nearG).get(0).getX()
+                    - transportNetwork.getStationPoints().get(nearF).get(0).getX())
+                    + (transportNetwork.getStationPoints().get(nearG).get(0).getY()
+                    - transportNetwork.getStationPoints().get(nearF).get(0).getY())
+                    * (transportNetwork.getStationPoints().get(nearG).get(0).getY()
+                    - transportNetwork.getStationPoints().get(nearF).get(0).getY()
+                    ));
             double weight = (double) (g.getStorage().get(gb.getGoodType())
                     - g.getCurrentStorage().get(gb.getGoodType()))
-                    / transportNetwork.getAdjStations(nearF).get(nearG).size();
+                    / distance;
             possibleTargets.put(g, weight);
             possTargets.add(g);
         }
@@ -148,6 +163,15 @@ public class Game {
         Factory targetFactory = possTargets.get(randomIndex);
         gb.setTargetStation(this.transportNetwork.getNearStations(targetFactory));
     }
+
+    /**
+     * Breitensuche über die Punkte, die das Netzwerk bilden, evtl unter Berücksichtigung der Reservierungen
+     * @param startPoint: Startpunkt
+     * @param targetStation: Zielfabrik
+     * @param vehicleType: Verkehrstyp
+     * @param startTime: Starttick
+     * @return kürzester Weg von startPoint zu targetStation
+     */
     public ArrayList<Point> bfs (Point startPoint, Station targetStation, String vehicleType, int startTime ){
 
         ArrayList<Point> shortestPath = new ArrayList<>();
@@ -175,7 +199,7 @@ public class Game {
                         if (!transportNetwork.getReservations().get(p).containsKey(depth+startTime)){
                             origins.put(p,currentPoint);
                             deq.add(p);
-                            if (transportNetwork.getStationPoints().get(targetStation).contains(p)){
+                            if (transportNetwork.getStationPoints().get(targetStation).equals(p)){
                                 targetFound = true;
                                 shortestPath.add(p);
                                 Point backtrack = origins.get(p);
@@ -225,31 +249,47 @@ public class Game {
         return shortestPath;
     }
 
+    /**
+     * Fahrzeuge suchen sich den Weg für einen Teil ihres Cargos.
+     * @param v: Fahrzeug
+     * @param startTick: Startzeitpunkt
+     * @return
+     */
     public ArrayList<Point> findPath(Vehicle v, int startTick){
-        GoodsBundle goodsBundle = v.getCurrentCargo().get(0);
-        ArrayList <Point> path = new ArrayList<>();
+        if (!v.getCurrentCargo().isEmpty()) {
+            GoodsBundle goodsBundle = v.getCurrentCargo().get(0);
+            ArrayList<Point> path = new ArrayList<>();
 
-        if (v.getKind().equals("road vehicle")) {
-            path.addAll(bfs(v.getCurrentPoint(), goodsBundle.getTargetStation(), v.getKind(),startTick));
-        }
-
-        if (v.getKind().equals("plane")){
-            path.addAll(bfs (v.getCurrentPoint(), goodsBundle.getTargetStation(),v.getKind(),startTick));
-
-            for (int i = 0; i < path.size(); i++){
-                transportNetwork.addReservations(path.get(i),startTick+i,v);
+            if (v.getKind().equals("road vehicle")) {
+                path.addAll(bfs(v.getCurrentPoint(), goodsBundle.getTargetStation(), v.getKind(), startTick));
             }
-        }
-        if (v.getKind().equals("engine")){
-            path.addAll(bfs (v.getCurrentPoint(), goodsBundle.getTargetStation(), v.getKind(),startTick));
 
-            for (int i = 0; i < path.size(); i++){
-                transportNetwork.addReservations(path.get(i),startTick+i,v);
+            if (v.getKind().equals("plane")) {
+                path.addAll(bfs(v.getCurrentPoint(), goodsBundle.getTargetStation(), v.getKind(), startTick));
+
+                for (int i = 0; i < path.size(); i++) {
+                    transportNetwork.addReservations(path.get(i), startTick + i, v);
+                }
             }
-        }
+            if (v.getKind().equals("engine")) {
+                path.addAll(bfs(v.getCurrentPoint(), goodsBundle.getTargetStation(), v.getKind(), startTick));
 
-        return path;
+                for (int i = 0; i < path.size(); i++) {
+                    transportNetwork.addReservations(path.get(i), startTick + i, v);
+                }
+            }
+            return path;
+        }
+        else return new ArrayList<>();
+
+
     }
+
+    /**
+     * Löscht Fahrzeuge, wenn es auf der Route zu viele gibt, oder wenn sie dem Typ der Route nicht entsprechen.
+     * Fügt Fahrzeuge hinzu, wenn es auf der Route zu wenige gibt.
+     * @param route
+     */
     public void manageVehicles(TrafficRoute route){
         int diff = route.getVehicles().size()-route.getVehicleAmount();
         if (diff > 0){
@@ -264,12 +304,15 @@ public class Game {
             Random rand = new Random();
             for (int i = 0; i < Math.abs(diff);i++){
                 route.addVehicle(possVehicles.get(rand.nextInt(possVehicles.size())));
+                vehiclesOnMap.add(possVehicles.get(rand.nextInt(possVehicles.size())));
             }
         }
         for (Vehicle v : route.getVehicles()){
             if (!v.getKind().equals(route.getVehicleType())){
                 route.removeVehicle(v);
+                vehiclesOnMap.remove(v);
                 manageVehicles(route);
+
             }
         }
     }
@@ -391,7 +434,7 @@ public class Game {
             });*/
 
             if (roadModel.getSpecial().isEmpty()) {
-                this.transportNetwork.addTrafficSection((double) pendingBuilding.startX, (double) pendingBuilding.startY, roadModel.getPoints(), roadModel.getRoads());
+                this.transportNetwork.addTrafficSection((double) pendingBuilding.startX, (double) pendingBuilding.startY, roadModel.getPoints(), roadModel.getRoads(),Road.class);
                 System.out.println("Added road to transport network!");
             } else if (roadModel.getSpecial().isPresent()) {
                 if (roadModel.getSpecial().get().equals("busstop")) {
@@ -599,34 +642,21 @@ public class Game {
         return this.music.get(1);
     }
 
-    public void handleUpdate() {
-        for (Factory factory : factories) {
-            factory.produce();
+    public void handleUpdate(int tick) {
+        if (!factoriesOnMap.isEmpty()) {
+            for (Factory factory : factoriesOnMap) {
+                factory.produce();
+            }
         }
-    }
-}
-class PrioPair implements Comparable<PrioPair>{
-    final Station station;
-    final Integer distance;
+        for (TrafficRoute trafficRoute : transportNetwork.getTrafficRoutes().keySet()){
+            manageVehicles(trafficRoute);
+        }
+        if (!vehiclesOnMap.isEmpty()) {
+            for (Vehicle v : vehiclesOnMap) {
+                drive(v, tick);
 
-    public PrioPair(Station station, Integer distance){
-        this.station = station;
-        this.distance = distance;
-    }
-    @Override
-    public int compareTo(PrioPair other) {
-        return (this.distance - other.distance);
-    }
-
-    public Station getStation() {
-        return station;
-    }
-
-    public Integer getDistance() {
-        return distance;
-    }
-
-    boolean containsStation(Station s){
-        return this.getStation().equals(s);
+            }
+        }
+        System.out.println("läuft");
     }
 }
