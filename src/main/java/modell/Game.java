@@ -604,12 +604,16 @@ public class Game {
         return this.music.get(1);
     }
 
-    public void handleUpdate() {
+    public void handleUpdate(int tick) {
         for (Factory factory : factories) {
             factory.produce();
         }
         for (TrafficRoute trafficRoute : transportNetwork.getTrafficRoutes().keySet()){
-            manageVehicles(trafficRoute);;
+            manageVehicles(trafficRoute);
+        }
+        for (Vehicle v : vehicles){
+            drive(v,tick);
+            System.out.println("läuft");
         }
     }
 }

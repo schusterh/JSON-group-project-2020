@@ -351,10 +351,12 @@ public class TransportNetwork {
         return Math.abs(p1.getX() - p2.getX()) <= diff && Math.abs(p1.getY() - p2.getY()) <= diff;
     }
 
-    @Override
+    /*@Override
     public int hashCode() {
         return Objects.hash(points);
     }
+
+     */
 
     public Station getNearStations(Factory f) {
         return nearStations.get(f);

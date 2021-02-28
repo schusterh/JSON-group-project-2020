@@ -43,7 +43,7 @@ public class GameController {
 
         this.timelineTask = event -> {
             this.currentTick++;
-            model.handleUpdate();
+            model.handleUpdate(currentTick);
             System.out.println("UPDATING EVERYTHING!");
         };
 
