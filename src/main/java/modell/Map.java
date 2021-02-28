@@ -92,9 +92,8 @@ public class Map {
     public void plainGround(int startX, int startY, int width, int depth, int height, boolean isConcrete) {
         for (int x = startX; x < (startX + width); x++) {
             for (int y = startY; y < (startY + depth); y++) {
-                if (isConcrete) this.landscapeMap[x][y].tileIndex = 4;
+                //if (isConcrete) this.landscapeMap[x][y].tileIndex = 4;
                 this.landscapeMap[x][y].height = height;
-
             }
         }
     }
