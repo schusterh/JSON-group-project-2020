@@ -52,7 +52,7 @@ GameView {
     TileRenderer renderer;
 
     /**
-     * The Top bar.
+     * The Top bar. Enthält MenuLeiste und Baumenüs
      */
     VBox topBar;
     /**
@@ -101,7 +101,7 @@ GameView {
     }
 
     /**
-     * Display game screen.
+     * Display game screen. Anzeige des Spieles, Menüleiste und Baumenüs
      */
     public void displayGameScreen() {
 
@@ -138,9 +138,6 @@ GameView {
         speedItem1.setOnAction(event -> controller.setTickLenght(1));
         MenuItem speedItem2 = new MenuItem("2x");
         speedItem2.setOnAction(event -> controller.setTickLenght(0.5));
-
-
-
 
 
         //Musik Lautstärke
@@ -325,7 +322,7 @@ GameView {
             topBar.getChildren().add(borderPane);
         });
 
-//Baumenü Rail
+        //Baumenü Rail
         for (Railway railway : this.model.getRailways()) {
 
             if (railway.getBuildmenu().isPresent() && railway.getBuildmenu().get().equals("rail")) {
@@ -343,7 +340,6 @@ GameView {
                 hboxRailway.getChildren().add(bRailway);
             }
         }
-
 
         gleiseItem.setOnAction(event -> {
             topBar.getChildren().remove(borderPane);
