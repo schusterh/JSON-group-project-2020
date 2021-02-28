@@ -370,8 +370,12 @@ public class Game {
             }
             Random rand = new Random();
             for (int i = 0; i < Math.abs(diff);i++){
-                route.addVehicle(possVehicles.get(rand.nextInt(possVehicles.size())));
-                vehiclesOnMap.add(possVehicles.get(rand.nextInt(possVehicles.size())));
+                Vehicle vehicle = possVehicles.get(rand.nextInt(possVehicles.size()));
+                route.addVehicle(vehicle);
+                vehiclesOnMap.add(vehicle);
+                vehicle.setCurrentPoint(transportNetwork.getStationPoints().get(route.getStations().get(0)).get(0));
+
+
             }
         }
         for (Vehicle v : route.getVehicles()){
