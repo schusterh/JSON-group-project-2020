@@ -11,7 +11,7 @@ public class Vehicle {
     private String graphic;
     private Optional<ArrayList<HashMap<String,Integer>>> cargo;
     private double speed;
-    private ArrayList<GoodsBundle> currentCargo;
+    private ArrayList<GoodsBundle> currentCargo = new ArrayList<>();
     private Station currentStation;
     private Station nextStation;
     private ArrayList<Point> path;
