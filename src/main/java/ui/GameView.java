@@ -22,29 +22,74 @@ import ui.tiles.TileRenderer;
 import java.util.ArrayList;
 
 
-
+/**
+ * The type Game view.
+ */
 public class
 GameView {
 
+    /**
+     * The Stage.
+     */
     Stage stage;
 
+    /**
+     * The Model.
+     */
     Game model;
+    /**
+     * The Controller.
+     */
     GameController controller;
 
+    /**
+     * The Game loop.
+     */
     GameLoop gameLoop;
+    /**
+     * The Renderer.
+     */
     TileRenderer renderer;
 
+    /**
+     * The Top bar.
+     */
     VBox topBar;
+    /**
+     * The Landscape layer.
+     */
     LandscapeLayer landscapeLayer;
+    /**
+     * The Building layer.
+     */
     BuildingLayer buildingLayer;
 
+    /**
+     * The Canvas.
+     */
     Canvas canvas;
+    /**
+     * The Music.
+     */
     MusicPlayer music;
 
 
+    /**
+     * The Tile dimension.
+     */
     final int TILE_DIMENSION = 138;
+    /**
+     * The Tile height offset.
+     */
     final int TILE_HEIGHT_OFFSET = 26;
 
+    /**
+     * Instantiates a new Game view.
+     *
+     * @param model      the model
+     * @param controller the controller
+     * @param stage      the stage
+     */
     public GameView(Game model, GameController controller, Stage stage) {
        this.model = model;
        this.controller = controller;
@@ -55,12 +100,15 @@ GameView {
        this.renderer = new TileRenderer();
     }
 
+    /**
+     * Display game screen.
+     */
     public void displayGameScreen() {
 
         //Creat MenuBar
         MenuBar menuBar = new MenuBar();
 
-        //Creat Menus
+        //Creat Menus for MenuBar
         Menu homeMenu = new Menu("Home");
         Menu bauenMenu = new Menu("Building");
         Menu lebenMenu = new Menu("Live");
@@ -69,7 +117,7 @@ GameView {
         Menu volumeMenu = new Menu("Music");
         Menu exitMenu = new Menu("Exit");
 
-        //Creat MenuItems
+        //Creat MenuItems (Unterpunkte der Menüpunkte)
         MenuItem straßenItem = new MenuItem("Roads");
         MenuItem gleiseItem = new MenuItem("Rails");
         MenuItem airportItem = new MenuItem("Airport");
@@ -107,10 +155,11 @@ GameView {
 
         landscapeItem.setOnAction(event -> controller.setGameMode(GameMode.TERRAIN));
 
-        // When user click on the Exit item.
+        // Close Game with Exit
         exitItem.setOnAction(event -> System.exit(0));
 
         BorderPane menuLeiste = new BorderPane();
+
         // Add menuItems to the Menus
         bauenMenu.getItems().addAll(straßenItem, gleiseItem, airportItem, bäumeItem);
         homeMenu.getItems().addAll(speichernItem, exitItem);
@@ -124,23 +173,26 @@ GameView {
 
 
         Button closeButton = new Button("Close");
-        //Label messageLabel = new Label("Pflanze neue Bäume:");
 
-        //HBox hbox = new HBox();
+        //Verschiedene HBoxen für die Unterschiedlichen Baumenüs (Natur, Road, Rail und Airport)
         HBox hboxNatur = new HBox();
         HBox hboxRoad = new HBox();
-        //HBox hboxBuildings = new HBox();
         HBox hboxRailway = new HBox();
         HBox hboxAirport = new HBox();
 
         BorderPane borderPane = new BorderPane();
         borderPane.setStyle("-fx-background-color: #FFFFFF;");
 
-
         borderPane.setBottom(closeButton);
-        //borderPane.setCenter(hbox);
-        //borderPane.setTop(messageLabel);
-        //borderPane.setPrefSize(1024,150);
+
+        //Schließen der Baumenüs
+        closeButton.setOnAction(event -> {
+            topBar.getChildren().remove(borderPane);
+            borderPane.getChildren().removeAll();
+            hboxNatur.getChildren().removeAll();
+        });
+
+
 
         this.landscapeLayer = new LandscapeLayer(this.model, this.controller, this.TILE_DIMENSION, this.TILE_HEIGHT_OFFSET);
         this.buildingLayer = new BuildingLayer(this.model, this.controller, this.TILE_DIMENSION, this.TILE_HEIGHT_OFFSET);
@@ -151,56 +203,50 @@ GameView {
 
         StackPane root = new StackPane();
 
-        //this.topBar = new HBox();
         this.topBar = new VBox();
         this.topBar.setPickOnBounds(false);
         this.canvas = new Canvas(1024, 768);
         this.canvas.widthProperty().bind(this.stage.widthProperty());
         this.canvas.heightProperty().bind(this.stage.heightProperty());
 
-        // Wenn im bäumeBaumenü auf schließen gecklickt wird.
-        closeButton.setOnAction(event -> {
-            topBar.getChildren().remove(borderPane);
-            borderPane.getChildren().removeAll();
-            hboxNatur.getChildren().removeAll();
-        });
-
-
 
         root.getChildren().add(this.canvas);
         this.topBar.getChildren().add(menuLeiste);
         root.getChildren().add(this.topBar);
 
-
+//Baumenü Natur
+        //Schleife durch alle NaturObjects aus dem JSON
         for (NatureObject nature : this.model.getNatureObjects()) {
 
+            //Überprüfung ob NaturObjekt ein Baumenu besitzt und dieses zu natur gehört
             if (nature.getBuildmenu().isPresent() && nature.getBuildmenu().get().equals("nature")) {
                 Button bNatur = new Button();
-
-
-                //ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/buildings/" + nature.getName() + ".png")));
-
+                //Wenn keine Grafik für das NaturObjekt vorhanden ist soll eine einheitliche Baum-Grafik verwendet werden (error-Grafik)
                 StandardImage std_nature = new StandardImage("/buildings/tree.png");
+                //Grafik wird anhand des NaturObjekt name gesucht
                 ImageView imageView = new ImageView(std_nature.setImage("/buildings/" + nature.getName() + ".png"));
                 imageView.setPreserveRatio(true);
+                //Da die Grafiken zu groß für das Baumenü sind werden sie kleiner Skaliert
                 imageView.setFitHeight(100);
-
+        //NaturObjekt Grafik wird dem Butten hinzugefügt
                 bNatur.setGraphic(imageView);
-
+//Jeder Button bekommt einen ActionHandler, womit man das entsprechende NaturObjekt auf der Map plazieren kann
                 bNatur.setOnAction(event -> {
                     buildingLayer.placeBuilding(nature);
                 });
+                //Button wird der entprechenden HBox hinzugefügt, damit es auch im Baumenü angezeigt wird
                 hboxNatur.getChildren().add(bNatur);
             }
         }
 
+        //ActionHandler auf BäumeItem in der Menüleiste, welche das Baumeü Natur anzeigt
         bäumeItem.setOnAction(event -> {
             topBar.getChildren().remove(borderPane);
             borderPane.setCenter(hboxNatur);
             topBar.getChildren().add(borderPane);
         });
 
-
+//Baumenü Road
         for (Road road : this.model.getRoads()) {
             if (this.model.getRoads().indexOf(road) == 8) {
                 controller.addBuildingToMap(road, 1, 1, this.model.getMap().getTile(1, 1).height);
@@ -228,7 +274,7 @@ GameView {
             topBar.getChildren().add(borderPane);
         });
 
-
+//Baumenü Rail
         for (Railway railway : this.model.getRailways()) {
 
             if (railway.getBuildmenu().isPresent() && railway.getBuildmenu().get().equals("rail")) {
@@ -306,39 +352,6 @@ GameView {
         });
 
 
-
-
-
-        // When user click on the bäume item.
-        /*bäumeItem.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                for (Button b : buttonBaum){
-                    Button bBaum = new Button();
-                    Image imageBaum = new Image(getClass().getResourceAsStream(b.getText()));
-                    bBaum.setGraphic(new ImageView(imageBaum));
-                    hbox.getChildren().add(bBaum);
-                    System.out.println("BAUM PFLANZEN YO");
-                }
-                topBar.getChildren().add(borderPane);
-            }
-        });*/
-
-        // When user click on the road item.
-       /* straßenItem.setOnAction(event -> {
-                for (Button b : buttonRoad) {
-                    Button bRoad = new Button();
-                    Image imageRoad = new Image(getClass().getResourceAsStream(b.getText()));
-                    bRoad.setGraphic(new ImageView(imageRoad));
-                    hbox.getChildren().add(bRoad);
-                }
-                topBar.getChildren().add(borderPane);
-        });*/
-
-
-
-
         this.gameLoop.initializeGame(this.renderer, this.canvas);
         //this.gameLoop.setInitialOffset((int) (this.canvas.getWidth()) / 2, (this.model.getMap().getWidth() * TILE_DIMENSION) / 4);
         this.gameLoop.setPanStep(26);
@@ -351,11 +364,20 @@ GameView {
     }
 
 
-
+    /**
+     * Gets landscape layer.
+     *
+     * @return the landscape layer
+     */
     public LandscapeLayer getLandscapeLayer() {
         return landscapeLayer;
     }
 
+    /**
+     * Gets building layer.
+     *
+     * @return the building layer
+     */
     public BuildingLayer getBuildingLayer() {
         return buildingLayer;
     }
