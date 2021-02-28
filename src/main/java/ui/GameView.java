@@ -250,7 +250,7 @@ GameView {
         languageMenu.getItems().addAll(changeLang);
 
         // Add Menus to the MenuBar
-        menuBar.getMenus().addAll(homeMenu, bauenMenu, landscapeMenu,speedMenu,volumeMenu);
+        menuBar.getMenus().addAll(homeMenu, bauenMenu, landscapeMenu,speedMenu,languageMenu, volumeMenu);
         menuLeiste.setTop(menuBar);
 
 

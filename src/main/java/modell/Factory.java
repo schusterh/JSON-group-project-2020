@@ -48,6 +48,7 @@ public class Factory extends Building{
      * Produce.
      */
     public void produce(Station near){
+        if (near != null) System.out.println("Near station: " + near);
         // Einmal durch alle Produktionen durchiterieren
         for (Production production : productions) {
             //Wir betrachten nun eine Production. Zuerst müssen wir überprüfen, ob wir genug im storage haben,
@@ -59,11 +60,14 @@ public class Factory extends Building{
                 .map(this::consume)
                 .orElseGet(() -> { return true; });
 
-
             if (requirementsChecked) {
                 production.produce.ifPresent(products -> {
                     for (Map.Entry<String, Integer> product : products.entrySet()) {
-                        //near.addGoods(new GoodsBundle(product.getKey(), product.getValue(),null));
+                        if (near != null) {
+                            System.out.println("Prodution added to Station!");
+                            near.addGoods(new GoodsBundle(product.getKey(), product.getValue(),null));
+                        }
+                        this.prodMessage = "Production running!";
                     }
                 });
             }
@@ -88,6 +92,7 @@ public class Factory extends Building{
         if (!currentStorage.isEmpty()) {
             for (Map.Entry<String, Integer> requirement : consumeRequirements.entrySet()) {
                 if (!currentStorage.containsKey(requirement.getKey()) || currentStorage.get(requirement.getKey()) < requirement.getValue()) {
+                    System.out.println("Factory " + name + " missing " + requirement.getKey());
                     requirementsChecked = false;
                 }
             }

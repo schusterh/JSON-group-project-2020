@@ -1,5 +1,7 @@
 package modell;
 
+import types.Point;
+
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -47,30 +49,10 @@ class Station extends Building{
     }
 }
 
-/**
- * Gebäude auf dem Netzwerk erzeugen Punkte.
- */
-class Point {
-    Double x;
-    Double y;
-    Point (Double x, Double y){
-        this.x = x;
-        this.y = y;
-    }
-
-    public Double getX() {
-        return x;
-    }
-
-    public Double getY() {
-        return y;
-    }
-}
-
-/**
- * Routen verbinden mehrere Stationen miteinander, beginnen und enden an Stationen und haben
- * festgelegte Verkehrsmittel. Sie müssen nicht zwangsweise Fabriken verbinden.
- * Wenn die Anzahl oder der Typ von Fahrzeugen nicht stimmt, werden diese gelöscht.
+/*
+Routen verbinden mehrere Stationen miteinander, beginnen und enden an Stationen und haben
+festgelegte Verkehrsmittel. Sie müssen nicht zwangsweise Fabriken verbinden.
+Wenn die Anzahl oder der Typ von Fahrzeugen nicht stimmt, werden diese gelöscht.
  */
 class TrafficRoute {
     private ArrayList<Station> stations;
@@ -163,6 +145,7 @@ class TrafficRoute {
      * @param station:
      */
     public void addStation(Station station){
+
         this.stations.add(station);
     }
 
@@ -200,6 +183,7 @@ class RailSection {
     public ArrayList<Point> getBetween() {
         return between;
     }
+    
 
     public String getSignal1() {
         return signal1;
@@ -237,6 +221,10 @@ public class TransportNetwork {
         this.railSections = new HashMap<>();
         this.vehicles = new ArrayList<>();
         this.reservations = new HashMap<>();
+    }
+
+    public ArrayList<Vehicle> getVehicles() {
+        return vehicles;
     }
 
     /**
@@ -407,12 +395,13 @@ public class TransportNetwork {
         stations.put(s,new ArrayList<Point>());
         stations.get(s).add(new Point(x,y));
 
-
         for (TrafficRoute route : trafficRoutes.keySet()){
             for (Point point : route.getPoints()){
                 if (Math.abs(point.getX()-x) <= 1.5 && (Math.abs(point.getY()-y) <= 1.5 )){
+                    System.out.println("found near station");
                     route.addStation(s);
                     System.out.println("New Station added to route");
+                    break;
                 }
             }
         }
@@ -504,6 +493,20 @@ public class TransportNetwork {
         return nearStations.get(f);
     }
 
+    public void setNearStation(Factory f, Station s) {
+        nearStations.put(f, s);
+    }
+
+    public Optional<Station> getStationAtPoint(Point point) {
+        for (Station s : stations.keySet()) {
+            for (Point p : stations.get(s)) {
+                if (Math.abs(p.getX() - point.getX()) <= 1.5 && Math.abs(p.getY() - point.getY()) <= 1.5) {
+                    return Optional.of(s);
+                }
+            }
+        }
+        return Optional.empty();
+    }
     /**
      * @return Graph aus Punkten mit direkten Nachbarn
      */
