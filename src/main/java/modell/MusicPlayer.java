@@ -12,8 +12,6 @@ public  class MusicPlayer {
     public MusicPlayer(String bm_file_path) {
 
         this.bm_file_path = getClass().getResource("/music/" + bm_file_path).toString();
-
-
     }
 
     public void playBackgroundMusic(){
@@ -22,6 +20,10 @@ public  class MusicPlayer {
             mediaPlayer = new MediaPlayer(h);
             mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
             mediaPlayer.play();
+    }
+
+    public void setVolume(double volume) {
+        mediaPlayer.setVolume(volume);
     }
 
 }
