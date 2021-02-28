@@ -291,10 +291,15 @@ public class Game {
         this.sortBuildings();
     }
 
-    public void addBuildingToMap(OnMapBuilding pendingBuilding) {
+    public void addBuildingToMap(OnMapBuilding pendingBuilding, boolean isCombination) {
 
         boolean isConcrete = pendingBuilding.model.getClass() != NatureObject.class && pendingBuilding.model.getClass() != Road.class;
         this.map.plainGround(pendingBuilding.startX, pendingBuilding.startY, pendingBuilding.width, pendingBuilding.depth, pendingBuilding.height, isConcrete);
+
+        if (isCombination) {
+            Optional<OnMapBuilding> underlyingRoad = getBuildingAtTile(pendingBuilding.startX, pendingBuilding.startY);
+            underlyingRoad.ifPresent(buildingsOnMap::remove);
+        }
         this.buildingsOnMap.add(pendingBuilding);
 
         if (pendingBuilding.model.getClass() == Road.class) {
@@ -430,16 +435,6 @@ public class Game {
         return Optional.empty();
     }
 
-    public void possiblyConnectStation(OnMapBuilding newRoad) {
-        if (newRoad.model.getClass() == Road.class) {
-            Road roadModel = (Road) newRoad.model;
-        }
-    }
-
-    public void updateRoadNetwork(OnMapBuilding newRoad) {
-        ArrayList<OnMapBuilding> adjBuildings = this.getAdjBuildings(newRoad);
-    }
-
     public ArrayList<OnMapBuilding> getAdjRoads(OnMapBuilding newRoad) {
         ArrayList<OnMapBuilding> returnList = new ArrayList<>();
 
@@ -509,7 +504,7 @@ public class Game {
                 posY = r.nextInt(this.map.getDepth()-1);
             }
 
-            this.addBuildingToMap(new OnMapBuilding(factory, posX, posY, this.map.getTile(posX, posY).height));
+            this.addBuildingToMap(new OnMapBuilding(factory, posX, posY, this.map.getTile(posX, posY).height), false);
         }
     }
 
@@ -524,7 +519,7 @@ public class Game {
                     posX = r.nextInt(this.map.getWidth() - 1);
                     posY = r.nextInt(this.map.getDepth() - 1);
                 }
-                this.addBuildingToMap(new OnMapBuilding(natob, posX, posY, this.map.getTile(posX, posY).height));
+                this.addBuildingToMap(new OnMapBuilding(natob, posX, posY, this.map.getTile(posX, posY).height), false);
             }
         }
     }
@@ -541,7 +536,7 @@ public class Game {
                     posX = r.nextInt(this.map.getWidth() - 1);
                     posY = r.nextInt(this.map.getDepth() - 1);
                 }
-                this.addBuildingToMap(new OnMapBuilding(natob, posX, posY, this.map.getTile(posX, posY).height));
+                this.addBuildingToMap(new OnMapBuilding(natob, posX, posY, this.map.getTile(posX, posY).height), false);
             }
         }
     }
@@ -559,7 +554,7 @@ public class Game {
                     posX = r.nextInt(this.map.getWidth() - 1);
                     posY = r.nextInt(this.map.getDepth() - 1);
                 }
-                this.addBuildingToMap(new OnMapBuilding(natob, posX, posY, this.map.getTile(posX, posY).height));
+                this.addBuildingToMap(new OnMapBuilding(natob, posX, posY, this.map.getTile(posX, posY).height), false);
             }
         }
     }
@@ -582,7 +577,7 @@ public class Game {
     public boolean isInWater(int x, int y, int width, int depth) {
         int waterCount = 0;
         for (int xPos = x; xPos < x + width; xPos++) {
-            for (int yPos = 0; yPos < y+depth; yPos++) {
+            for (int yPos = y; yPos < y+depth; yPos++) {
                 if (this.map.getTile(xPos, yPos).height == -1) {
                     waterCount++;
                 }

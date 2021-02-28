@@ -61,7 +61,6 @@ public class GameLoop {
         scene.setOnKeyPressed(
                 event -> {
                     String code = event.getCode().toString();
-                    System.out.println(event.getCode().toString());
                     if (!input.contains(code)) {
                         input.add(code);
                     }

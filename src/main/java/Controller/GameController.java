@@ -98,8 +98,12 @@ public class GameController {
     public boolean isBuildingPossible() {
         OnMapBuilding pendingBuilding = this.view.getBuildingLayer().getToBePlacedBuilding();
 
-        if (model.isInWater(pendingBuilding.startX, pendingBuilding.startY, pendingBuilding.width, pendingBuilding.depth)) return false;
-        if (!model.isInMap(pendingBuilding.startX, pendingBuilding.startY, pendingBuilding.width, pendingBuilding.depth)) return false;
+        if (model.isInWater(pendingBuilding.startX, pendingBuilding.startY, pendingBuilding.width, pendingBuilding.depth)) {
+            return false;
+        }
+        if (!model.isInMap(pendingBuilding.startX, pendingBuilding.startY, pendingBuilding.width, pendingBuilding.depth)) {
+            return false;
+        }
 
         if (pendingBuilding.model.getClass() == Road.class) {
             Road pendingRoad = (Road) pendingBuilding.model;
@@ -142,7 +146,8 @@ public class GameController {
     public void placePendingBuilding() {
         if (isBuildingPossible()) {
             OnMapBuilding newBuilding = this.view.getBuildingLayer().getToBePlacedBuilding();
-            this.model.addBuildingToMap(new OnMapBuilding(newBuilding.model, newBuilding.startX, newBuilding.startY, newBuilding.height));
+            boolean isCombination = this.view.getBuildingLayer().isPendingBuildingCombination();
+            this.model.addBuildingToMap(new OnMapBuilding(newBuilding.model, newBuilding.startX, newBuilding.startY, newBuilding.height), isCombination);
             //this.setGameMode(GameMode.NORMAL);
         }
     }
@@ -189,7 +194,6 @@ public class GameController {
                         this.timelineTask));
         this.timeline.setCycleCount(Timeline.INDEFINITE);
         this.startAnimation();
-        System.out.println("GAMESPEEED CHANGEEED!!!!");
 
     }
 }
