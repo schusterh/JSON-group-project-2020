@@ -6,7 +6,10 @@ import java.util.Map;
 import java.util.Optional;
 
 
-
+/**
+ * This class represents factories. A factory is not a part of any buildmenu.
+ * Every factory type gets built once onto the map at the start of the game.
+ */
 public class Factory extends Building{
 
     private String name;
@@ -18,6 +21,17 @@ public class Factory extends Building{
     private String prodMessage;
 
 
+    /**
+     * Instantiates a new Factory.
+     *
+     * @param name        the name
+     * @param width       the width
+     * @param depth       the depth
+     * @param special     the special
+     * @param productions the productions
+     * @param storage     the storage
+     * @param dz          the dz
+     */
     public Factory(String name, int width, int depth, String special, ArrayList<Production> productions, Optional<HashMap<String, Integer>> storage, int dz) {
         super(width,depth, name);
         this.name = name;
@@ -30,6 +44,9 @@ public class Factory extends Building{
 
     public String getName() { return name; }
 
+    /**
+     * Produce.
+     */
     public void produce(){
         // Einmal durch alle Produktionen durchiterieren
         for (Production production : productions) {
@@ -56,6 +73,12 @@ public class Factory extends Building{
         // kind steht. schauen ob der key (kind) vorhanden ist, wenn nicht, hinzufügen + amount hinzufügen, ansonsten amount erhöhen
     }
 
+    /**
+     * Consume boolean.
+     *
+     * @param consumeRequirements the consume requirements
+     * @return the boolean
+     */
     public boolean consume(HashMap<String, Integer> consumeRequirements){
         //storage: amount der bei productions consume steht abziehen , falls vorhanden
         // wenn storage einen key hat, der übereinstimmt und der value zu einem key größer oder gleich
@@ -80,18 +103,38 @@ public class Factory extends Building{
         return requirementsChecked;
     }
 
+    /**
+     * Gets storage.
+     *
+     * @return the storage
+     */
     public HashMap<String, Integer> getStorage() {
         return storage;
     }
 
+    /**
+     * Gets current storage.
+     *
+     * @return the current storage
+     */
     public HashMap<String, Integer> getCurrentStorage() {
         return currentStorage;
     }
 
+    /**
+     * Gets productions.
+     *
+     * @return the productions
+     */
     public ArrayList<Production> getProductions() {
         return productions;
     }
 
+    /**
+     * Gets prod message.
+     *
+     * @return the prod message
+     */
     public String getProdMessage() {
         return prodMessage;
     }

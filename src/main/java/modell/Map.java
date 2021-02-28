@@ -8,6 +8,9 @@ import ui.tiles.LandscapeLayer;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * This class represents the map of the game.
+ */
 public class Map {
 
     private String mapgen;
@@ -16,6 +19,14 @@ public class Map {
     private int depth;
     private Tile[][] landscapeMap;
 
+    /**
+     * Instantiates a new Map.
+     *
+     * @param mapgen   the mapgen
+     * @param gamemode the gamemode
+     * @param width    the width
+     * @param depth    the depth
+     */
     public Map(String mapgen, String gamemode, int width, int depth) {
         this.mapgen = mapgen;
         this.gamemode = gamemode;
@@ -34,28 +45,58 @@ public class Map {
 
     }
 
+    /**
+     * Gets depth.
+     *
+     * @return the depth
+     */
     public int getDepth() {
         return depth;
     }
 
+    /**
+     * Gets width.
+     *
+     * @return the width
+     */
     public int getWidth() {
         return width;
     }
 
+    /**
+     * Gets gamemode.
+     *
+     * @return the gamemode
+     */
     public String getGamemode() {
         return gamemode;
     }
 
+    /**
+     * Gets mapgen.
+     *
+     * @return the mapgen
+     */
     public String getMapgen() {
         return mapgen;
     }
 
+    /**
+     * Increase height of selected tiles.
+     *
+     * @param selectedTiles the selected tiles
+     */
     public void increaseHeightOfSelectedTiles(List<Coordinate> selectedTiles) {
         for (Coordinate tileCoord : selectedTiles) {
             this.changeRelativeHeightOfTile(tileCoord.x, tileCoord.y, 1);
         }
     }
 
+    /**
+     * Decrease height of selected tiles.
+     *
+     * @param selectedTiles the selected tiles
+     */
     public void decreaseHeightOfSelectedTiles(List<Coordinate> selectedTiles) {
         for (Coordinate tileCoord : selectedTiles) {
             this.changeRelativeHeightOfTile(tileCoord.x, tileCoord.y, -1);
@@ -89,6 +130,16 @@ public class Map {
         }
     }
 
+    /**
+     * Plain ground.
+     *
+     * @param startX     the start x
+     * @param startY     the start y
+     * @param width      the width
+     * @param depth      the depth
+     * @param height     the height
+     * @param isConcrete the is concrete
+     */
     public void plainGround(int startX, int startY, int width, int depth, int height, boolean isConcrete) {
         for (int x = startX; x < (startX + width); x++) {
             for (int y = startY; y < (startY + depth); y++) {
@@ -98,9 +149,21 @@ public class Map {
         }
     }
 
+    /**
+     * Gets tile.
+     *
+     * @param x the x
+     * @param y the y
+     * @return the tile
+     */
     public Tile getTile(int x, int y) {
         return landscapeMap[x][y];
     }
 
+    /**
+     * Get tile map tile [ ] [ ].
+     *
+     * @return the tile [ ] [ ]
+     */
     public Tile[][] getTileMap() { return landscapeMap; }
 }

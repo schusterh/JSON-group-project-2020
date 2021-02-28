@@ -8,12 +8,11 @@ import java.nio.file.Paths;
 import java.util.*;
 import org.json.*;
 
-import javax.swing.*;
 
 /**
  * The JSON Importer is used to choose a scenario specified as a JSON-file. All information that is necessary for the game to run,
  * must be specified in the file. The JSON Imported reads the file and checks if all obligatory data is present and if that data is in a
- * correct format. If this is not the case, then the JSON-Importer gives back an error message wich includes the problem.
+ * correct format. If this is not the case, then the JSON-Importer gives back an error message which includes the problem.
  */
 public class JSONImporter {
 
@@ -66,23 +65,29 @@ public class JSONImporter {
 
             JSONObject js_vehicles = json.getJSONObject("vehicles");
             ArrayList<Vehicle> vehicles = getVehicles(js_vehicles);
-            System.out.println(vehicles);
+
 
             JSONObject js_buildings = json.getJSONObject("buildings");
             ArrayList<Road> roads = getRoads(js_buildings);
 
+
             ArrayList<Railway> railways = getRailways(js_buildings);
             ArrayList<Factory> factories = getFactories(js_buildings);
+
 
             JSONArray js_commodities = json.getJSONArray("commodities");
             ArrayList<String> commodities = getCommodities(js_commodities);
 
+
             JSONObject js_map = json.getJSONObject("map");
             Map map = getMap(js_map);
 
+
             ArrayList<NatureObject> nature_objects = getNatureObjects(js_buildings);
 
+
             ArrayList<Tower> towers = getTowers(js_buildings);
+
 
             ArrayList<AirportObject> airport_objects = getAirportObjects(js_buildings);
 
@@ -151,6 +156,9 @@ public class JSONImporter {
                 catch (Exception error3) {
                     throw new Exception("Speed in a vehicle is not in a correct format!");
                 }
+                if (speed <= 0) {
+                    throw new Exception("Speed of a vehicle must be a positive number!");
+                }
 
                 ArrayList<HashMap<String, Integer>> cargo = null;
                 if (vehicle.has("cargo")) {
@@ -211,6 +219,10 @@ public class JSONImporter {
                     }
                     catch (Exception error1) {
                         throw new Exception("Width and/or depth attributes in a road are not in a correct format!");
+                    }
+
+                    if (width <= 0 || depth <= 0) {
+                        throw new Exception("Width and depth of a road must be positive numbers!");
                     }
 
 
@@ -334,6 +346,9 @@ public class JSONImporter {
                     catch (Exception error2) {
                         throw new Exception("Depth in a rail is not in a correct format!");
                     }
+                }
+                if (width < 0 || depth < 0) {
+                    throw new Exception("Width and depth of a railway can't be negative!");
                 }
 
                 HashMap<String, ArrayList<Double>> points = null;
@@ -478,6 +493,12 @@ public class JSONImporter {
                     catch (Exception error2) {
                         throw new Exception("Depth of a factory not in a correct format!");
                     }
+
+                    if (width <= 0 || depth <= 0) {
+                        throw new Exception("Width and depth of a factory must be positive numbers!");
+                    }
+
+
 
                     String special;
                     try {
@@ -629,6 +650,11 @@ public class JSONImporter {
                 throw new Exception("Depth of the map not in a supported format!");
             }
 
+            if(width < 100 || depth < 100) {
+                throw new Exception("Width and depth of the map must at least be 100!");
+            }
+
+
             Map m = new Map(mapgen, gamemode, width, depth);
             return m;
         }
@@ -670,6 +696,10 @@ public class JSONImporter {
                     throw new Exception("Depth of a nature object not in a correct format!");
                 }
 
+                if (width <= 0 || depth <= 0) {
+                    throw new Exception("Width and depth of a nature object must be positive numbers!");
+                }
+
                 String buildmenu = null;
                 if (natob.has("buildmenu")) {
                     try {
@@ -706,11 +736,11 @@ public class JSONImporter {
     }
 
     /**
-     * Gets towers.
+     * Gets an arraylist of all the tower objects specified in the json file.
      *
-     * @param towers the towers
-     * @return the towers
-     * @throws Exception the exception
+     * @param towers a json object of all elements in "buildings" of the json file.
+     * @return the arraylist of all objects which can be identified as tower objects
+     * @throws Exception with a specified error message depending on what the error is.
      */
     public ArrayList<Tower> getTowers(JSONObject towers) throws Exception{
         String ERROR_MESSAGE = "Error! The tower is not in a supported format!";
@@ -723,12 +753,56 @@ public class JSONImporter {
                 }
                 else{
                     String name = key;
-                    int width = tower.getInt("width");
-                    int depth = tower.getInt("depth");
-                    String buildmenu = tower.getString("buildmenu");
-                    String special = tower.getString("special");
-                    int maxplanes = tower.getInt("maxplanes");
-                    int dz = tower.getInt("dz");
+                    int width;
+                    int depth;
+
+                    try {
+                         width = tower.getInt("width");
+                         depth = tower.getInt("depth");
+                    }
+                    catch (Exception error1) {
+                        throw new Exception("Width and/or depth of a tower are not in a correct format!");
+                    }
+                    if(width <= 0 || depth <= 0) {
+                        throw new Exception("Width and depth of a tower must be positive numbers!");
+                    }
+
+
+                    String buildmenu;
+                    try {
+                      buildmenu  = tower.getString("buildmenu");
+                    }
+                    catch (Exception error2) {
+                        throw new Exception("Buildmenu of a tower is not in a correct format!");
+                    }
+
+                    String special;
+                    try {
+                        special = tower.getString("special");
+                    }
+                    catch (Exception error3) {
+                        throw new Exception("Special of a tower is not in a correct format!");
+                    }
+
+                    int maxplanes;
+                    try {
+                        maxplanes = tower.getInt("maxplanes");
+                    }
+                    catch (Exception error4) {
+                        throw new Exception("Maxplanes of a tower are not in a correct format!");
+                    }
+                    if(maxplanes <= 0) {
+                        throw new Exception("Maxplanes of a tower must be a positive number!");
+                    }
+
+                    int dz;
+                    try {
+                        dz = tower.getInt("dz");
+                    }
+                    catch (Exception error5) {
+                        throw new Exception("Dz of a tower is not in a correct format!");
+                    }
+
                     Tower new_tower = new Tower(width, depth, name, buildmenu, special, maxplanes, dz);
                     t.add(new_tower);
                 }
@@ -738,11 +812,11 @@ public class JSONImporter {
     }
 
     /**
-     * Gets airport objects.
+     * Gets an arraylist of all the nature objects specified in the json file.
      *
-     * @param airobjs the airobjs
-     * @return the airport objects
-     * @throws Exception the exception
+     * @param airobjs a json object of all elements in "buildings" of the json file.
+     * @return the arraylist of all objects which can be identified as airport objects
+     * @throws Exception with a specified error message depending on what the error is.
      */
     public ArrayList<AirportObject> getAirportObjects(JSONObject airobjs) throws Exception{
         String ERROR_MESSAGE = "Error! The airport object is not in a supported format!";
@@ -771,6 +845,10 @@ public class JSONImporter {
                     }
                     catch (Exception error2) {
                         throw new Exception("Depth of a airport object not in a correct format!");
+                    }
+
+                    if(width <= 0 || depth <=0) {
+                        throw new Exception("Width and depth of an airport object must be positive numbers!");
                     }
 
                     HashMap<String, ArrayList<Double>> points;
@@ -857,11 +935,11 @@ public class JSONImporter {
     }
 
     /**
-     * Gets music.
+     * Gets an arraylist of all the music if its specified in the json file.
      *
-     * @param music the music
-     * @return the music
-     * @throws Exception the exception
+     * @param music a json object with the key "music" in the the json file.
+     * @return the arraylist of all objects which can be identified as nature objects
+     * @throws Exception with a specified error message depending on what the error is.
      */
     public ArrayList<String> getMusic(JSONObject music) throws Exception{
         ArrayList<String> m = new ArrayList<>(1);
