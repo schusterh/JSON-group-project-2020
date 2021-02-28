@@ -230,37 +230,6 @@ GameView {
             }
         });
 
-
-        // Set Accelerator for Exit MenuItem.
-        exitItem.setAccelerator(KeyCombination.keyCombination("Ctrl+E"));
-
-        landscapeItem.setOnAction(event -> controller.setGameMode(GameMode.TERRAIN));
-        demolitionItem.setOnAction(event -> controller.setGameMode(GameMode.DEMOLITION));
-
-        // Close Game with Exit
-        exitItem.setOnAction(event -> System.exit(0));
-        // Add menuItems to the Menus
-        bauenMenu.getItems().addAll(straßenItem, gleiseItem, airportItem, bäumeItem);
-        homeMenu.getItems().addAll(exitItem);
-        landscapeMenu.getItems().addAll(landscapeItem, demolitionItem);
-        speedMenu.getItems().addAll(speedItem0, speedItem1, speedItem2);
-        volumeMenu.getItems().addAll(fullVolumeItem, halfVolumeItem, muteVolumeItem);
-        languageMenu.getItems().addAll(changeLang);
-
-        // Add Menus to the MenuBar
-        menuBar.getMenus().addAll(homeMenu, bauenMenu, landscapeMenu,speedMenu,languageMenu, volumeMenu);
-        menuLeiste.setTop(menuBar);
-
-
-
-        borderPane.setStyle("-fx-background-color: #FFFFFF;");
-
-
-        borderPane.setBottom(closeButton);
-        //borderPane.setCenter(hbox);
-        //borderPane.setTop(messageLabel);
-        //borderPane.setPrefSize(1024,150);
-
         this.landscapeLayer = new LandscapeLayer(this.model, this.controller, this.TILE_DIMENSION, this.TILE_HEIGHT_OFFSET);
         this.buildingLayer = new BuildingLayer(this.model, this.controller, this.TILE_DIMENSION, this.TILE_HEIGHT_OFFSET);
         landscapeLayer.makeInteractable(this.gameLoop);
