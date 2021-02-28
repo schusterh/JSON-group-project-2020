@@ -35,6 +35,10 @@ public class GameLoop {
 
     int selectionRadius = 0;
 
+    /**
+     * Game Loop constructor
+     * @param controller GameController instance
+     */
     public GameLoop(GameController controller) {
         this.controller = controller;
     }
@@ -44,19 +48,36 @@ public class GameLoop {
         this.gc.fillRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
     }
 
+    /**
+     * Sets the initial offset of the map (used for centering the map at startup)
+     * @param offsetX offset X in pixel
+     * @param offsetY offset Y in pixel
+     */
     public void setInitialOffset(int offsetX, int offsetY) {
         this.panX = offsetX;
         this.panY = -offsetY;
     }
 
+    /**
+     *  Sets speed at which panning over the map occurs
+     * @param panStep stepSize in pixels
+     */
     public void setPanStep(int panStep) {
         this.panStep = panStep;
     }
 
+    /**
+     * Returns current mousePosition
+     * @return Array with X position at [0] and Y position at [1]
+     */
     public int[] getMousePosition() {
         return new int[]{this.mouseX, this.mouseY};
     }
 
+    /**
+     * Adds events for keypresses and mouse clicks for further calculation.
+     * @param scene Scene for which events should be catched
+     */
     public void addInputHandler(Scene scene) {
         scene.setOnKeyPressed(
                 event -> {
@@ -85,10 +106,12 @@ public class GameLoop {
         );
     }
 
-    public void initializeGame(Renderer renderer, Canvas canvas) {
-
-    }
-
+    /**
+     * Initializes the game and sets up the 60fps Game loop
+     *
+     * @param renderer Game Renderer instance
+     * @param canvas Canvas on which the game is drawn
+     */
     public void initializeGame(TileRenderer renderer, Canvas canvas) {
         this.renderer = renderer;
         this.canvas = canvas;
@@ -103,22 +126,34 @@ public class GameLoop {
             }
         };
 
+        /*
+         * sets action event for mouse movement
+         */
         this.canvas.setOnMouseMoved(event -> {
             this.mouseX = ((int)event.getX());
             this.mouseY = ((int)event.getY());
         });
     }
 
+    /**
+     * Starts game loop
+     */
     public void startGame() {
         this.timer.start();
     }
 
+    /**
+     * Handles single frame steps
+     */
     public void tick() {
         this.handleUserInput();
         this.prepareCanvas();
         this.renderer.drawFrame(this.gc, this.panX, this.panY);
     }
 
+    /**
+     * Handles keypresses and mouse clicks and forwards them to view or controller
+     */
     public void handleUserInput() {
         if (this.input.contains("W"))
             this.panY += this.panStep;
@@ -174,16 +209,11 @@ public class GameLoop {
             this.controller.decreaseHeightOfSelectedTiles();
             this.input.remove("CLICK_SECONDARY");
         }
-
-
-        /*
-        if (this.mouseX > 0 && this.mouseX < 50) this.panX += 10;
-        else if (this.mouseX > (this.canvas.getWidth() - 50) && this.mouseX < this.canvas.getWidth()) this.panX -= 10;
-        else if (this.mouseY > 0 && this.mouseY < 50) this.panY += 10;
-        else if (this.mouseY > (this.canvas.getHeight() - 50) && this.mouseY < this.canvas.getHeight()) this.panY -= 10;
-         */
     }
 
+    /**
+     * Stops game loop
+     */
     public void stopGame() {
         this.timer.stop();
     }

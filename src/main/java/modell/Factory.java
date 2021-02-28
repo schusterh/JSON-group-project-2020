@@ -63,7 +63,7 @@ public class Factory extends Building{
             if (requirementsChecked) {
                 production.produce.ifPresent(products -> {
                     for (Map.Entry<String, Integer> product : products.entrySet()) {
-                        near.addGoods(new GoodsBundle(product.getKey(), product.getValue(),null));
+                        //near.addGoods(new GoodsBundle(product.getKey(), product.getValue(),null));
                     }
                 });
             }
