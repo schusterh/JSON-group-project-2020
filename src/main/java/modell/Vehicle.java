@@ -1,5 +1,9 @@
 package modell;
 
+import javafx.scene.image.Image;
+import types.Point;
+import ui.StandardImage;
+
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -8,7 +12,7 @@ public class Vehicle {
     // Attribute
     private String name;
     private String kind;
-    private String graphic;
+    private Image graphic;
     private Optional<ArrayList<HashMap<String,Integer>>> cargo;
     private double speed;
     private ArrayList<GoodsBundle> currentCargo = new ArrayList<>();
@@ -25,7 +29,7 @@ public class Vehicle {
 
         this.name = name;
         this.kind = kind;
-        this.graphic = graphic;
+        this.graphic = new Image("/vehicles/dry bulk truck.png");
         this.speed = speed;
         this.cargo = cargo;
         this.possibleWagons = new ArrayList<>();
@@ -38,7 +42,7 @@ public class Vehicle {
         return name;
     }
     public String getKind() { return kind; }
-    public String getGraphic() { return graphic; }
+    public Image getGraphic() { return graphic; }
     public  Optional<ArrayList<HashMap<String,Integer>>> getCargo() { return cargo; }
     public double getSpeed() { return speed; }
 
@@ -69,6 +73,7 @@ public class Vehicle {
         } else {
             this.currentCargo.add(gb);
         }
+
         if (remain.getGoodAmount()==0){
             remain = null;
         }
@@ -76,6 +81,7 @@ public class Vehicle {
     }
 
     public void unloadCargo(GoodsBundle gb){
+        System.out.println("Unloading Cargo");
         currentCargo.remove(gb);
     }
 

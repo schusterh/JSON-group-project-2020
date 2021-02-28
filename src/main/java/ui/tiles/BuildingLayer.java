@@ -10,8 +10,10 @@ import javafx.scene.text.Font;
 import modell.Building;
 import modell.Factory;
 import modell.Game;
+import modell.Vehicle;
 import types.GameMode;
 import types.OnMapBuilding;
+import types.Point;
 import ui.RenderLayer;
 
 import java.util.ArrayList;
@@ -48,6 +50,14 @@ public class BuildingLayer implements RenderLayer {
         double posX = (( building.startX + building.startY) * (double) (tileDimension / 2) + offsetX) * zoomFactor;
         double heightOffset = (-tileDimension) + (double) (tileDimension/4) + building.graphic.getHeight() - (double) (building.width * tileDimension/4);
         double posY = ((building.startX - building.startY) * (double) (tileDimension / 4) - heightOffset - (building.height * this.tileHeightOffset) + offsetY) * zoomFactor;
+
+        return new double[]{posX, posY};
+    }
+
+    public double[] calculateDrawingPosition(Vehicle vehicle, int offsetX, int offsetY, double zoomFactor) {
+        double posX = (( vehicle.getCurrentPoint().getX() + vehicle.getCurrentPoint().getY()) * (double) (tileDimension / 2) + offsetX) * zoomFactor;
+        //double heightOffset = (-tileDimension) + (double) (tileDimension/4) + vehicle.graphic.getHeight() - (double) (building.width * tileDimension/4);
+        double posY = ((vehicle.getCurrentPoint().getX() - vehicle.getCurrentPoint().getY()) * (double) (tileDimension / 4) + offsetY) * zoomFactor;
 
         return new double[]{posX, posY};
     }
@@ -174,6 +184,11 @@ public class BuildingLayer implements RenderLayer {
             }
             gc.setGlobalAlpha(1f);
             gc.setEffect(null);
+        }
+
+        for (Vehicle car : model.getVehiclesOnMap()) {
+            double[] startPos = calculateDrawingPosition(car, offsetX, offsetY, zoomFactor);
+            gc.drawImage(car.getGraphic(), startPos[0], startPos[1], car.getGraphic().getWidth() * zoomFactor, car.getGraphic().getHeight() * zoomFactor);
         }
     }
 
