@@ -48,6 +48,7 @@ public class Factory extends Building{
      * Produce.
      */
     public void produce(Station near){
+        if (near != null) System.out.println("Near station: " + near);
         // Einmal durch alle Produktionen durchiterieren
         for (Production production : productions) {
             //Wir betrachten nun eine Production. Zuerst müssen wir überprüfen, ob wir genug im storage haben,
@@ -62,7 +63,10 @@ public class Factory extends Building{
             if (requirementsChecked) {
                 production.produce.ifPresent(products -> {
                     for (Map.Entry<String, Integer> product : products.entrySet()) {
-                        if (near != null) near.addGoods(new GoodsBundle(product.getKey(), product.getValue(),null));
+                        if (near != null) {
+                            System.out.println("Prodution added to Station!");
+                            near.addGoods(new GoodsBundle(product.getKey(), product.getValue(),null));
+                        }
                         this.prodMessage = "Production running!";
                     }
                 });

@@ -131,10 +131,9 @@ public class BuildingLayer implements RenderLayer {
             gc.setEffect(null);
         }
 
-        for (Vehicle car : model.getTransportNetwork().getVehicles()) {
+        for (Vehicle car : model.getVehiclesOnMap()) {
             double[] startPos = calculateDrawingPosition(car, offsetX, offsetY, zoomFactor);
             gc.drawImage(car.getGraphic(), startPos[0], startPos[1], car.getGraphic().getWidth() * zoomFactor, car.getGraphic().getHeight() * zoomFactor);
-
         }
     }
 

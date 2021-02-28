@@ -395,12 +395,13 @@ public class TransportNetwork {
         stations.put(s,new ArrayList<Point>());
         stations.get(s).add(new Point(x,y));
 
-
         for (TrafficRoute route : trafficRoutes.keySet()){
             for (Point point : route.getPoints()){
-                if (Math.abs(point.getX()-x) <= 3 && (Math.abs(point.getY()-y) <= 3 )){
+                if (Math.abs(point.getX()-x) <= 1.5 && (Math.abs(point.getY()-y) <= 1.5 )){
+                    System.out.println("found near station");
                     route.addStation(s);
                     System.out.println("New Station added to route");
+                    break;
                 }
             }
         }
@@ -492,6 +493,20 @@ public class TransportNetwork {
         return nearStations.get(f);
     }
 
+    public void setNearStation(Factory f, Station s) {
+        nearStations.put(f, s);
+    }
+
+    public Optional<Station> getStationAtPoint(Point point) {
+        for (Station s : stations.keySet()) {
+            for (Point p : stations.get(s)) {
+                if (Math.abs(p.getX() - point.getX()) <= 1.5 && Math.abs(p.getY() - point.getY()) <= 1.5) {
+                    return Optional.of(s);
+                }
+            }
+        }
+        return Optional.empty();
+    }
     /**
      * @return Graph aus Punkten mit direkten Nachbarn
      */

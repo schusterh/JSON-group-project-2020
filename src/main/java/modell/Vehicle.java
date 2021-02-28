@@ -73,6 +73,7 @@ public class Vehicle {
         } else {
             this.currentCargo.add(gb);
         }
+
         if (remain.getGoodAmount()==0){
             remain = null;
         }
@@ -80,6 +81,7 @@ public class Vehicle {
     }
 
     public void unloadCargo(GoodsBundle gb){
+        System.out.println("Unloading Cargo");
         currentCargo.remove(gb);
     }
 

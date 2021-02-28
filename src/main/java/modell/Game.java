@@ -172,19 +172,25 @@ public class Game {
      * @param tick: Tick
      */
     public void drive (Vehicle v, int tick){
+        System.out.println("Path: ");
         if (v.getPath()!=null) {
+            for (Point point : v.getPath()) {
+                System.out.println("Point on Path: [" + point.getX() + ", " + point.getY() + "]");
+            }
             if (transportNetwork.getPointConnections().containsKey(v.getNextPoint())){
                 v.setCurrentPoint(v.getNextPoint());
                 v.setNextPoint(v.getPath().get(0));
                 v.getPath().remove(0);
             } else {
-                findPath(v,tick);
-                drive(v,tick);
+                //findPath(v,tick);
+                //drive(v,tick);
             }
         } else {
             if (!v.getCurrentCargo().isEmpty()) {
-                v.unloadCargo(v.getCurrentCargo().get(0));
-                findPath(v, tick);
+                if (transportNetwork.getStationPoints().get(v.getCurrentCargo().get(0).getTargetStation()).contains(v.getCurrentPoint())) {
+                    v.unloadCargo(v.getCurrentCargo().get(0));
+                    //findPath(v, tick);
+                }
             }
         }
     }
@@ -197,26 +203,34 @@ public class Game {
     public void findTarget(GoodsBundle gb, Station station){
         HashMap<Factory, Double> possibleTargets = new HashMap<>();
         ArrayList<Factory> possTargets = new ArrayList<>();
-        for (Factory g : this.getFactories()) {
+        System.out.println(this.factories.size());
+        for (Factory g : this.factories) {
             g.getProductions().stream().filter(p -> p.getConsume()
                     .isPresent()).filter(p -> p.getConsume().get()
                     .containsKey(gb.getGoodType()))
                     .forEach(p -> possibleTargets.put(g, null));
             Station nearG = transportNetwork.getNearStations(g);
-            double distance = Math.sqrt((transportNetwork.getStationPoints().get(nearG).get(0).getX()
-                    - transportNetwork.getStationPoints().get(station).get(0).getX())
-                    * (transportNetwork.getStationPoints().get(nearG).get(0).getX()
-                    - transportNetwork.getStationPoints().get(station).get(0).getX())
-                    + (transportNetwork.getStationPoints().get(nearG).get(0).getY()
-                    - transportNetwork.getStationPoints().get(station).get(0).getY())
-                    * (transportNetwork.getStationPoints().get(nearG).get(0).getY()
-                    - transportNetwork.getStationPoints().get(station).get(0).getY()
-                    ));
-            double weight = (double) (g.getStorage().get(gb.getGoodType())
-                    - g.getCurrentStorage().get(gb.getGoodType()))
-                    / distance;
-            possibleTargets.put(g, weight);
-            possTargets.add(g);
+            System.out.println("near station of factory " + g.getName() + ": " + nearG);
+            if (nearG != null) {
+                double distance = Math.sqrt((transportNetwork.getStationPoints().get(nearG).get(0).getX()
+                        - transportNetwork.getStationPoints().get(station).get(0).getX())
+                        * (transportNetwork.getStationPoints().get(nearG).get(0).getX()
+                        - transportNetwork.getStationPoints().get(station).get(0).getX())
+                        + (transportNetwork.getStationPoints().get(nearG).get(0).getY()
+                        - transportNetwork.getStationPoints().get(station).get(0).getY())
+                        * (transportNetwork.getStationPoints().get(nearG).get(0).getY()
+                        - transportNetwork.getStationPoints().get(station).get(0).getY()
+                ));
+                System.out.println(gb.getGoodType());
+                if (g.getStorage().get(gb.getGoodType()) != null) {
+                    double weight = (double) (g.getStorage().get(gb.getGoodType()));
+                    weight -= (g.getCurrentStorage().get(gb.getGoodType()) != null ? g.getCurrentStorage().get(gb.getGoodType()) : 0);
+                    weight = weight / distance;
+                    possibleTargets.put(g, weight);
+                    possTargets.add(g);
+                }
+
+            }
         }
         double totalWeight = 0.0d;
         for (Factory factory : possTargets) {
@@ -227,8 +241,11 @@ public class Game {
             r -= possibleTargets.get(possTargets.get(randomIndex));
             if (r <= 0.0) break;
         }
-        Factory targetFactory = possTargets.get(randomIndex);
-        gb.setTargetStation(this.transportNetwork.getNearStations(targetFactory));
+        if (possTargets.size() > 0) {
+            System.out.println("Target station found!");
+            Factory targetFactory = possTargets.get(randomIndex);
+            gb.setTargetStation(this.transportNetwork.getNearStations(targetFactory));
+        }
     }
 
     /**
@@ -520,7 +537,7 @@ public class Game {
             });*/
 
             if (roadModel.getSpecial().isEmpty()) {
-                this.transportNetwork.addTrafficSection((double) pendingBuilding.startX, (double) pendingBuilding.startY, roadModel.getPoints(), roadModel.getRoads(),Road.class);
+                //this.transportNetwork.addTrafficSection((double) pendingBuilding.startX, (double) pendingBuilding.startY, roadModel.getPoints(), roadModel.getRoads(),Road.class);
                 System.out.println("Added road to transport network!");
             } else if (roadModel.getSpecial().isPresent()) {
                 if (roadModel.getSpecial().get().equals("busstop")) {
@@ -531,6 +548,7 @@ public class Game {
                         for (OnMapBuilding adjBuilding : adjBuildings) {
                             if (adjBuilding.model.getClass() == Factory.class) {
                                 newStation.setNearFactory((Factory) adjBuilding.model);
+                                this.transportNetwork.setNearStation((Factory) adjBuilding.model, newStation);
                                 System.out.println("Station " + newStation.getName() + " mit Fabrik " + adjBuilding.model.getName() + " verbunden!");
                                 break;
                             }
@@ -813,6 +831,10 @@ public class Game {
         return this.music.get(1);
     }
 
+    public ArrayList<Vehicle> getVehiclesOnMap() {
+        return this.vehiclesOnMap;
+    }
+
     public void handleUpdate(int tick) {
         for (Factory factory : factories) {
             factory.produce(transportNetwork.getNearStations(factory));
@@ -820,15 +842,37 @@ public class Game {
         for (TrafficRoute trafficRoute : transportNetwork.getTrafficRoutes().keySet()){
             manageVehicles(trafficRoute);
         }
+        System.out.println("Checking vehicles");
         if (!vehiclesOnMap.isEmpty()) {
+            System.out.println("Vehicles not empty");
             for (Vehicle v : vehiclesOnMap) {
-                drive(v, tick);
-
+                for (OnMapBuilding underlyingBuilding : this.buildingsOnMap) {
+                    if (Math.abs(underlyingBuilding.startX - v.getCurrentPoint().getX()) <= 1.5 && Math.abs(underlyingBuilding.startY - v.getCurrentPoint().getY()) <= 1.5) {
+                        if (underlyingBuilding.model.getClass() == Road.class) {
+                            Road underlyingStation = (Road) underlyingBuilding.model;
+                            if (underlyingStation.getSpecial().isPresent() && underlyingStation.getSpecial().get().equals("busstop")) {
+                                Optional<Station> loadingStation = transportNetwork.getStationAtPoint(new Point((double) underlyingBuilding.startX, (double) underlyingBuilding.startY));
+                                loadingStation.ifPresent(station -> {
+                                    if (station.getHoldingArea().size() > 0) {
+                                        //v.loadCargo(station.getHoldingArea().get(0));
+                                        //v.setPath(findPath(v, tick));
+                                        System.out.println("CARGO FUCKING LOADED!");
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+                System.out.println("Vehicle " + v.getKind() + " driving!");
+                System.out.println("Vehicle cargo: " + v.getCurrentCargo());
+                //drive(v, tick);
+                if (v.getNextPoint() != null) System.out.println("Next point: [" + v.getNextPoint().getX() + ", " + v.getNextPoint().getY() + "]");
             }
         }
         for (Station station:transportNetwork.getStationPoints().keySet()) {
             for (GoodsBundle goodsBundle : station.getHoldingArea()){
                 if (goodsBundle.getTargetStation() == null){
+                    System.out.println("Searching for target");
                     findTarget(goodsBundle,station);
                 }
             }
