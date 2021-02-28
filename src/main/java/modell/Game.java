@@ -635,6 +635,16 @@ public class Game {
      * Add factories to map.
      */
     public void addFactoriesToMap() {
+
+        for (Factory factory : this.factories) {
+            if (factory.getName().equals("kieswerk")) {
+                this.addBuildingToMap(new OnMapBuilding(factory, 3, 3, this.map.getTile(3, 3).height), false);
+            } else if (factory.getName().equals("glasfabrik")) {
+                this.addBuildingToMap(new OnMapBuilding(factory, 1, 9, this.map.getTile(1, 9).height), false);
+            }
+        }
+
+        /*
         Random r = new Random();
 
         for (Factory factory : this.factories) {
@@ -647,7 +657,7 @@ public class Game {
             }
 
             this.addBuildingToMap(new OnMapBuilding(factory, posX, posY, this.map.getTile(posX, posY).height), false);
-        }
+        }*/
     }
 
     /**
@@ -805,10 +815,8 @@ public class Game {
     }
 
     public void handleUpdate(int tick) {
-        if (!factoriesOnMap.isEmpty()) {
-            for (Factory factory : factoriesOnMap) {
-                factory.produce(transportNetwork.getNearStations(factory));
-            }
+        for (Factory factory : factories) {
+            factory.produce(transportNetwork.getNearStations(factory));
         }
         for (TrafficRoute trafficRoute : transportNetwork.getTrafficRoutes().keySet()){
             manageVehicles(trafficRoute);
@@ -826,6 +834,6 @@ public class Game {
                 }
             }
         }
-        System.out.println("läuft");
+        //System.out.println("läuft");
     }
 }

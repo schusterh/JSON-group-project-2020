@@ -44,7 +44,6 @@ public class GameController {
         this.timelineTask = event -> {
             this.currentTick++;
             model.handleUpdate(currentTick);
-            System.out.println("UPDATING EVERYTHING!");
         };
 
         this.timeline = new Timeline(
@@ -128,7 +127,6 @@ public class GameController {
                 if (underlyingRoad.model.getClass() == Road.class) {
                     if (roadModel.getCombines().isPresent()) {
                         HashMap<String, String> combines = roadModel.getCombines().get();
-                        System.out.println("Trying to combine " + roadModel.getName() + " and " + underlyingRoad.model.getName());
                         if (combines.containsKey(underlyingRoad.model.getName())) {
                             Road replacementModel = this.model.getRoads().stream().filter(roadFilter -> roadFilter.getName().equals(combines.get(underlyingRoad.model.getName()))).findFirst().orElse(null);
                             if (replacementModel != null) {

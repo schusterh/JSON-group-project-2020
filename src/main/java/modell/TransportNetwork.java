@@ -145,6 +145,7 @@ class TrafficRoute {
      * @param station:
      */
     public void addStation(Station station){
+
         this.stations.add(station);
     }
 
@@ -397,7 +398,7 @@ public class TransportNetwork {
 
         for (TrafficRoute route : trafficRoutes.keySet()){
             for (Point point : route.getPoints()){
-                if (Math.abs(point.getX()-x) <= 1.5 && (Math.abs(point.getY()-y) <= 1.5 )){
+                if (Math.abs(point.getX()-x) <= 3 && (Math.abs(point.getY()-y) <= 3 )){
                     route.addStation(s);
                 }
             }

@@ -59,11 +59,11 @@ public class Factory extends Building{
                 .map(this::consume)
                 .orElseGet(() -> { return true; });
 
-
             if (requirementsChecked) {
                 production.produce.ifPresent(products -> {
                     for (Map.Entry<String, Integer> product : products.entrySet()) {
-                        near.addGoods(new GoodsBundle(product.getKey(), product.getValue(),null));
+                        if (near != null) near.addGoods(new GoodsBundle(product.getKey(), product.getValue(),null));
+                        this.prodMessage = "Production running!";
                     }
                 });
             }
@@ -88,6 +88,7 @@ public class Factory extends Building{
         if (!currentStorage.isEmpty()) {
             for (Map.Entry<String, Integer> requirement : consumeRequirements.entrySet()) {
                 if (!currentStorage.containsKey(requirement.getKey()) || currentStorage.get(requirement.getKey()) < requirement.getValue()) {
+                    System.out.println("Factory " + name + " missing " + requirement.getKey());
                     requirementsChecked = false;
                 }
             }
