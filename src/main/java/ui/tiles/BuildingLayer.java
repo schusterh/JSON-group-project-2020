@@ -29,6 +29,7 @@ public class BuildingLayer implements RenderLayer {
     GameController controller;
 
     OnMapBuilding toBePlacedBuilding;
+    OnMapBuilding toBeRemovedBuilding;
     OnMapBuilding combinationOverlay;
 
     ColorAdjust buildingNotPossibleEffect;
@@ -105,6 +106,9 @@ public class BuildingLayer implements RenderLayer {
         this.isInteractive = value;
     }
 
+    public Optional<OnMapBuilding> getToBeRemovedBuilding() {
+        return Optional.of(this.toBeRemovedBuilding);
+    }
 
     /**
      * Draws a single frame step on the building layer
@@ -122,7 +126,16 @@ public class BuildingLayer implements RenderLayer {
         for (OnMapBuilding building : this.model.getBuildingsOnMap()) {
 
             double[] startPos = calculateDrawingPosition(building, offsetX, offsetY, zoomFactor);
+            if (controller.getGameMode() == GameMode.DEMOLITION) {
+                int[] mousePos = this.model.getCurrentMouseTileIndex();
+                if ((building.startX <= mousePos[0]) && (mousePos[0] <= building.startX + building.width) &&
+                        (building.startY <= mousePos[1]) && (mousePos[1] <= building.startY + building.depth)) {
+                    gc.setEffect(this.buildingNotPossibleEffect);
+                    this.toBeRemovedBuilding = building;
+                }
+            }
             gc.drawImage(building.graphic, startPos[0], startPos[1], building.graphic.getWidth() * zoomFactor, building.graphic.getHeight() * zoomFactor);
+            gc.setEffect(null);
             if (building.model.getClass() == Factory.class) {
                 Factory model = (Factory) building.model;
                 Font temp = gc.getFont();

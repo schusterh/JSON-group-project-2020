@@ -5,10 +5,7 @@ import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.util.Duration;
-import modell.Building;
-import modell.Game;
-import modell.MusicPlayer;
-import modell.Road;
+import modell.*;
 import types.Coordinate;
 import types.GameMode;
 import types.OnMapBuilding;
@@ -219,7 +216,7 @@ public class GameController {
                 this.view.getLandscapeLayer().setInteractive(true);
                 this.view.getBuildingLayer().setInteractive(false);
                 break;
-            case BUILDING:
+            case BUILDING: case DEMOLITION:
                 this.view.getLandscapeLayer().setInteractive(false);
                 this.view.getBuildingLayer().setInteractive(false);
                 break;
@@ -231,6 +228,16 @@ public class GameController {
      */
     public void startAnimation() {
         this.timeline.play();
+    }
+
+    public void removeBuilding() {
+        Optional<OnMapBuilding> toBeRemovedBuilding = this.view.getBuildingLayer().getToBeRemovedBuilding();
+
+        toBeRemovedBuilding.ifPresent(onMapBuilding -> {
+            if (onMapBuilding.model.getClass() != Factory.class) {
+                this.model.getBuildingsOnMap().remove(onMapBuilding);
+            }
+        });
     }
 
     /**

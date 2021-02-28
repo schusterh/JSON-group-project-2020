@@ -190,10 +190,18 @@ public class GameLoop {
             this.input.remove("COMMA");
         }
         if (this.input.contains("CLICK_PRIMARY")) {
-            if (this.controller.getGameMode() == GameMode.TERRAIN) {
-                this.controller.increaseHeightOfSelectedTiles();
-            } else if (this.controller.getGameMode() == GameMode.BUILDING) {
-                this.controller.placePendingBuilding();
+            switch(this.controller.getGameMode()) {
+                case TERRAIN:
+                    this.controller.increaseHeightOfSelectedTiles();
+                    break;
+                case BUILDING:
+                    this.controller.placePendingBuilding();
+                    break;
+                case DEMOLITION:
+                    this.controller.removeBuilding();
+                    break;
+                default:
+                    break;
             }
             this.input.remove("CLICK_PRIMARY");
         }
